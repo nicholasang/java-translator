@@ -13,6 +13,7 @@ Example command to execute translator from Sbt
 
 ```runxtc -printJavaAst src/test/java/inputs/Test000/Test000.java ```
 
+```
 Project Map
 -----------
 
@@ -52,3 +53,4 @@ Project Map
         └── java
             ├── edu (translator unit tests)
             └── inputs (translator test inputs)
+```
