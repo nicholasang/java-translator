@@ -10,6 +10,7 @@ import edu.nyu.oop.util.NodeUtil;
 import edu.nyu.oop.util.XtcProps;
 import org.slf4j.Logger;
 
+import xtc.tree.Location;
 import xtc.tree.GNode;
 import xtc.tree.Node;
 import xtc.util.Tool;
@@ -43,7 +44,8 @@ public class Boot extends Tool {
         runtime.
         bool("printJavaAst", "printJavaAst", false, "Print Java Ast.").
         bool("printJavaCode", "printJavaCode", false, "Print Java code.").
-        bool("printJavaImportCode", "printJavaImportCode", false, "Print Java code for imports and package source.");
+        bool("printJavaImportCode", "printJavaImportCode", false, "Print Java code for imports and package source.").
+        bool("parseJava", "parseJava", false, "Parse source file dependencies.");
     }
 
     @Override
@@ -90,6 +92,24 @@ public class Boot extends Tool {
             }
             runtime.console().flush();
         }
+
+        if (runtime.test("parseJava")) {
+            String workingDir = System.getProperty("user.dir");
+
+            Location nLocation = n.getLocation();
+            Location longLocation = new Location(workingDir + "/" + nLocation.file, nLocation.line, nLocation.column);
+            n.setLocation(longLocation);
+
+            List<GNode> dependencies = GenerateDependencyASTs.beginParse((GNode) n);
+
+            runtime.console().pln();
+            for(Node node : dependencies) {
+                runtime.console().pln(node.getLocation().file);
+            }
+            runtime.console().pln().flush();
+        }
+
+
 
         // if (runtime.test("Your command here.")) { ... don't forget to add it to init()
     }
