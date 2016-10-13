@@ -25,12 +25,10 @@ import java.util.*;
 
 import java.util.HashMap;
 
-public class generateDependencyASTs
-{
-    private generateDependencyASTs(){};
+public class generateDependencyASTs {
+    private generateDependencyASTs() {};
 
-    public static List<GNode> beginParse(GNode n)
-    {
+    public static List<GNode> beginParse(GNode n) {
         HashMap<String, Boolean> fileNamesFound = new HashMap<String, Boolean>();
         List<GNode> dependencyASTs = new ArrayList<GNode>();
         beginParse(n, fileNamesFound, dependencyASTs);
@@ -38,21 +36,18 @@ public class generateDependencyASTs
         return dependencyASTs;
     }
 
-    private static void beginParse(GNode n, HashMap<String, Boolean> fileNamesFound, List<GNode> dependencyASTs)
-    {
+    private static void beginParse(GNode n, HashMap<String, Boolean> fileNamesFound, List<GNode> dependencyASTs) {
 
         //enqueue nodes and find dependencies until no files left to explore
         Queue<GNode> nodesToCheck = new ArrayDeque<GNode>();
         nodesToCheck.add(n);
-        while(!nodesToCheck.isEmpty())
-        {
+        while(!nodesToCheck.isEmpty()) {
 
             GNode next = nodesToCheck.poll();
 
             //test if seen to avoid cyclical dependencies
             String loc = next.getLocation().file;
-            if(fileNamesFound.get(loc))
-            {
+            if(fileNamesFound.get(loc) != null) {
                 continue;
             }
 
