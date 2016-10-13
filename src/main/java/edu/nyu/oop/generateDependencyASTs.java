@@ -41,23 +41,28 @@ public class generateDependencyASTs
     private static void beginParse(GNode n, HashMap<String, Boolean> fileNamesFound, List<GNode> dependencyASTs)
     {
 
-        Queue<GNode> ad = new ArrayDeque<GNode>();
-        ad.add(n);
-        while(!ad.isEmpty())
+        //enqueue nodes and find dependencies until no files left to explore
+        Queue<GNode> nodesToCheck = new ArrayDeque<GNode>();
+        nodesToCheck.add(n);
+        while(!nodesToCheck.isEmpty())
         {
-            GNode underExamination = ad.poll();
 
-            String loc = underExamination.getLocation().file;
+            GNode next = nodesToCheck.poll();
+
+            //test if seen to avoid cyclical dependencies
+            String loc = next.getLocation().file;
             if(fileNamesFound.get(loc))
             {
                 continue;
             }
 
+            //if unseen, mark as seen to avoid cycles,
+            //add to list of dependencies, examine all dependency children
             fileNamesFound.put(loc, true);
 
-            dependencyASTs.add(underExamination);
+            dependencyASTs.add(next);
 
-            ad.addAll(JavaFiveImportParser.parse(underExamination));
+            nodesToCheck.addAll(JavaFiveImportParser.parse(next));
         }
 
     }
