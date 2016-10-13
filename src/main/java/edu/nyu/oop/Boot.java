@@ -43,7 +43,8 @@ public class Boot extends Tool {
         runtime.
         bool("printJavaAst", "printJavaAst", false, "Print Java Ast.").
         bool("printJavaCode", "printJavaCode", false, "Print Java code.").
-        bool("printJavaImportCode", "printJavaImportCode", false, "Print Java code for imports and package source.");
+        bool("printJavaImportCode", "printJavaImportCode", false, "Print Java code for imports and package source.").
+        bool("parseJava", "parseJava", false, "Parse source file dependencies.");
     }
 
     @Override
@@ -90,6 +91,18 @@ public class Boot extends Tool {
             }
             runtime.console().flush();
         }
+
+        if (runtime.test("parseJava")) {
+            List<GNode> dependencies = GenerateDependencyASTs.beginParse((GNode) n);
+
+            runtime.console().pln();
+            for(Node node : dependencies) {
+                runtime.console().pln(node.getLocation().file);
+            }
+            runtime.console().pln().flush();
+        }
+
+
 
         // if (runtime.test("Your command here.")) { ... don't forget to add it to init()
     }
