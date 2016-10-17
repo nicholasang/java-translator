@@ -1,4 +1,4 @@
-package edu.nyu.oop.util;
+package edu.nyu.oop;
 
 /**
  * Created by stud on 10/17/16.
