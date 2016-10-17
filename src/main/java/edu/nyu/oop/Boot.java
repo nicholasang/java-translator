@@ -10,6 +10,7 @@ import edu.nyu.oop.util.NodeUtil;
 import edu.nyu.oop.util.XtcProps;
 import org.slf4j.Logger;
 
+import xtc.tree.Location;
 import xtc.tree.GNode;
 import xtc.tree.Node;
 import xtc.util.Tool;
@@ -93,6 +94,12 @@ public class Boot extends Tool {
         }
 
         if (runtime.test("parseJava")) {
+            String workingDir = System.getProperty("user.dir");
+
+            Location nLocation = n.getLocation();
+            Location longLocation = new Location(workingDir + "/" + nLocation.file, nLocation.line, nLocation.column);
+            n.setLocation(longLocation);
+
             List<GNode> dependencies = GenerateDependencyASTs.beginParse((GNode) n);
 
             runtime.console().pln();

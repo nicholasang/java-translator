@@ -6,11 +6,11 @@ package inputs.testX;
 public class testDependency {
     public boolean testVariable = true;
 
-    public testDependency(){
+    public testDependency() {
 
     }
 
-    public void testMethod(){
+    public void testMethod() {
         System.out.println("This does nothing.");
     }
 }
