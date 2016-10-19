@@ -10,61 +10,15 @@ import java.util.LinkedHashSet;
  * @author Karl Toby Rosenberg
  */
 public class findMethodsExperiments {
-    public static class PreA {
-        PreA() {}
 
-        public void test0() {
-            System.out.println("PreA_0");
-        }
-    }
-    public static class A extends PreA {
-        A() {}
-
-        public static void test1() {
-            System.out.println("A_1");
-        }
-        public void test2() {
-            System.out.println("A_2");
-        }
-        void test3() {
-            System.out.println("A_3");
-        }
-        protected void test4() {
-            System.out.println("A_4");
-        }
-
-        private void test5(int x) {
-            System.out.println("A_5");
-        }
-    }
-
-    public static class B extends A {
-        B() {}
-
-        public void test6() {
-            System.out.println("B_6");
-        }
-    }
-
-    public static void main(String[] args) {
-
-        System.out.println("TESTING A");
-        testPrint1(new A().getClass());
-        System.out.println("TESTING B");
-        testPrint1(new B().getClass());
-
-        B b = new B();
-
-        b.test0();
-
+    public static void printSuperClassVirtualMethods(Class c) {
         System.out.println("\n---------------------------------------\n");
-        System.out.println("print B's inherited methods from A and PreA");
-        LinkedHashSet<Method> methods = recursiveInheritedMethodFinder(B.class);
+
+        LinkedHashSet<Method> methods = recursiveInheritedMethodFinder(c);
 
         for(Method m : methods) {
             methodDisplay(m);
         }
-
     }
 
     public static void testPrint1(Class c) {

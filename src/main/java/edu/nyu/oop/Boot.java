@@ -17,6 +17,10 @@ import xtc.util.Tool;
 import xtc.lang.JavaPrinter;
 import xtc.parser.ParseException;
 
+import java.net.URLClassLoader;
+
+
+
 /**
  * This is the entry point to your program. It configures the user interface, defining
  * the set of valid commands for your tool, provides feedback to the user about their inputs
@@ -45,7 +49,11 @@ public class Boot extends Tool {
         bool("printJavaAst", "printJavaAst", false, "Print Java Ast.").
         bool("printJavaCode", "printJavaCode", false, "Print Java code.").
         bool("printJavaImportCode", "printJavaImportCode", false, "Print Java code for imports and package source.").
-        bool("parseJava", "parseJava", false, "Parse source file dependencies.");
+        bool("parseJava", "parseJava", false, "Parse source file dependencies.")/*;*/.
+
+        //DELETE THIS ONE LATER
+        bool("fvms", "fvms", false, "testing method finding, finding \"virtual\" methods in superclasses excluding those from Object");
+
     }
 
     @Override
@@ -110,9 +118,73 @@ public class Boot extends Tool {
         }
 
 
+        //DELETE THIS LATER (find superclass's "virtual" methods excluding object)
+        if(runtime.test("fvms")) {
+
+            String workingDir = System.getProperty("user.dir");
+
+
+            Location nLocation = n.getLocation();
+            Location longLocation = new Location(workingDir + "/" + nLocation.file, nLocation.line, nLocation.column);
+            n.setLocation(longLocation);
+
+            List<GNode> dependencies = GenerateDependencyASTs.beginParse((GNode) n);
+
+            boolean flag = false;
+
+            for(GNode gn : dependencies) {
+
+                System.out.println("---------------------------------------------------");
+                if(flag)break;
+
+                flag = true;
+
+                try {
+
+                    //URL u = new URL();
+                    System.out.println(workingDir);
+
+                    String fileDir =  workingDir + "/src/test/java/inputs/";
+
+                    System.out.println(fileDir);
+
+                    if(true == false)
+                    {
+
+                        String className = "src.main.test.java.inputs.testX1." + (String) NodeUtil.dfs(gn, "ClassDeclaration").get(1);
+
+                        ClassLoader classy = ClassLoader.getSystemClassLoader();
+
+                        System.out.println(className);
+
+                        Class toLoad = classy.loadClass(className);
+
+                        System.out.println("SOMETHING WORKED!");
+                    }
+
+
+                    //findMethodsExperiments.printSuperClassVirtualMethods(Boot.class);
+
+                } catch(ClassNotFoundException ex) {
+                    System.out.println("ABORTING");
+                    System.out.println("WEE " + workingDir);
+
+                    System.exit(-1);
+                }
+
+            }
+
+        }
+
+
+
+
+
 
         // if (runtime.test("Your command here.")) { ... don't forget to add it to init()
     }
+
+
 
     /**
      * Run Boot with the specified command line arguments.
