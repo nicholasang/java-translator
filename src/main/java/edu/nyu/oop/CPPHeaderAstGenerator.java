@@ -1,23 +1,24 @@
 package edu.nyu.oop;
 
+import edu.nyu.oop.util.NodeUtil;
 import xtc.tree.GNode;
+import xtc.tree.Node;
 
 import edu.nyu.oop.customUtil.InheritanceHierarchyTreeGenerator.*;
 import edu.nyu.oop.customUtil.MappingNodeEntry.DataFieldList;
 import edu.nyu.oop.customUtil.MappingNodeEntry.NodeEntry;
 
+
 import edu.nyu.oop.customUtil.*;
 
 import java.util.*;
 
-public class CPPHeaderAstGenerator
-{
-    private CPPHeaderAstGenerator(){}
+public class CPPHeaderAstGenerator {
+    private CPPHeaderAstGenerator() {}
 
     public static List<MappingNodeEntry> allEntries;
 
-    public static void generate(GNode javaRoot, InheritanceHierarchyTree tree)
-    {
+    public static void generate(GNode javaRoot, InheritanceHierarchyTree tree) {
 
         allEntries = new ArrayList<MappingNodeEntry>();
 
@@ -66,15 +67,26 @@ public class CPPHeaderAstGenerator
         GNode cppHeaderAst = initSomeBigWrapperNode();
 
 
+        System.out.println("JAVA_____________________________________");
+        XtcTestUtils.prettyPrintAst(javaRoot);
+
+        System.out.println("\nCPPHeader_____________________________________");
+
         XtcTestUtils.prettyPrintAst(cppHeaderAst);
 
-        //jav.visit(javaRoot, cppHeaderAst);
+
+        //get namespace nodes
+        jav.visit(javaRoot, cppHeaderAst);
+
+        XtcTestUtils.prettyPrintAst(cppHeaderAst);
+
+        //find every ClassDeclaration
+        List<Node> allClassDeclarations = NodeUtil.dfsAll(javaRoot, "ClassDeclaration");
 
     }
 
 
-    public static GNode createMappingNode(String constructType)
-    {
+    public static GNode createMappingNode(String constructType) {
 
         GNode construct = GNode.create(constructType);
         LinkedHashMap<String, MappingNodeEntry> dataMap = new LinkedHashMap<String, MappingNodeEntry>();
@@ -90,27 +102,24 @@ public class CPPHeaderAstGenerator
     }
 
 
-    public static GNode createMappingNodeOneShot(String constructType, String fieldNameKey, ArrayList<String> values)
-    {
+    public static GNode createMappingNodeOneShot(String constructType, String fieldNameKey, ArrayList<String> values) {
         GNode construct = createMappingNode(constructType);
         addDataFieldMapping(construct, fieldNameKey, values);
         return construct;
     }
 
-    public static GNode createMappingNodeOneShot(String constructType, String fieldNameKey, String value)
-    {
+    public static GNode createMappingNodeOneShot(String constructType, String fieldNameKey, String value) {
         GNode construct = createMappingNode(constructType);
         addDataFieldMapping(construct, fieldNameKey, value);
         return construct;
     }
 
-    public static GNode initSomeBigWrapperNode()
-    {
+    public static GNode initSomeBigWrapperNode() {
         //SomeBigWrapperNode
         GNode cppHeaderAst = GNode.create("SomeBigWrapperNode");
 
         GNode preDirectives = createMappingNodeOneShot("PrecompilerDeclarations", "Names", new ArrayList<String>(
-                Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>") ));
+                                  Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>") ));
 
         cppHeaderAst.add(preDirectives);
 
@@ -122,8 +131,7 @@ public class CPPHeaderAstGenerator
     }
 
 
-    public static void addDataFieldMapping(GNode node, String fieldNameKey, ArrayList<String> values)
-    {
+    public static void addDataFieldMapping(GNode node, String fieldNameKey, ArrayList<String> values) {
         LinkedHashMap<String, MappingNodeEntry> dataMap = (LinkedHashMap<String, MappingNodeEntry>)node.get(0);
 
         DataFieldList dfl = (DataFieldList)dataMap.get(fieldNameKey);
@@ -131,18 +139,14 @@ public class CPPHeaderAstGenerator
         DataFieldList all = (DataFieldList)dataMap.get("ALL");
 
 
-        if(dfl == null)
-        {
+        if(dfl == null) {
             dfl = new DataFieldList(values);
             dataMap.put(fieldNameKey, dfl);
             allEntries.add(dfl);
 
             all.append(values);
-        }
-        else
-        {
-            for(String value : values)
-            {
+        } else {
+            for(String value : values) {
                 dfl.append(value);
 
                 all.append(values);
@@ -152,8 +156,7 @@ public class CPPHeaderAstGenerator
 
     }
 
-    public static void addDataFieldMapping(GNode node, String fieldNameKey, String value)
-    {
+    public static void addDataFieldMapping(GNode node, String fieldNameKey, String value) {
 
         LinkedHashMap<String, MappingNodeEntry> dataMap = (LinkedHashMap<String, MappingNodeEntry>)node.get(0);
 
@@ -162,21 +165,20 @@ public class CPPHeaderAstGenerator
         DataFieldList all = (DataFieldList)dataMap.get("ALL");
 
 
-        if(dfl == null)
-        {
+        if(dfl == null) {
             dfl = new DataFieldList(value);
             dataMap.put(fieldNameKey, dfl);
             allEntries.add(dfl);
 
             all.append(value);
 
-        }
-        else
-        {
+        } else {
             dfl.append(value);
 
             all.append(value);
 
         }
     }
+
+    // TODO: add official MappngNode adder for NodeEntry subclass of MappingNode to keep track of previous node found
 }
