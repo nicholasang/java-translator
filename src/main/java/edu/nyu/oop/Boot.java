@@ -7,6 +7,7 @@ import java.util.List;
 
 import edu.nyu.oop.util.JavaFiveImportParser;
 import edu.nyu.oop.util.NodeUtil;
+import edu.nyu.oop.util.SymbolTableUtil;
 import edu.nyu.oop.util.XtcProps;
 import org.slf4j.Logger;
 
@@ -18,7 +19,6 @@ import xtc.lang.JavaPrinter;
 import xtc.parser.ParseException;
 
 import java.net.*;
-
 
 
 /**
@@ -108,18 +108,23 @@ public class Boot extends Tool {
             Location longLocation = new Location(workingDir + "/" + nLocation.file, nLocation.line, nLocation.column);
             n.setLocation(longLocation);
 
-            List<GNode> dependencies = GenerateJavaASTs.beginParse((GNode) n);
+            List<GNode> allAsts = GenerateJavaASTs.beginParse((GNode) n);
 
             runtime.console().pln();
-            for(Node node : dependencies) {
+            for(Node node : allAsts) {
                 runtime.console().pln(node.getLocation().file);
             }
             runtime.console().pln().flush();
 
+            // TODO: Generate Inheritance hierarchy tree here when finding methods
 
-            for(GNode root : dependencies)
+            for(GNode root : allAsts)
             {
-                GenerateCPPHeader.getHeaderAST(root, runtime);
+                // TODO: Pass the inheritance hierarchy tree to the CPPHeaderAstGenerator method
+                CPPHeaderAstGenerator.generate(root, null);
+
+                // REMOVE: later
+                System.exit(0);
             }
         }
 
