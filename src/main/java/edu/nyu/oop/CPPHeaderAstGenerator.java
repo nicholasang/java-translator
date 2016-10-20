@@ -24,6 +24,8 @@ public class CPPHeaderAstGenerator
         JavaAstVisitor jav = new JavaAstVisitor();
 
 
+        /*STEP-WISE creation
+
         //SomeBigWrapperNode
         GNode cppHeaderAst = GNode.create("SomeBigWrapperNode");
 
@@ -39,6 +41,30 @@ public class CPPHeaderAstGenerator
         GNode usingNamespace = createMappingNode("UsingNamespace");
         addDataFieldMapping(usingNamespace, "Names", "java::lang");
         cppHeaderAst.add(usingNamespace);
+        */
+
+        //ONE-SHOT CREATION:
+
+        /*
+        //SomeBigWrapperNode
+        GNode cppHeaderAst = GNode.create("SomeBigWrapperNode");
+
+        GNode preDirectives = createMappingNodeOneShot("PrecompilerDeclarations", "Names", new ArrayList<String>(
+                Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>") ));
+
+        cppHeaderAst.add(preDirectives);
+
+        GNode usingNamespace = createMappingNodeOneShot("UsingNamespace", "Names", "java::lang");
+
+        cppHeaderAst.add(usingNamespace);
+        */
+
+
+        //DEFAULT OUTER SHELL CREATION EXAMPLE:
+
+        //SomeBigWrapperNode //I know other hard-codeable nodes are missing
+        GNode cppHeaderAst = initSomeBigWrapperNode();
+
 
         XtcTestUtils.prettyPrintAst(cppHeaderAst);
 
@@ -63,17 +89,38 @@ public class CPPHeaderAstGenerator
         return construct;
     }
 
-    /*
-    public static void GNode createMappingNodeOneShot(String constructType, String fieldNameKey, List<String> values)
-    {
 
+    public static GNode createMappingNodeOneShot(String constructType, String fieldNameKey, ArrayList<String> values)
+    {
+        GNode construct = createMappingNode(constructType);
+        addDataFieldMapping(construct, fieldNameKey, values);
+        return construct;
     }
 
-    public static void GNode createMappingNodeOneShot(String constructType, String fieldNameKey, String value)
+    public static GNode createMappingNodeOneShot(String constructType, String fieldNameKey, String value)
     {
-
+        GNode construct = createMappingNode(constructType);
+        addDataFieldMapping(construct, fieldNameKey, value);
+        return construct;
     }
-    */
+
+    public static GNode initSomeBigWrapperNode()
+    {
+        //SomeBigWrapperNode
+        GNode cppHeaderAst = GNode.create("SomeBigWrapperNode");
+
+        GNode preDirectives = createMappingNodeOneShot("PrecompilerDeclarations", "Names", new ArrayList<String>(
+                Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>") ));
+
+        cppHeaderAst.add(preDirectives);
+
+        GNode usingNamespace = createMappingNodeOneShot("UsingNamespace", "Names", "java::lang");
+
+        cppHeaderAst.add(usingNamespace);
+
+        return cppHeaderAst;
+    }
+
 
     public static void addDataFieldMapping(GNode node, String fieldNameKey, ArrayList<String> values)
     {
