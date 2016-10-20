@@ -17,7 +17,7 @@ import xtc.util.Tool;
 import xtc.lang.JavaPrinter;
 import xtc.parser.ParseException;
 
-import java.net.URLClassLoader;
+import java.net.*;
 
 
 
@@ -108,13 +108,19 @@ public class Boot extends Tool {
             Location longLocation = new Location(workingDir + "/" + nLocation.file, nLocation.line, nLocation.column);
             n.setLocation(longLocation);
 
-            List<GNode> dependencies = GenerateDependencyASTs.beginParse((GNode) n);
+            List<GNode> dependencies = GenerateJavaASTs.beginParse((GNode) n);
 
             runtime.console().pln();
             for(Node node : dependencies) {
                 runtime.console().pln(node.getLocation().file);
             }
             runtime.console().pln().flush();
+
+
+            for(GNode root : dependencies)
+            {
+                GenerateCPPHeader.getHeaderAST(root, runtime);
+            }
         }
 
 
@@ -128,7 +134,7 @@ public class Boot extends Tool {
             Location longLocation = new Location(workingDir + "/" + nLocation.file, nLocation.line, nLocation.column);
             n.setLocation(longLocation);
 
-            List<GNode> dependencies = GenerateDependencyASTs.beginParse((GNode) n);
+            List<GNode> dependencies = GenerateJavaASTs.beginParse((GNode) n);
 
             boolean flag = false;
 
@@ -141,12 +147,32 @@ public class Boot extends Tool {
 
                 try {
 
-                    //URL u = new URL();
-                    System.out.println(workingDir);
+                    try
+                    {
+                        //URL u = new URL();
+                        System.out.println(workingDir);
 
-                    String fileDir =  workingDir + "/src/test/java/inputs/";
+                        String fileDir = "file://" + workingDir + "/src/test/java/inputs/";
 
-                    System.out.println(fileDir);
+                        System.out.println(fileDir);
+
+                        URL[] urls = new URL[]{new URL(fileDir)};
+
+                        ClassLoader loader = new URLClassLoader(urls);
+
+                        Class c = loader.loadClass("inputs.testX1." + "TestX1");
+
+                        GNode g = GNode.create("wee");
+
+
+
+                    }
+                    catch(Exception ex)
+                    {
+                        System.err.println(ex.getStackTrace());
+                        System.exit(-1);
+                    }
+
 
                     if(true == false)
                     {

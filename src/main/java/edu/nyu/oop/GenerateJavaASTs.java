@@ -25,14 +25,14 @@ import java.util.*;
 
 import java.util.HashMap;
 
-public class GenerateDependencyASTs {
-    private GenerateDependencyASTs() {};
+public class GenerateJavaASTs
+{
+    private GenerateJavaASTs() {};
 
     public static List<GNode> beginParse(GNode n) {
         HashMap<String, Boolean> fileNamesFound = new HashMap<String, Boolean>();
         List<GNode> dependencyASTs = new ArrayList<GNode>();
         beginParse(n, fileNamesFound, dependencyASTs);
-
         return dependencyASTs;
     }
 
