@@ -76,9 +76,24 @@ public class CPPHeaderAstGenerator {
         replaceLocalDataFieldValue(preDirectives, "Name", "#include \"java_lang.h\"", 1);
 
 
+        XtcTestUtils.prettyPrintAst(cppHeaderAst);
+
+        // TODO
+        //jav.visit(javaRoot, cppHeaderAst);
+
+        System.out.println(allEntries);
+
+        GNode replacement = createMappingNode("UsingNamespace");
+        addDataFieldMapping(replacement, "Name", "java::lang's been REPLACED!!");
+        replaceNode(cppHeaderAst, replacement, 0);
+
+
+        XtcTestUtils.prettyPrintAst(cppHeaderAst);
+
+        System.out.println(((DataField)(allEntries.get(8))).get().equals("java::lang's been REPLACED!!"));
+
 
         //get namespace nodes
-        jav.visit(javaRoot, cppHeaderAst);
 
         //System.out.println(allEntries);
 
@@ -123,7 +138,7 @@ public class CPPHeaderAstGenerator {
         */
 
 
-        XtcTestUtils.prettyPrintAst(cppHeaderAst);
+        //XtcTestUtils.prettyPrintAst(cppHeaderAst);
 
 
         //XtcTestUtils.prettyPrintAst(javaRoot);
@@ -308,6 +323,25 @@ public class CPPHeaderAstGenerator {
         }
 
         node.add(child);
+
+        return node;
+    }
+
+    public static Object replaceNode(GNode node, GNode childReplacement, int ithOccurrence) {
+
+        if(node == null || childReplacement == null)return null;
+
+        LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
+
+        ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(childReplacement.getName());
+
+        if(localGlobalIndices == null || localGlobalIndices.size() == 0)return null;
+
+        Integer globalIndex;
+        if((globalIndex = getGlobalIndexOf(node, childReplacement.getName(), ithOccurrence)) == null)return null;
+        allEntries.set(globalIndex, childReplacement);
+
+        node.set(getLocalIndexOf(node, childReplacement.getName(), ithOccurrence), childReplacement);
 
         return node;
     }
