@@ -40,7 +40,7 @@ public class CPPHeaderAstGenerator {
         allEntries.add(cppHeaderAst); //no hashmap stores the root, but the root is implicitly the first item in allEntries
 
         //display the embedded hashmaps for debugging
-        InvisiblePrintObject.toggleInvisibilityCloak();
+        //InvisiblePrintObject.toggleInvisibilityCloak();
 
 
         //add preprocessor directives, node must be linked with a parent before anything is added to it!
