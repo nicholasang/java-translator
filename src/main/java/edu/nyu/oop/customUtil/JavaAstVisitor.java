@@ -3,6 +3,7 @@ package edu.nyu.oop.customUtil;
 import java.util.*;
 
 import edu.nyu.oop.CPPHeaderAstGenerator;
+import edu.nyu.oop.XtcTestUtils;
 import xtc.tree.GNode;
 import xtc.tree.Node;
 import java.util.List;
@@ -118,9 +119,24 @@ public class JavaAstVisitor extends xtc.tree.Visitor {
             CPPHeaderAstGenerator.cppHeaderMostRecentParent = parent;
 
         }
-
-
-        //visit(n, parent);
     }
+
+    public void visitClassDeclaration(GNode n) {
+
+
+        GNode localParent = (GNode)CPPHeaderAstGenerator.addNode(CPPHeaderAstGenerator.cppHeaderMostRecentParent, CPPHeaderAstGenerator.createMappingNode("ClassWrapper"));
+
+        //System.out.println("ENTERING CLASS BODY");
+
+        visit(n);
+
+        CPPHeaderAstGenerator.cppHeaderMostRecentParent = localParent;
+
+        //System.out.println("EXITING CLASS BODY");
+
+
+    }
+
+
 
 }

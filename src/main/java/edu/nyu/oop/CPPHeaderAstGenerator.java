@@ -40,10 +40,12 @@ public class CPPHeaderAstGenerator {
         allEntries.add(cppHeaderAst); //no hashmap stores the root, but the root is implicitly the first item in allEntries
 
         //display the embedded hashmaps for debugging
-        //InvisiblePrintObject.toggleInvisibilityCloak();
+        InvisiblePrintObject.toggleInvisibilityCloak();
 
 
-        //add preprocessor directives, node must be linked with a parent before anything is added to it!
+        //add preprocessor directives,
+        //node must be linked with a parent before anything is added to it!
+        // (Not really, it still works, but consistency is nice)
         GNode preDirectives = createMappingNode("PreprocessorDirectives");
         addNode(cppHeaderAst, preDirectives);
         addDataFieldMapping(preDirectives, "Name", new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")) );
@@ -80,13 +82,14 @@ public class CPPHeaderAstGenerator {
 
         //System.out.println(allEntries);
 
-        XtcTestUtils.prettyPrintAst(cppHeaderAst);
+        //XtcTestUtils.prettyPrintAst(cppHeaderAst);
 
         //find every ClassDeclaration
-        List<Node> allClassDeclarations = NodeUtil.dfsAll(javaRoot, "ClassDeclaration");
+        //List<Node> allClassDeclarations = NodeUtil.dfsAll(javaRoot, "ClassDeclaration");
 
 
         //testing
+        /*
         {
             GNode firstClass = createMappingNode("ClassWrapper");
             addNode(cppHeaderMostRecentParent, firstClass);
@@ -98,6 +101,34 @@ public class CPPHeaderAstGenerator {
 
             XtcTestUtils.prettyPrintAst(cppHeaderAst);
         }
+        */
+
+
+
+        /*MORE TESTS
+        for(Node c : allClassDeclarations)
+        {
+           GNode n = (GNode)addNode(cppHeaderMostRecentParent, createMappingNode("ClassWrapper"));
+        }
+
+        addDataFieldMapping((GNode)getInstanceOf(cppHeaderMostRecentParent, "ClassWrapper", 0), "THIS_IS_A_TEST", "YEP");
+
+        addNode((GNode)getInstanceOf(cppHeaderMostRecentParent, "ClassWrapper", 0), createMappingNode("WHATAMIEVEN"));
+
+        addDataFieldMapping((GNode)getInstanceOf(cppHeaderMostRecentParent, "ClassWrapper", 0), "THIS_IS_A_TEST", "YEP2");
+
+        replaceLocalDataFieldValue((GNode)getInstanceOf(cppHeaderMostRecentParent, "ClassWrapper", 0), "THIS_IS_A_TEST", "TEST_FINISHED", 0);
+
+        System.out.println(getInstanceOf(cppHeaderMostRecentParent, "ClassWrapper", 1) == allEntries.get(getGlobalIndexOf(cppHeaderMostRecentParent, "ClassWrapper", 1)));
+        */
+
+
+        XtcTestUtils.prettyPrintAst(cppHeaderAst);
+
+
+        //XtcTestUtils.prettyPrintAst(javaRoot);
+
+
         //comment out the above block please and do the following:
 
         //call jav.visit on each class in allClassDeclarations
@@ -313,7 +344,7 @@ public class CPPHeaderAstGenerator {
         return out;
     }
 
-    public static Object getLocalIndexOf(GNode node, String key, int ithOccurrence) {
+    public static Integer getLocalIndexOf(GNode node, String key, int ithOccurrence) {
 
         if(node == null)return null;
 
@@ -325,13 +356,13 @@ public class CPPHeaderAstGenerator {
         return localGlobalIndices.get(0).get(ithOccurrence);
     }
 
-    public static ArrayList<Object> getAllLocalIndicesOf(GNode node, String key) {
+    public static ArrayList<Integer> getAllLocalIndicesOf(GNode node, String key) {
         LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
         ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(key);
 
         if(localGlobalIndices == null || localGlobalIndices.size() == 0)return null;
 
-        ArrayList<Object> out = new ArrayList<Object>();
+        ArrayList<Integer> out = new ArrayList<Integer>();
 
         ArrayList<Integer> localIndices = localGlobalIndices.get(0);
 
@@ -340,7 +371,7 @@ public class CPPHeaderAstGenerator {
         return out;
     }
 
-    public static Object getGlobalIndexOf(GNode node, String key, int ithOccurence) {
+    public static Integer getGlobalIndexOf(GNode node, String key, int ithOccurence) {
 
         if(node == null)return null;
 
@@ -352,13 +383,13 @@ public class CPPHeaderAstGenerator {
         return localGlobalIndices.get(1).get(ithOccurence);
     }
 
-    public static ArrayList<Object> getAllGlobalIndicesOf(GNode node, String key) {
+    public static ArrayList<Integer> getAllGlobalIndicesOf(GNode node, String key) {
         LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
         ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(key);
 
         if(localGlobalIndices == null || localGlobalIndices.size() == 0)return null;
 
-        ArrayList<Object> out = new ArrayList<Object>();
+        ArrayList<Integer> out = new ArrayList<Integer>();
 
         ArrayList<Integer> globalIndices = localGlobalIndices.get(1);
 
