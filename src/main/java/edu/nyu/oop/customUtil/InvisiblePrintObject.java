@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 public class InvisiblePrintObject {
     private Object o;
 
-    private boolean invisibleCloakIsInactive;
+    private static boolean invisibleCloakIsInactive;
 
     private String whatToPrintInstead;
 
@@ -24,13 +24,13 @@ public class InvisiblePrintObject {
         return this.o;
     }
 
-    public void toggleInvisibleCloak() {
-        this.invisibleCloakIsInactive = !this.invisibleCloakIsInactive;
+    public static void toggleInvisibleCloak() {
+        InvisiblePrintObject.invisibleCloakIsInactive = !InvisiblePrintObject.invisibleCloakIsInactive;
     }
 
     public String toString() {
         LinkedHashMap<String, ArrayList<ArrayList<Integer>>> map = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)o;
-        return (this.invisibleCloakIsInactive) ? o.toString() : "{numTypes=" + Integer.toString((map.size() - 1)) + "}";
+        return (InvisiblePrintObject.invisibleCloakIsInactive) ? o.toString() : "{numTypes=" + Integer.toString((map.size() - 1)) + "}";
 
     }
 }

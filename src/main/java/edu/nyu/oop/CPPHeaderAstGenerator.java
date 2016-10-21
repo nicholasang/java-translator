@@ -193,25 +193,57 @@ public class CPPHeaderAstGenerator {
     }
     */
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* VERSION 2 MAIN */
     public static void generateNew(GNode javaRoot, InheritanceHierarchyTree tree) {
 
-        InvisiblePrintObject allEntriesEmbeddedInTree = new InvisiblePrintObject(allEntries = new ArrayList<Object>());
+        //track every item added, in order
+        allEntries = new ArrayList<Object>();
+
+        //new visitor
         JavaAstVisitor jav = new JavaAstVisitor();
 
+        //create the cpp header root
         GNode cppHeaderAst = createMappingNode("SomeBigWrapperNode");
 
+        allEntries.add(cppHeaderAst); //no hashmap stores the root, but the root is implicitly the first item in allEntries
 
-        GNode preDirectives = createMappingNode("PreprocessorDeclarations");
+        //display the embedded hashmaps for debugging
+        InvisiblePrintObject.toggleInvisibleCloak();
+
+
+        //add preprocessor directives, node must be linked with a parent before anything is added to it!
+        GNode preDirectives = createMappingNode("PreprocessorDirectives");
         addNode(cppHeaderAst, preDirectives);
         addDataFieldMapping(preDirectives, "Name", new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")) );
 
-        //usingnamespace, oneshot create and link with parent
+        //usingnamespace, "one-shot create and link with parent node" example
         GNode usingNamespace = createAndLinkDataFieldMappingNodeOneShot(cppHeaderAst,"UsingNamespace", "Name", "java::lang");
 
         XtcTestUtils.prettyPrintAst(cppHeaderAst);
 
+
+        System.out.println("\nTESTING");
+        System.out.println(getInstanceOf(preDirectives, "Name", 2));
+        System.out.println(getAllInstancesOf(preDirectives, "Name"));
+        System.out.println(getAllInstancesOf(preDirectives, "WEE"));
+
+        System.out.println(getAllLocalIndicesOf(preDirectives, "Name"));
+        System.out.println(getLocalIndexOf(preDirectives, "Name", 2));
+
+        System.out.println(getAllGlobalIndicesOf(preDirectives, "Name"));
+        System.out.println(getGlobalIndexOf(preDirectives, "Name", 2));
+
+
+        System.out.println("\nTESTING REPLACE FIELD VALUE");
+        replaceLocalDataFieldValue(preDirectives, "Name", "SOMEONE STOLE MY INCLUDE!", 1);
+        XtcTestUtils.prettyPrintAst(cppHeaderAst);
+
+
+
+
         System.out.println(allEntries);
+
 
 
     }
@@ -234,7 +266,9 @@ public class CPPHeaderAstGenerator {
         return construct;
     }
 
-    public static void addDataFieldMapping(GNode node, String fieldNameKey, String value) {
+    public static Object addDataFieldMapping(GNode node, String fieldNameKey, String value) {
+
+        if(node == null)return null;
 
         LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
 
@@ -245,7 +279,7 @@ public class CPPHeaderAstGenerator {
 
         DataField df;
 
-        if (localGlobalIndices == null) {
+        if (localGlobalIndices == null || localGlobalIndices.size() == 0) {
             int nextAvailID = allEntries.size();
 
             df = MappingNodeEntry2.createDataField(fieldNameKey, value, nextAvailID);
@@ -283,16 +317,23 @@ public class CPPHeaderAstGenerator {
         }
 
         node.add(df);
+
+        return node;
     }
 
-    public static void addDataFieldMapping(GNode node, String fieldNameKey, ArrayList<String> values) {
+    public static Object addDataFieldMapping(GNode node, String fieldNameKey, ArrayList<String> values) {
 
+        Object success = null;
         for(String value : values) {
-            addDataFieldMapping(node, fieldNameKey, value);
+            if((success = addDataFieldMapping(node, fieldNameKey, value)) == null)return null;
         }
+        return success;
     }
 
     public static GNode createAndLinkDataFieldMappingNodeOneShot(GNode parent, String constructType, String fieldNameKey, String value) {
+
+        if(parent == null)return null;
+
         GNode construct = createMappingNode(constructType);
         addNode(parent, construct);
         addDataFieldMapping(construct, fieldNameKey, value);
@@ -300,6 +341,9 @@ public class CPPHeaderAstGenerator {
     }
 
     public static GNode createAndLinkDataFieldMappingNodeOneShot(GNode parent, String constructType, String fieldNameKey, ArrayList<String> values) {
+
+        if(parent == null)return null;
+
         GNode construct = createMappingNode(constructType);
         addNode(parent, construct);
 
@@ -329,7 +373,9 @@ public class CPPHeaderAstGenerator {
     */
 
 
-    public static void addNode(GNode node, GNode child) {
+    public static Object addNode(GNode node, GNode child) {
+
+        if(node == null || child == null)return null;
 
         LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
 
@@ -338,7 +384,7 @@ public class CPPHeaderAstGenerator {
         ArrayList<ArrayList<Integer>> all = (ArrayList<ArrayList<Integer>>)dataMap.get("ALL");
 
 
-        if (localGlobalIndices == null) {
+        if(localGlobalIndices == null || localGlobalIndices.size() == 0) {
             int nextAvailID = allEntries.size();
 
             ArrayList<Integer> localIndices = new ArrayList<Integer>();
@@ -371,9 +417,105 @@ public class CPPHeaderAstGenerator {
         }
 
         node.add(child);
+
+        return node;
     }
 
-    //methods
+    public static Object getInstanceOf(GNode node, String key, int index) {
+
+        if(node == null)return null;
+
+        LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
+        ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(key);
+
+        if(localGlobalIndices == null || index >= localGlobalIndices.get(0).size() || index < 0)return null;
+
+        return node.get(localGlobalIndices.get(0).get(index));
+    }
+
+    public static ArrayList<Object> getAllInstancesOf(GNode node, String key) {
+
+        if(node == null)return null;
+
+        LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
+        ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(key);
+
+        if(localGlobalIndices == null || localGlobalIndices.size() == 0)return null;
+
+        ArrayList<Object> out = new ArrayList<Object>();
+
+        ArrayList<Integer> localIndices = localGlobalIndices.get(0);
+        int len = localIndices.size();
+        for(int i = 0; i < len; ++i) {
+            out.add(node.get(localIndices.get(i)));
+        }
+
+        return out;
+    }
+
+    public static Object getLocalIndexOf(GNode node, String key, int ithOccurrence) {
+
+        if(node == null)return null;
+
+        LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
+        ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(key);
+
+        if(localGlobalIndices == null || localGlobalIndices.size() == 0 || ithOccurrence >= localGlobalIndices.get(0).size() || ithOccurrence < 0)return null;
+
+        return localGlobalIndices.get(0).get(ithOccurrence);
+    }
+
+    public static ArrayList<Object> getAllLocalIndicesOf(GNode node, String key) {
+        LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
+        ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(key);
+
+        if(localGlobalIndices == null || localGlobalIndices.size() == 0)return null;
+
+        ArrayList<Object> out = new ArrayList<Object>();
+
+        ArrayList<Integer> localIndices = localGlobalIndices.get(0);
+
+        out.addAll(localIndices);
+
+        return out;
+    }
+
+    public static Object getGlobalIndexOf(GNode node, String key, int ithOccurence) {
+
+        if(node == null)return null;
+
+        LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
+        ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(key);
+
+        if(localGlobalIndices == null || localGlobalIndices.size() == 0 || ithOccurence >= localGlobalIndices.get(1).size() || ithOccurence < 0)return null;
+
+        return localGlobalIndices.get(1).get(ithOccurence);
+    }
+
+    public static ArrayList<Object> getAllGlobalIndicesOf(GNode node, String key) {
+        LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
+        ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(key);
+
+        if(localGlobalIndices == null || localGlobalIndices.size() == 0)return null;
+
+        ArrayList<Object> out = new ArrayList<Object>();
+
+        ArrayList<Integer> globalIndices = localGlobalIndices.get(1);
+
+        out.addAll(globalIndices);
+
+        return out;
+    }
+
+    public static Object replaceLocalDataFieldValue(GNode node, String key, String value, int ithOccurrence) {
+        Object o = node.get((Integer)(getLocalIndexOf(node, key, ithOccurrence)));
+
+        if(o instanceof DataField) {
+            ((DataField) o).setVal(value);
+        }
+
+        return null;
+    }
 
 
 
