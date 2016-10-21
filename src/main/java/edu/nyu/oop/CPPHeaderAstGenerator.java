@@ -5,8 +5,6 @@ import xtc.tree.GNode;
 import xtc.tree.Node;
 
 import edu.nyu.oop.customUtil.InheritanceHierarchyTreeGenerator.*;
-import edu.nyu.oop.customUtil.MappingNodeEntry.DataFieldList;
-import edu.nyu.oop.customUtil.MappingNodeEntry.NodeEntry;
 
 import edu.nyu.oop.customUtil.MappingNodeEntry2.DataField;
 
@@ -193,6 +191,10 @@ public class CPPHeaderAstGenerator {
     }
     */
 
+    public static GNode cppHeaderAst;
+    //most recent parent
+    public static GNode cppHeaderMostRecentParent;
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* VERSION 2 MAIN */
     public static void generateNew(GNode javaRoot, InheritanceHierarchyTree tree) {
@@ -204,12 +206,12 @@ public class CPPHeaderAstGenerator {
         JavaAstVisitor jav = new JavaAstVisitor();
 
         //create the cpp header root
-        GNode cppHeaderAst = createMappingNode("SomeBigWrapperNode");
+        cppHeaderAst = createMappingNode("SomeBigWrapperNode");
 
         allEntries.add(cppHeaderAst); //no hashmap stores the root, but the root is implicitly the first item in allEntries
 
         //display the embedded hashmaps for debugging
-        InvisiblePrintObject.toggleInvisibleCloak();
+        InvisiblePrintObject.toggleInvisibilityCloak();
 
 
         //add preprocessor directives, node must be linked with a parent before anything is added to it!
@@ -235,14 +237,43 @@ public class CPPHeaderAstGenerator {
         System.out.println(getGlobalIndexOf(preDirectives, "Name", 2));
 
 
+
         System.out.println("\nTESTING REPLACE FIELD VALUE");
         replaceLocalDataFieldValue(preDirectives, "Name", "SOMEONE STOLE MY INCLUDE!", 1);
         XtcTestUtils.prettyPrintAst(cppHeaderAst);
 
+        replaceLocalDataFieldValue(preDirectives, "Name", "#include \"java_lang.h\"", 1);
 
 
 
-        System.out.println(allEntries);
+        //get namespace nodes
+        jav.visit(javaRoot, cppHeaderAst);
+
+        //System.out.println(allEntries);
+
+        XtcTestUtils.prettyPrintAst(cppHeaderAst);
+
+        //find every ClassDeclaration
+        List<Node> allClassDeclarations = NodeUtil.dfsAll(javaRoot, "ClassDeclaration");
+
+
+                //testing
+        {
+            GNode firstClass = createMappingNode("ClassWrapper");
+            addNode(cppHeaderMostRecentParent, firstClass);
+
+            addDataFieldMapping(cppHeaderMostRecentParent, "WHAT AM I?", "A series of characters");
+
+
+            addDataFieldMapping(cppHeaderAst, "PROGRAMMER'S NOTE", "THIS TREE IS STILL A SAPLING");
+
+            XtcTestUtils.prettyPrintAst(cppHeaderAst);
+        }
+        //comment out the above block please and do the following:
+
+        //call jav.visit on each class in allClassDeclarations
+        //add a bunch of visitors and follow the logic of the methods/objects I created plus their relationship
+        //with this class to build the tree top-to-bottom
 
 
 

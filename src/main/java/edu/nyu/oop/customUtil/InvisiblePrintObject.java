@@ -24,7 +24,7 @@ public class InvisiblePrintObject {
         return this.o;
     }
 
-    public static void toggleInvisibleCloak() {
+    public static void toggleInvisibilityCloak() {
         InvisiblePrintObject.invisibleCloakIsInactive = !InvisiblePrintObject.invisibleCloakIsInactive;
     }
 

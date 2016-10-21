@@ -109,13 +109,14 @@ public class JavaAstVisitor extends xtc.tree.Visitor {
         GNode parent = this.cppHeaderAstRoot;
         GNode namespace = null;
         for(String s : packageNames) {
-            //namespace = CPPHeaderAstGenerator.createMappingNodeOneShot("Namespace", "Name", s);
+            //namespace = CPPHeaderAstGenerator.createAndLinkDataFieldMappingNodeOneShot(parent, "Namespace", "Name", s);
+            //parent = namespace;
 
-            if(parent != null) {
-                parent.addNode(namespace);
-            }
+            //could be a one-liner:
+            parent = CPPHeaderAstGenerator.createAndLinkDataFieldMappingNodeOneShot(parent, "Namespace", "Name", s);
 
-            parent = namespace;
+            CPPHeaderAstGenerator.cppHeaderMostRecentParent = parent;
+
         }
 
 
