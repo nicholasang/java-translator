@@ -193,8 +193,6 @@ public class CPPHeaderAstGenerator {
     }
     */
 
-    // TODO: add official MappingNode adder for NodeEntry subclass of MappingNode to keep track of previous node found
-
     /* VERSION 2 MAIN */
     public static void generateNew(GNode javaRoot, InheritanceHierarchyTree tree) {
 
@@ -204,14 +202,7 @@ public class CPPHeaderAstGenerator {
         GNode cppHeaderAst = createMappingNode("SomeBigWrapperNode");
 
 
-        //preprocessor directives
-        /*
-        GNode preDirectives = createDataFieldMappingNodeOneShot("PrecompilerDeclarations", "Name",
-                              new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")));
-        */
-
-
-        GNode preDirectives = createMappingNode("ProcompilerDeclarations");
+        GNode preDirectives = createMappingNode("PreprocessorDeclarations");
         addNode(cppHeaderAst, preDirectives);
         addDataFieldMapping(preDirectives, "Name", new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")) );
 
@@ -238,14 +229,14 @@ public class CPPHeaderAstGenerator {
 
         dataMap.put("ALL", all);
 
-        construct.add(dataMap);
+        construct.add(new InvisiblePrintObject(dataMap));
 
         return construct;
     }
 
     public static void addDataFieldMapping(GNode node, String fieldNameKey, String value) {
 
-        LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>) node.get(0);
+        LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
 
         ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(fieldNameKey);
 
@@ -318,6 +309,7 @@ public class CPPHeaderAstGenerator {
         return construct;
     }
 
+    /*
     @Deprecated
     public static GNode createDataFieldMappingNodeOneShot(String constructType, String fieldNameKey, String value) {
         GNode construct = createMappingNode(constructType);
@@ -334,11 +326,12 @@ public class CPPHeaderAstGenerator {
         }
         return construct;
     }
+    */
 
 
     public static void addNode(GNode node, GNode child) {
 
-        LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>) node.get(0);
+        LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
 
         ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(child.getName());
 

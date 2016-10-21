@@ -1,5 +1,8 @@
 package edu.nyu.oop.customUtil;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+
 public class InvisiblePrintObject {
     private Object o;
 
@@ -26,6 +29,8 @@ public class InvisiblePrintObject {
     }
 
     public String toString() {
-        return (this.invisibleCloakIsInactive) ? o.toString() : whatToPrintInstead;
+        LinkedHashMap<String, ArrayList<ArrayList<Integer>>> map = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)o;
+        return (this.invisibleCloakIsInactive) ? o.toString() : "{numTypes=" + Integer.toString((map.size() - 1)) + "}";
+
     }
 }
