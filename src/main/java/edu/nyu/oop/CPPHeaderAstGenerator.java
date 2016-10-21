@@ -40,7 +40,7 @@ public class CPPHeaderAstGenerator {
         allEntries.add(cppHeaderAst); //no hashmap stores the root, but the root is implicitly the first item in allEntries
 
         //display the embedded hashmaps for debugging
-        InvisiblePrintObject.toggleInvisibilityCloak();
+        //InvisiblePrintObject.toggleInvisibilityCloak();
 
 
         //add preprocessor directives,
@@ -79,7 +79,7 @@ public class CPPHeaderAstGenerator {
         XtcTestUtils.prettyPrintAst(cppHeaderAst);
 
         // TODO
-        //jav.visit(javaRoot, cppHeaderAst);
+        jav.visit(javaRoot, cppHeaderAst);
 
         System.out.println(allEntries);
 
@@ -89,8 +89,6 @@ public class CPPHeaderAstGenerator {
 
 
         XtcTestUtils.prettyPrintAst(cppHeaderAst);
-
-        System.out.println(((DataField)(allEntries.get(8))).get().equals("java::lang's been REPLACED!!"));
 
 
         //get namespace nodes
