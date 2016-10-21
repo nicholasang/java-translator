@@ -21,6 +21,7 @@ public class CPPHeaderAstGenerator {
     public static ArrayList<Object> allEntries;
 
 
+    @Deprecated
     public static void generate(GNode javaRoot, InheritanceHierarchyTree tree) {
 
 
