@@ -118,10 +118,12 @@ public class Boot extends Tool {
 
             // TODO: Generate Inheritance hierarchy tree here when finding methods
 
-            for(GNode root : allAsts)
-            {
+            for(GNode root : allAsts) {
                 // TODO: Pass the inheritance hierarchy tree to the CPPHeaderAstGenerator method
-                CPPHeaderAstGenerator.generate(root, null);
+                //CPPHeaderAstGenerator.generate(root, null);
+
+                CPPHeaderAstGenerator.generateNew(root, null);
+
 
                 // REMOVE: later
                 System.exit(0);
@@ -152,8 +154,7 @@ public class Boot extends Tool {
 
                 try {
 
-                    try
-                    {
+                    try {
                         //URL u = new URL();
                         System.out.println(workingDir);
 
@@ -161,7 +162,7 @@ public class Boot extends Tool {
 
                         System.out.println(fileDir);
 
-                        URL[] urls = new URL[]{new URL(fileDir)};
+                        URL[] urls = new URL[] {new URL(fileDir)};
 
                         ClassLoader loader = new URLClassLoader(urls);
 
@@ -171,16 +172,13 @@ public class Boot extends Tool {
 
 
 
-                    }
-                    catch(Exception ex)
-                    {
+                    } catch(Exception ex) {
                         System.err.println(ex.getStackTrace());
                         System.exit(-1);
                     }
 
 
-                    if(true == false)
-                    {
+                    if(true == false) {
 
                         String className = "src.main.test.java.inputs.testX1." + (String) NodeUtil.dfs(gn, "ClassDeclaration").get(1);
 

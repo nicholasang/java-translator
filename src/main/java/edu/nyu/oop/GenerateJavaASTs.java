@@ -25,8 +25,7 @@ import java.util.*;
 
 import java.util.HashMap;
 
-public class GenerateJavaASTs
-{
+public class GenerateJavaASTs {
     private GenerateJavaASTs() {};
 
     public static List<GNode> beginParse(GNode n) {

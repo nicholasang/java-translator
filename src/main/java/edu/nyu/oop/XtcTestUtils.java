@@ -8,8 +8,7 @@ import xtc.util.Runtime;
 import java.io.File;
 
 
-public class XtcTestUtils
-{
+public class XtcTestUtils {
 
     public static Runtime newRuntime() {
         Runtime runtime = new Runtime();

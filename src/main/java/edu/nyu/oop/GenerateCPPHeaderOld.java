@@ -29,14 +29,11 @@ import java.util.*;
 
 
 @Deprecated
-public class GenerateCPPHeaderOld
-{
-    private GenerateCPPHeaderOld()
-    {
+public class GenerateCPPHeaderOld {
+    private GenerateCPPHeaderOld() {
     }
 
-    public static GNode getHeaderAST(GNode root, xtc.util.Runtime runtime)
-    {
+    public static GNode getHeaderAST(GNode root, xtc.util.Runtime runtime) {
         HeaderRawContainer dotH = new HeaderRawContainer(root);
 
         System.exit(0); //DOING THIS ON PURPOSE TO FORCE THIS TO STOP AFTER ONE FILE
@@ -44,13 +41,11 @@ public class GenerateCPPHeaderOld
         return null;
     }
 
-    private static class HeaderRawContainer
-    {
+    private static class HeaderRawContainer {
         //won't be used?
         ArrayList<String> headerContents;
 
-        HeaderRawContainer(GNode rootJAst)
-        {
+        HeaderRawContainer(GNode rootJAst) {
             /*
             //SomeBigWrapperNode
             GNode cppHeaderAst = GNode.create("SomeBigWrapperNode", 3);
@@ -160,8 +155,7 @@ public class GenerateCPPHeaderOld
 
 
 
-        private GNode createMappingNodeV2(String constructType)
-        {
+        private GNode createMappingNodeV2(String constructType) {
 
             GNode construct = GNode.create(constructType, 10);
             LinkedHashMap<String, ValueWrapper> dataMap = new LinkedHashMap<String, ValueWrapper>();
@@ -173,8 +167,7 @@ public class GenerateCPPHeaderOld
             return construct;
         }
 
-        private void putDataMapping(GNode construct, String infoKind, Object value)
-        {
+        private void putDataMapping(GNode construct, String infoKind, Object value) {
             LinkedHashMap<String, ValueWrapper> dataMap = (LinkedHashMap<String, ValueWrapper>)construct.get(0);
 
             ((ArrayList<ValueWrapper>)((Object)(dataMap.get("all")).get())).add(new ValueWrapper(value));
@@ -182,55 +175,41 @@ public class GenerateCPPHeaderOld
             dataMap.put(infoKind, new ValueWrapper(value));
         }
 
-        private void putConstructChild(GNode construct, GNode child)
-        {
+        private void putConstructChild(GNode construct, GNode child) {
             construct.add(child);
         }
 
-        private GNode getConstructChild(GNode construct, long i)
-        {
+        private GNode getConstructChild(GNode construct, long i) {
             if(i < 1)return null;
 
             return (GNode)construct.get((int)i);
         }
 
-        private ArrayList<ValueWrapper> getAllValues(GNode node)
-        {
-            try
-            {
+        private ArrayList<ValueWrapper> getAllValues(GNode node) {
+            try {
                 LinkedHashMap<String, ValueWrapper> dataMap = (LinkedHashMap<String, ValueWrapper>) node.get(0);
                 return (ArrayList<ValueWrapper>)dataMap.get("all").get();
-            }
-            catch(Exception ex)
-            {
+            } catch(Exception ex) {
                 return null;
             }
         }
 
-        private ValueWrapper getDataAtKey(GNode node, String key)
-        {
-            try
-            {
+        private ValueWrapper getDataAtKey(GNode node, String key) {
+            try {
                 LinkedHashMap<String, ValueWrapper> dataMap = (LinkedHashMap<String, ValueWrapper>) node.get(0);
                 return dataMap.get(key);
-            }
-            catch(Exception ex)
-            {
+            } catch(Exception ex) {
                 return null;
             }
         }
 
-        private ValueWrapper getDataAtIndex(GNode node, long i)
-        {
-            try
-            {
+        private ValueWrapper getDataAtIndex(GNode node, long i) {
+            try {
                 LinkedHashMap<String, ValueWrapper> dataMap = (LinkedHashMap<String, ValueWrapper>) node.get(0);
 
                 return ((ArrayList<ValueWrapper>)((Object)(dataMap.get("all")).get())).get((int)i);
 
-            }
-            catch(Exception ex)
-            {
+            } catch(Exception ex) {
                 return null;
             }
         }
@@ -258,53 +237,42 @@ public class GenerateCPPHeaderOld
         }
 
 
-/*
+        /*
         private void putDataMapping(GNode construct, String infoKind, List<String> values)
         {
             LinkedHashMap<String, List<String>> dataMap = (LinkedHashMap<String, List<String>>)construct.get(0);
             dataMap.put(infoKind, values);
         }
-  */
+        */
 
-        private void putChildMapping(GNode construct, String childKind, List<GNode> children)
-        {
+        private void putChildMapping(GNode construct, String childKind, List<GNode> children) {
             LinkedHashMap<String, List<GNode>> childMap = (LinkedHashMap<String, List<GNode>>)construct.get(0);
             childMap.put(childKind, (List<GNode>)children);
         }
 
 
         //get list of data of certain type (using lists so portable between GNodes, regardless of number of data items
-        private List<String> dataListAtKey(GNode node, String key)
-        {
-            try
-            {
+        private List<String> dataListAtKey(GNode node, String key) {
+            try {
                 LinkedHashMap<String, List<String>> dataMap = (LinkedHashMap<String, List<String>>) node.get(0);
                 return dataMap.get(key);
-            }
-            catch(Exception ex)
-            {
+            } catch(Exception ex) {
                 return null;
             }
         }
 
-        private String[] dataListAll(GNode node)
-        {
-            try
-            {
+        private String[] dataListAll(GNode node) {
+            try {
                 LinkedHashMap<String, List<String>> dataMap = (LinkedHashMap<String, List<String>>) node.get(0);
                 String[] sA = (String[])dataMap.values().toArray();
                 return sA;
-            }
-            catch(Exception ex)
-            {
+            } catch(Exception ex) {
                 return null;
             }
         }
 
-        private Object dataAtIndex(GNode node, int i)
-        {
-            try
-            {
+        private Object dataAtIndex(GNode node, int i) {
+            try {
                 LinkedHashMap<String, List<String>> dataMap = (LinkedHashMap<String, List<String>>) node.get(0);
 
                 System.out.println(dataMap);
@@ -318,36 +286,26 @@ public class GenerateCPPHeaderOld
                 System.out.println("WEEEEEEEEEEEEEEEEEEEEEEEEEEE" + s[0]);
                 System.exit(0);
                 return s[i];
-            }
-            catch(Exception ex)
-            {
+            } catch(Exception ex) {
                 return null;
             }
         }
 
-        private List<GNode> childListAtKey(GNode node, String key)
-        {
-            try
-            {
+        private List<GNode> childListAtKey(GNode node, String key) {
+            try {
                 LinkedHashMap<String, List<GNode>> childMap = (LinkedHashMap<String, List<GNode>>) node.get(1);
                 return childMap.get(key);
-            }
-            catch(Exception ex)
-            {
+            } catch(Exception ex) {
                 return null;
             }
         }
 
-        private GNode childAtIndex(GNode node, int i)
-        {
-            try
-            {
+        private GNode childAtIndex(GNode node, int i) {
+            try {
                 LinkedHashMap<String, List<GNode>> childMap = (LinkedHashMap<String, List<GNode>>) node.get(1);
                 return (GNode)childMap.values().toArray()[i];
 
-            }
-            catch(Exception ex)
-            {
+            } catch(Exception ex) {
                 return null;
             }
         }

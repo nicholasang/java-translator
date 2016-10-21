@@ -2,36 +2,30 @@ package edu.nyu.oop;
 import java.util.ArrayList;
 
 @Deprecated
-public class ValueWrapper
-{
+public class ValueWrapper {
     private Object o;
     private boolean noPrint;
 
-    ValueWrapper(Object o)
-    {
+    ValueWrapper(Object o) {
         this.o = o;
     }
 
-    ValueWrapper(Object o, boolean noPrint)
-    {
+    ValueWrapper(Object o, boolean noPrint) {
         this.o = o;
         this.noPrint = noPrint;
 
     }
 
-    public Object get()
-    {
+    public Object get() {
         return o;
     }
 
-    public void set(Object o)
-    {
+    public void set(Object o) {
         this.o = o;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return (this.noPrint) ? Integer.toString(((ArrayList<ValueWrapper>)o).size()) : o.toString();
     }
 
