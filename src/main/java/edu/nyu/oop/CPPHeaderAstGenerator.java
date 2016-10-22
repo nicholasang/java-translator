@@ -17,27 +17,37 @@ import java.util.*;
 public class CPPHeaderAstGenerator {
     private CPPHeaderAstGenerator() {}
 
-    //public static List<MappingNodeEntry> allEntries;
-    public static ArrayList<Object> allEntries;
+    public static ArrayList<CPPHeaderAst> allCppHeaderAsts;
 
-    public static GNode cppHeaderAst;
     //most recent parent
     public static GNode cppHeaderMostRecentParent;
 
+    //this pointer references the list belonging to the AST currently being constructed, can be redirected
+    public static ArrayList<Object> allEntries;
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /* VERSION 2 MAIN */
-    public static void generateNew(GNode javaRoot, InheritanceHierarchyTree tree) {
+    /* VERSION 3 MAIN */
+    public static ArrayList<CPPHeaderAst> generateNew(List<GNode> javaRoots, InheritanceHierarchyTree tree) {
 
+        int i = 0;
+
+        allCppHeaderAsts = new ArrayList<CPPHeaderAst>();
+
+        //some algorithm to build the ASTs in order of class hiararchy (superclasses to subclasses) (topological sort?)
         //track every item added, in order
-        allEntries = new ArrayList<Object>();
 
+        // TODO: a loop should be here
+
+        GNode javaRoot = javaRoots.get(i);
         //new visitor
         JavaAstVisitor jav = new JavaAstVisitor();
 
         //create the cpp header root
-        cppHeaderAst = createMappingNode("SomeBigWrapperNode");
+        GNode cppHeaderAst = createMappingNode("SomeBigWrapperNode");
 
-        allEntries.add(cppHeaderAst); //no hashmap stores the root, but the root is implicitly the first item in allEntries
+        allCppHeaderAsts.add(new CPPHeaderAst(cppHeaderAst));
+
+        allEntries = allCppHeaderAsts.get(i).getAllEntries();
 
         //display the embedded hashmaps for debugging
         //InvisiblePrintObject.toggleInvisibilityCloak();
@@ -90,7 +100,8 @@ public class CPPHeaderAstGenerator {
 
         XtcTestUtils.prettyPrintAst(cppHeaderAst);
 
-
+        System.exit(0);
+        return null;
         //get namespace nodes
 
         //System.out.println(allEntries);
@@ -257,26 +268,6 @@ public class CPPHeaderAstGenerator {
         return construct;
     }
 
-    /*
-    @Deprecated
-    public static GNode createDataFieldMappingNodeOneShot(String constructType, String fieldNameKey, String value) {
-        GNode construct = createMappingNode(constructType);
-        addDataFieldMapping(construct, fieldNameKey, value);
-        return construct;
-    }
-
-    @Deprecated
-    public static GNode createDataFieldMappingNodeOneShot(String constructType, String fieldNameKey, ArrayList<String> values) {
-        GNode construct = createMappingNode(constructType);
-
-        for(String value : values) {
-            addDataFieldMapping(construct, fieldNameKey, value);
-        }
-        return construct;
-    }
-    */
-
-
     public static Object addNode(GNode node, GNode child) {
 
         if(node == null || child == null)return null;
@@ -325,6 +316,7 @@ public class CPPHeaderAstGenerator {
         return node;
     }
 
+    // NOTE: Better not to use
     public static Object replaceNode(GNode node, GNode childReplacement, int ithOccurrence) {
 
         if(node == null || childReplacement == null)return null;
@@ -440,178 +432,9 @@ public class CPPHeaderAstGenerator {
         return null;
     }
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    @Deprecated
-    public static void generate(GNode javaRoot, InheritanceHierarchyTree tree) {
-
-
-
-
-        /*STEP-WISE creation
-
-        //SomeBigWrapperNode
-        GNode cppHeaderAst = GNode.create("SomeBigWrapperNode");
-
-
-        //preprocessor directives
-        GNode preDirectives = createMappingNode("PrecompilerDeclarations");
-        //add data fields
-        addDataFieldMapping(preDirectives, "Names", new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")));
-        //link the node to the root
-        cppHeaderAst.add(preDirectives);
-
-        //namespaces
-        GNode usingNamespace = createMappingNode("UsingNamespace");
-        addDataFieldMapping(usingNamespace, "Names", "java::lang");
-        cppHeaderAst.add(usingNamespace);
-        */
-
-        //ONE-SHOT CREATION:
-
-        /*
-        //SomeBigWrapperNode
-        GNode cppHeaderAst = GNode.create("SomeBigWrapperNode");
-
-        GNode preDirectives = createMappingNodeOneShot("PrecompilerDeclarations", "Names", new ArrayList<String>(
-                Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>") ));
-
-        cppHeaderAst.add(preDirectives);
-
-        GNode usingNamespace = createMappingNodeOneShot("UsingNamespace", "Names", "java::lang");
-
-        cppHeaderAst.add(usingNamespace);
-        */
-
-
-        //DEFAULT OUTER SHELL CREATION EXAMPLE:
-
-        //SomeBigWrapperNode //I know other hard-codeable nodes are missing
-
-        /*
-        GNode cppHeaderAst = initSomeBigWrapperNode();
-
-
-        System.out.println("JAVA_____________________________________");
-        XtcTestUtils.prettyPrintAst(javaRoot);
-
-        System.out.println("\nCPPHeader_____________________________________");
-
-        XtcTestUtils.prettyPrintAst(cppHeaderAst);
-
-
-        //get namespace nodes
-        jav.visit(javaRoot, cppHeaderAst);
-
-        XtcTestUtils.prettyPrintAst(cppHeaderAst);
-
-        //find every ClassDeclaration
-        List<Node> allClassDeclarations = NodeUtil.dfsAll(javaRoot, "ClassDeclaration");
-        */
-
-
-
-
-
+    public static void resumeConstructionOf(CPPHeaderAst cppH) {
+        allEntries = cppH.getAllEntries();
     }
-
-    //methods
-    /* VERSION 1
-
-    public static GNode createMappingNode(String constructType) {
-
-    GNode construct = GNode.create(constructType);
-    LinkedHashMap<String, MappingNodeEntry> dataMap = new LinkedHashMap<String, MappingNodeEntry>();
-
-
-    DataFieldList all = (DataFieldList)MappingNodeEntry.createDataFieldList();
-    all.setAsAllMarker();
-    dataMap.put("ALL", all);
-
-    construct.add(dataMap);
-
-    return construct;
-    }
-
-
-    public static GNode createMappingNodeOneShot(String constructType, String fieldNameKey, ArrayList<String> values) {
-    GNode construct = createMappingNode(constructType);
-    addDataFieldMapping(construct, fieldNameKey, values);
-    return construct;
-    }
-
-    public static GNode createMappingNodeOneShot(String constructType, String fieldNameKey, String value) {
-    GNode construct = createMappingNode(constructType);
-    addDataFieldMapping(construct, fieldNameKey, value);
-    return construct;
-    }
-
-    public static GNode initSomeBigWrapperNode() {
-    //SomeBigWrapperNode
-    GNode cppHeaderAst = GNode.create("SomeBigWrapperNode");
-
-    GNode preDirectives = createMappingNodeOneShot("PrecompilerDeclarations", "Names", new ArrayList<String>(
-                              Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>") ));
-
-    cppHeaderAst.add(preDirectives);
-
-    GNode usingNamespace = createMappingNodeOneShot("UsingNamespace", "Names", "java::lang");
-
-    cppHeaderAst.add(usingNamespace);
-
-    return cppHeaderAst;
-    }
-
-
-    public static void addDataFieldMapping(GNode node, String fieldNameKey, ArrayList<String> values) {
-    LinkedHashMap<String, MappingNodeEntry> dataMap = (LinkedHashMap<String, MappingNodeEntry>)node.get(0);
-
-    DataFieldList dfl = (DataFieldList)dataMap.get(fieldNameKey);
-
-    DataFieldList all = (DataFieldList)dataMap.get("ALL");
-
-
-    if(dfl == null) {
-        dfl = new DataFieldList(values);
-        dataMap.put(fieldNameKey, dfl);
-        allEntries.add(dfl);
-
-        all.append(values);
-    } else {
-        for(String value : values) {
-            dfl.append(value);
-
-            all.append(values);
-
-        }
-    }
-
-    }
-
-    public static void addDataFieldMapping(GNode node, String fieldNameKey, String value) {
-
-    LinkedHashMap<String, MappingNodeEntry> dataMap = (LinkedHashMap<String, MappingNodeEntry>)node.get(0);
-
-    DataFieldList dfl = (DataFieldList)dataMap.get(fieldNameKey);
-
-    DataFieldList all = (DataFieldList)dataMap.get("ALL");
-
-
-    if(dfl == null) {
-        dfl = new DataFieldList(value);
-        dataMap.put(fieldNameKey, dfl);
-        allEntries.add(dfl);
-
-        all.append(value);
-
-    } else {
-        dfl.append(value);
-
-        all.append(value);
-
-    }
-    }
-    */
 
 
 }

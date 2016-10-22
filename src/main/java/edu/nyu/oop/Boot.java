@@ -118,16 +118,7 @@ public class Boot extends Tool {
 
             // TODO: Generate Inheritance hierarchy tree here when finding methods
 
-            for(GNode root : allAsts) {
-                // TODO: Pass the inheritance hierarchy tree to the CPPHeaderAstGenerator method
-                //CPPHeaderAstGenerator.generate(root, null);
-
-                CPPHeaderAstGenerator.generateNew(root, null);
-
-
-                // REMOVE: later
-                System.exit(0);
-            }
+            List<CPPHeaderAst> allCPPAsts = CPPHeaderAstGenerator.generateNew(allAsts, null);
         }
 
 
