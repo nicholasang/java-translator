@@ -34,6 +34,8 @@ public class CppHeaderAstsGenerator {
 
         allCppHeaderAsts = new ArrayList<CppHeaderAst>();
 
+
+
         //some algorithm to build the ASTs in order of class hiararchy (superclasses to subclasses) (topological sort?)
         //track every item added, in order
 
@@ -160,7 +162,7 @@ public class CppHeaderAstsGenerator {
         // (Not really, it still works, but consistency is nice)
         GNode preDirectives = createMappingNode("PreprocessorDirectives");
         addNode(cppHeaderAst, preDirectives);
-        addDataFieldMapping(preDirectives, "Name", new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")) );
+        addDataFieldMappingMulti(preDirectives, "Name", new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")) );
 
         //usingnamespace, "one-shot create and link with parent node" example
         GNode usingNamespace = createAndLinkDataFieldMappingNodeOneShot(cppHeaderAst,"UsingNamespace", "Name", "java::lang");
@@ -340,12 +342,34 @@ public class CppHeaderAstsGenerator {
         return node;
     }
 
-    public static Object addDataFieldMapping(GNode node, String fieldNameKey, ArrayList<String> values) {
+    public static Object addDataFieldMappingMulti(GNode node, String fieldNameKey, ArrayList<String> values) {
+
+        if(node == null)return null;
 
         Object success = null;
         for(String value : values) {
             if((success = addDataFieldMapping(node, fieldNameKey, value)) == null)return null;
         }
+        return success;
+    }
+
+    // TODO: IS A COMMA-DELIMITED STRING GOOD ENOUGH, OR SHOULD I MODIFY SO A LIST OF STRINGS IS CONTAINED, WOULD REQUIRE MORE WORK, BUT DOABLE
+    public static Object addDataFieldMappingAsList(GNode node, String fieldNameKey, ArrayList<String> values) {
+
+        if(node == null)return null;
+
+        Object success = null;
+        StringBuilder sb = new StringBuilder();
+        int s = 0;
+        int bound = values.size() - 1;
+        for(; s < bound; ++s) {
+            sb.append(values.get(s));
+            sb.append(", ");
+        }
+        sb.append(values.get(s));
+
+        if((success = addDataFieldMapping(node, fieldNameKey, sb.toString())) == null)return null;
+
         return success;
     }
 
@@ -359,7 +383,7 @@ public class CppHeaderAstsGenerator {
         return construct;
     }
 
-    public static GNode createAndLinkDataFieldMappingNodeOneShot(GNode parent, String constructType, String fieldNameKey, ArrayList<String> values) {
+    public static GNode createAndLinkDataFieldMappingNodeOneShotMulti(GNode parent, String constructType, String fieldNameKey, ArrayList<String> values) {
 
         if(parent == null)return null;
 
@@ -369,6 +393,30 @@ public class CppHeaderAstsGenerator {
         for(String value : values) {
             addDataFieldMapping(construct, fieldNameKey, value);
         }
+        return construct;
+    }
+
+    public static GNode createAndLinkDataFieldMappingNodeOneShotAsList(GNode parent, String constructType, String fieldNameKey, ArrayList<String> values) {
+
+        if(parent == null)return null;
+
+        GNode construct = createMappingNode(constructType);
+        addNode(parent, construct);
+
+        for(String value : values) {
+        }
+
+        StringBuilder sb = new StringBuilder();
+        int s = 0;
+        int bound = values.size() - 1;
+        for(; s < bound; ++s) {
+            sb.append(values.get(s));
+            sb.append(", ");
+        }
+        sb.append(values.get(s));
+
+        addDataFieldMapping(construct, fieldNameKey, sb.toString());
+
         return construct;
     }
 
@@ -485,6 +533,9 @@ public class CppHeaderAstsGenerator {
     }
 
     public static ArrayList<Integer> getAllLocalIndicesOf(GNode node, String key) {
+
+        if(node == null)return null;
+
         LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
         ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(key);
 
@@ -512,6 +563,9 @@ public class CppHeaderAstsGenerator {
     }
 
     public static ArrayList<Integer> getAllGlobalIndicesOf(GNode node, String key) {
+
+        if(node == null)return null;
+
         LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
         ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(key);
 
@@ -527,13 +581,19 @@ public class CppHeaderAstsGenerator {
     }
 
     public static Object replaceLocalDataFieldValue(GNode node, String key, String value, int ithOccurrence) {
-        Object o = node.get((Integer)(getLocalIndexOf(node, key, ithOccurrence)));
+
+        if(node == null)return null;
+
+        Object o;
+        Integer i;
+        if((i = (Integer)(getLocalIndexOf(node, key, ithOccurrence))) == null
+                || (o = node.get(i)) == null)return null;
 
         if(o instanceof DataField) {
             ((DataField) o).setVal(value);
         }
 
-        return null;
+        return node;
     }
 
     public static void resumeConstructionOf(CppHeaderAst cppH) {
