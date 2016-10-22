@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import xtc.tree.GNode;
 
-public class CPPHeaderAst {
+public class CppHeaderAst {
 
     private GNode root;
     private ArrayList<Object> allEntries;
@@ -13,7 +13,7 @@ public class CPPHeaderAst {
     // TODO: have a list of GNodes pointing to all class bodies in the tree, also list of methods/fields
     private ArrayList<MethodsAndFieldsList> classMethodsAndFields;
 
-    public CPPHeaderAst(GNode root) {
+    public CppHeaderAst(GNode root) {
         this.allEntries = new ArrayList<Object>();
         this.allEntries.add(root);
     }

@@ -7,7 +7,6 @@ import java.util.List;
 
 import edu.nyu.oop.util.JavaFiveImportParser;
 import edu.nyu.oop.util.NodeUtil;
-import edu.nyu.oop.util.SymbolTableUtil;
 import edu.nyu.oop.util.XtcProps;
 import org.slf4j.Logger;
 
@@ -118,7 +117,7 @@ public class Boot extends Tool {
 
             // TODO: Generate Inheritance hierarchy tree here when finding methods
 
-            List<CPPHeaderAst> allCPPAsts = CPPHeaderAstGenerator.generateNew(allAsts, null);
+            List<CppHeaderAst> allCPPAsts = CppHeaderAstsGenerator.generateNew(allAsts, null);
         }
 
 

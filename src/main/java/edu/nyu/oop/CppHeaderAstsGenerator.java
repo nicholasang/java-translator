@@ -12,10 +12,10 @@ import edu.nyu.oop.customUtil.*;
 
 import java.util.*;
 
-public class CPPHeaderAstGenerator {
-    private CPPHeaderAstGenerator() {}
+public class CppHeaderAstsGenerator {
+    private CppHeaderAstsGenerator() {}
 
-    public static ArrayList<CPPHeaderAst> allCppHeaderAsts;
+    public static ArrayList<CppHeaderAst> allCppHeaderAsts;
 
     //most recent parent
     public static GNode cppHeaderMostRecentParent;
@@ -25,11 +25,11 @@ public class CPPHeaderAstGenerator {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* VERSION 3 MAIN */
-    public static ArrayList<CPPHeaderAst> generateNew(List<GNode> javaRoots, InheritanceHierarchyTree tree) {
+    public static ArrayList<CppHeaderAst> generateNew(List<GNode> javaRoots, InheritanceHierarchyTree tree) {
 
         int i = 0;
 
-        allCppHeaderAsts = new ArrayList<CPPHeaderAst>();
+        allCppHeaderAsts = new ArrayList<CppHeaderAst>();
 
         //some algorithm to build the ASTs in order of class hiararchy (superclasses to subclasses) (topological sort?)
         //track every item added, in order
@@ -43,7 +43,7 @@ public class CPPHeaderAstGenerator {
         //create the cpp header root
         GNode cppHeaderAst = createMappingNode("SomeBigWrapperNode");
 
-        allCppHeaderAsts.add(new CPPHeaderAst(cppHeaderAst));
+        allCppHeaderAsts.add(new CppHeaderAst(cppHeaderAst));
 
         allEntries = allCppHeaderAsts.get(i).getAllEntries();
 
@@ -430,7 +430,7 @@ public class CPPHeaderAstGenerator {
         return null;
     }
 
-    public static void resumeConstructionOf(CPPHeaderAst cppH) {
+    public static void resumeConstructionOf(CppHeaderAst cppH) {
         allEntries = cppH.getAllEntries();
     }
 
