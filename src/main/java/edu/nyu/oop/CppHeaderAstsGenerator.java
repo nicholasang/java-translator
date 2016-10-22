@@ -1,6 +1,9 @@
 package edu.nyu.oop;
 
+import edu.nyu.oop.util.NodeUtil;
 import xtc.tree.GNode;
+import xtc.tree.Node;
+
 
 import edu.nyu.oop.customUtil.InheritanceHierarchyTreeGenerator.*;
 
@@ -74,8 +77,43 @@ public class CppHeaderAstsGenerator {
         "B" {AST2}
         "C" {AST1}
         "D" {AST1}
+        /*
 
 
+         */
+
+        //SOMETHING LIKE THIS: (OR use a class wrapper object to contain more info like CppClassRef (made the skeleton)
+
+        /*
+        HashMap<GNode, GNode> classToJAstMap = new HashMap<GNode, GNode>();
+
+        for(GNode file : javaRoots)
+        {
+            CppHeaderAst h = new CppHeaderAst("SomeBigWrapperNode");
+
+            List<Node> classes = NodeUtil.dfsAll(file, "ClassDeclaration");
+
+            for(Node n : classes)
+            {
+                h.addClass((GNode)n);
+                classToJAstMap.put((GNode)n, file);
+            }
+
+
+            allCppHeaderAsts.add(h);
+
+        }
+
+        HashMap<String, String> childNametoParentNameMap = new HashMap<String, String>();
+        HashMap<String, GNode> classNameToBodyMap = new HashMap<String, GNode>();
+
+
+        XtcTestUtils.prettyPrintAst(javaRoots.get(0));
+        System.exit(0);
+        /*
+
+         */
+        /*
         We need to jump around so we can fill the vtables/structs in order of increasing number of parents
 
         -also an intermediary structure to contain entries in our structs per class--one per our Class object (GNode pointing to class body)
