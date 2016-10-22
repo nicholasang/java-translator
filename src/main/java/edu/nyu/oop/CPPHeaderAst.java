@@ -4,10 +4,6 @@ import java.util.ArrayList;
 
 import xtc.tree.GNode;
 
-import edu.nyu.oop.customUtil.InheritanceHierarchyTreeGenerator.*;
-
-import edu.nyu.oop.customUtil.MappingNodeEntry2.DataField;
-
 public class CPPHeaderAst {
 
     private GNode root;

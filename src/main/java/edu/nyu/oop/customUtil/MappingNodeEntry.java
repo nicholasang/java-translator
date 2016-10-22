@@ -1,91 +1,36 @@
 package edu.nyu.oop.customUtil;
-import java.util.*;
-import xtc.tree.GNode;
 
-@Deprecated
-public abstract class MappingNodeEntry {
+public abstract class MappingNodeEntry
+{
     private MappingNodeEntry() {}
 
-    public static MappingNodeEntry createDataFieldList() {
-        return new DataFieldList();
+    public static DataField createDataField(String key, String val, int ID) {
+        return new DataField(key, val, ID);
     }
 
-    public static MappingNodeEntry createNodeEntry(GNode node) {
-        try {
-            return new NodeEntry(node);
-        } catch(NoSuchElementException ex) {
-            return null;
-        }
-    }
+    public static class DataField extends MappingNodeEntry
+    {
+        private String key;
+        private String val;
+        private int     ID;
 
-
-    public static class DataFieldList extends MappingNodeEntry {
-        private List<String> dataFields;
-        private boolean allMarker;
-
-        public DataFieldList() {
-            this.dataFields = new ArrayList<String>();
+        public DataField(String key, String val, int ID) {
+            this.key = key;
+            this.val = val;
+            this.ID  =  ID;
         }
 
-        public DataFieldList(String toAdd) {
-            this();
-            this.dataFields.add(toAdd);
+        public void setVal(String val) {
+            this.val = val;
         }
 
-        public DataFieldList(ArrayList<String> dfl) {
-            this.dataFields = dfl;
-        }
-
-        public void append(String toAdd) {
-            this.dataFields.add(toAdd);
-        }
-
-        public void append(ArrayList<String> toAdd) {
-            for(String val : toAdd) {
-                this.dataFields.add(val);
-            }
-        }
-
-        public String getFirst() {
-            return this.dataFields.get(0);
-        }
-
-        public String getAt(int i) {
-            return this.dataFields.get(i);
-        }
-
-        public List<String> getList() {
-            return this.dataFields;
-        }
-
-        public void setAsAllMarker() {
-            this.allMarker = true;
+        public String get() {
+            return this.val;
         }
 
         @Override
         public String toString() {
-            if(this.allMarker) {
-                return "[" + Integer.toString(this.dataFields.size()) + "]";
-            }
-
-            return this.dataFields.toString();
-        }
-    }
-
-    public static class NodeEntry extends MappingNodeEntry {
-        private GNode node;
-
-        private NodeEntry() {}
-
-        public NodeEntry(GNode node) throws NoSuchElementException {
-            if(node == null) throw new NoSuchElementException();
-
-            this.node = node;
-        }
-
-        public GNode getNode() {
-            return this.node;
+            return this.key + " = " + this.val;
         }
     }
 }
-

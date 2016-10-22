@@ -1,12 +1,10 @@
 package edu.nyu.oop;
 
-import edu.nyu.oop.util.NodeUtil;
 import xtc.tree.GNode;
-import xtc.tree.Node;
 
 import edu.nyu.oop.customUtil.InheritanceHierarchyTreeGenerator.*;
 
-import edu.nyu.oop.customUtil.MappingNodeEntry2.DataField;
+import edu.nyu.oop.customUtil.MappingNodeEntry.DataField;
 
 
 
@@ -197,7 +195,7 @@ public class CPPHeaderAstGenerator {
         if (localGlobalIndices == null || localGlobalIndices.size() == 0) {
             int nextAvailID = allEntries.size();
 
-            df = MappingNodeEntry2.createDataField(fieldNameKey, value, nextAvailID);
+            df = MappingNodeEntry.createDataField(fieldNameKey, value, nextAvailID);
 
             ArrayList<Integer> localIndices = new ArrayList<Integer>();
             localIndices.add(node.size());
@@ -219,7 +217,7 @@ public class CPPHeaderAstGenerator {
         } else {
             int nextAvailID = allEntries.size();
 
-            df = MappingNodeEntry2.createDataField(fieldNameKey, value, nextAvailID);
+            df = MappingNodeEntry.createDataField(fieldNameKey, value, nextAvailID);
 
             localGlobalIndices.get(0).add(node.size());
 
