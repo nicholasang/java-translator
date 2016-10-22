@@ -13,8 +13,8 @@ public class ClassRef {
     private GNode cppHStructBody;
     private GNode cppHVtableBody;
 
-    ClassRef parentClassRef;
-    LayoutSchematic tables;
+    private ClassRef parentClassRef;
+    private LayoutSchematic tables;
 
     public ClassRef() {
         this.tables = new LayoutSchematic();
