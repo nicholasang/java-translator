@@ -29,7 +29,9 @@ public class CppHeaderAst {
         this.classes = new ArrayList<GNode>();
     }
 
-    public void addClass(GNode c) { this.classes.add(c); }
+    public void addClass(GNode c) {
+        this.classes.add(c);
+    }
     public GNode getRoot() {
         return this.root;
     }

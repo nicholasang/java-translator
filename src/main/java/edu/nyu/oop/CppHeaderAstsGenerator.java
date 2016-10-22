@@ -82,7 +82,7 @@ public class CppHeaderAstsGenerator {
 
          */
 
-        //SOMETHING LIKE THIS: (OR use a class wrapper object to contain more info like CppClassRef (made the skeleton)
+        //SOMETHING LIKE THIS: (OR use a class wrapper object to contain more info like ClassRef (made the skeleton)
 
         /*
         HashMap<GNode, GNode> classToJAstMap = new HashMap<GNode, GNode>();

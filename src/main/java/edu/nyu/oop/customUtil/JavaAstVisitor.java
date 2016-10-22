@@ -1,59 +1,12 @@
 package edu.nyu.oop.customUtil;
 
 import edu.nyu.oop.CppHeaderAstsGenerator;
+import edu.nyu.oop.ClassRef;
+
 import xtc.tree.GNode;
 import xtc.tree.Node;
 
 import java.util.ArrayList;
-
-/*
-public class JavaAstVisitor extends xtc.tree.Visitor {
-    GNode cppHeaderAstRoot;
-
-    public void visit(Node n, GNode cppHeaderAstRoot) {
-        this.cppHeaderAstRoot = cppHeaderAstRoot;
-        visit(n);
-    }
-
-    public void visit(Node n) {
-        for (Object o : n) {
-            if (o instanceof Node) dispatch((Node) o);
-        }
-    }
-
-    public void visitCompilationUnit(GNode n) {
-        visit(n);
-
-    }
-
-    public void visitPackageDeclaration(GNode n) {
-
-        GNode qualifiedIdentifier = (GNode)n.get(1);
-
-        ArrayList<String> packageNames = new ArrayList<String>(qualifiedIdentifier.size());
-
-        for(int i = 0; i < qualifiedIdentifier.size(); ++i) {
-            packageNames.add((String)qualifiedIdentifier.get(i));
-        }
-
-        GNode parent = this.cppHeaderAstRoot;
-        GNode namespace = null;
-        for(String s : packageNames) {
-            //namespace = CppHeaderAstsGenerator.createMappingNodeOneShot("Namespace", "Name", s);
-
-            if(parent != null) {
-                parent.addNode(namespace);
-            }
-
-            parent = namespace;
-        }
-
-
-        //visit(n, parent);
-    }
-
-}
-*/
 
 public class JavaAstVisitor extends xtc.tree.Visitor {
     GNode cppHeaderAstRoot;
@@ -115,6 +68,60 @@ public class JavaAstVisitor extends xtc.tree.Visitor {
 
 
     }
+
+
+
+    //////////////////////OLD/////////////////////
+    /*
+    public class JavaAstVisitor extends xtc.tree.Visitor {
+        GNode cppHeaderAstRoot;
+
+        public void visit(Node n, GNode cppHeaderAstRoot) {
+            this.cppHeaderAstRoot = cppHeaderAstRoot;
+            visit(n);
+        }
+
+        public void visit(Node n) {
+            for (Object o : n) {
+                if (o instanceof Node) dispatch((Node) o);
+            }
+        }
+
+        public void visitCompilationUnit(GNode n) {
+            visit(n);
+
+        }
+
+        public void visitPackageDeclaration(GNode n) {
+
+            GNode qualifiedIdentifier = (GNode)n.get(1);
+
+            ArrayList<String> packageNames = new ArrayList<String>(qualifiedIdentifier.size());
+
+            for(int i = 0; i < qualifiedIdentifier.size(); ++i) {
+                packageNames.add((String)qualifiedIdentifier.get(i));
+            }
+
+            GNode parent = this.cppHeaderAstRoot;
+            GNode namespace = null;
+            for(String s : packageNames) {
+                //namespace = CppHeaderAstsGenerator.createMappingNodeOneShot("Namespace", "Name", s);
+
+                if(parent != null) {
+                    parent.addNode(namespace);
+                }
+
+                parent = namespace;
+            }
+
+
+            //visit(n, parent);
+        }
+
+    }
+    */
+
+
 
 
 
