@@ -2,7 +2,8 @@ package edu.nyu.oop;
 
 import xtc.tree.GNode;
 
-//instead of a bunch of
+//instead of using several hash-maps, encapulate relationships between classes in
+//different ASTs, parts of different ASTs, and other classes in a ClassRef object
 public class ClassRef {
     private String name;
     private GNode jAst;
