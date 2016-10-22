@@ -12,16 +12,16 @@ import edu.nyu.oop.customUtil.*;
 
 import java.util.*;
 
+
 public class CppHeaderAstsGenerator {
     private CppHeaderAstsGenerator() {}
 
     public static ArrayList<CppHeaderAst> allCppHeaderAsts;
 
+    public static CppHeaderAst currentCpph;
+
     //most recent parent
     public static GNode cppHeaderMostRecentParent;
-
-    //this pointer references the list belonging to the AST currently being constructed, can be redirected
-    public static ArrayList<Object> allEntries;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* VERSION 3 MAIN */
@@ -34,6 +34,72 @@ public class CppHeaderAstsGenerator {
         //some algorithm to build the ASTs in order of class hiararchy (superclasses to subclasses) (topological sort?)
         //track every item added, in order
 
+        //since multiple classes in one header may extend from classes in other files, we may need to jump back and forth between
+        //partially-finished trees and create pieces of class bodies here and there, rejoin later. I need to create an ArrayList of GNode pointers
+        //to the class bodies
+
+        //Need a hierarchy tree:
+        /*EX:
+
+        C and D in file 1, AST1
+        B and A in file 2, AST2
+
+
+        C -> B -> A   D
+
+
+        HashMap<String, String>:
+
+        //child-to-parent tree-map
+
+        "A" {}
+        "B" {"A}
+        "C" {"B"}
+        "D" {}
+
+        in addition, need one to map names to ptrs
+
+        HashMap<String, GNode>:
+
+        "A" {classBodyA}
+        "B" {classBodyB}
+        "C" {classBodyC}
+        "D" {classBodyD}
+
+        and ptrs to ASTs
+
+        HashMap<GNode, GNode>:
+
+        "A" {AST2}
+        "B" {AST2}
+        "C" {AST1}
+        "D" {AST1}
+
+
+        We need to jump around so we can fill the vtables/structs in order of increasing number of parents
+
+        -also an intermediary structure to contain entries in our structs per class--one per our Class object (GNode pointing to class body)
+        -probably will contain a linear list of methods as well as a linear list of fields, two of each for public/package private and private/static
+
+        create a default intermediary structure with information from Object, save it (I will call the intermediary structure a schematic for now)
+        Start with A or D:
+
+        EX: D:
+        see that it has no parent, create a full copy of the Object schematic, assign it to parent somehow (Another HashMap is fine)
+
+        move to class A, see the same as for D, create a full copy of Object's schematic, assign
+
+        ...somehow use topological sorting to figure where to go next, or something simpler if available.
+
+        visit B next, see that its parent is A-- make a full copy of A's *public/package private schematic, but since the parent isn't Object, maybe
+        simultaneously figure which methods and fields in A override A's methods and fields instead of making a full copy first. Possibly use some sort of ordered set
+
+        visit C next, etc.
+
+        I included ways to track the current AST and also what is the most recent parent to which we added something (manually updated since sometimes
+        making that automatic wouldn't be helpful) NodeUtils.dfs would also work most of the time, but both the recent parent pointer and that may be helpful
+         */
+
         // TODO: a loop should be here
 
         GNode javaRoot = javaRoots.get(i);
@@ -43,9 +109,9 @@ public class CppHeaderAstsGenerator {
         //create the cpp header root
         GNode cppHeaderAst = createMappingNode("SomeBigWrapperNode");
 
-        allCppHeaderAsts.add(new CppHeaderAst(cppHeaderAst));
-
-        allEntries = allCppHeaderAsts.get(i).getAllEntries();
+        CppHeaderAst next = new CppHeaderAst(cppHeaderAst);
+        allCppHeaderAsts.add(next);
+        currentCpph = next;
 
         //display the embedded hashmaps for debugging
         //InvisiblePrintObject.toggleInvisibilityCloak();
@@ -89,7 +155,7 @@ public class CppHeaderAstsGenerator {
         // TODO
         jav.visit(javaRoot, cppHeaderAst);
 
-        System.out.println(allEntries);
+        System.out.println(currentCpph.getAllEntries());
 
         GNode replacement = createMappingNode("UsingNamespace");
         addDataFieldMapping(replacement, "Name", "java::lang's been REPLACED!!");
@@ -97,6 +163,8 @@ public class CppHeaderAstsGenerator {
 
 
         XtcTestUtils.prettyPrintAst(cppHeaderAst);
+
+        System.out.println("\n\n" + currentCpph.getAllEntries());
 
         System.exit(0);
         return null;
@@ -193,7 +261,7 @@ public class CppHeaderAstsGenerator {
         DataField df;
 
         if (localGlobalIndices == null || localGlobalIndices.size() == 0) {
-            int nextAvailID = allEntries.size();
+            int nextAvailID = currentCpph.getAllEntries().size();
 
             df = MappingNodeEntry.createDataField(fieldNameKey, value, nextAvailID);
 
@@ -206,7 +274,7 @@ public class CppHeaderAstsGenerator {
             localGlobalIndices.add(localIndices);
             localGlobalIndices.add(globalIndices);
 
-            allEntries.add(df);
+            currentCpph.getAllEntries().add(df);
 
             all.get(0).add(node.size());
             all.get(1).add(nextAvailID);
@@ -215,7 +283,7 @@ public class CppHeaderAstsGenerator {
 
 
         } else {
-            int nextAvailID = allEntries.size();
+            int nextAvailID = currentCpph.getAllEntries().size();
 
             df = MappingNodeEntry.createDataField(fieldNameKey, value, nextAvailID);
 
@@ -223,7 +291,7 @@ public class CppHeaderAstsGenerator {
 
             localGlobalIndices.get(1).add(nextAvailID);
 
-            allEntries.add(df);
+            currentCpph.getAllEntries().add(df);
 
             all.get(0).add(node.size());
             all.get(1).add(nextAvailID);
@@ -278,7 +346,7 @@ public class CppHeaderAstsGenerator {
 
 
         if(localGlobalIndices == null || localGlobalIndices.size() == 0) {
-            int nextAvailID = allEntries.size();
+            int nextAvailID = currentCpph.getAllEntries().size();
 
             ArrayList<Integer> localIndices = new ArrayList<Integer>();
             localIndices.add(node.size());
@@ -289,7 +357,7 @@ public class CppHeaderAstsGenerator {
             localGlobalIndices.add(localIndices);
             localGlobalIndices.add(globalIndices);
 
-            allEntries.add(child);
+            currentCpph.getAllEntries().add(child);
 
             all.get(0).add(node.size());
             all.get(1).add(nextAvailID);
@@ -298,12 +366,12 @@ public class CppHeaderAstsGenerator {
 
 
         } else {
-            int nextAvailID = allEntries.size();
+            int nextAvailID = currentCpph.getAllEntries().size();
             localGlobalIndices.get(0).add(node.size());
 
             localGlobalIndices.get(1).add(nextAvailID);
 
-            allEntries.add(child);
+            currentCpph.getAllEntries().add(child);
 
             all.get(0).add(node.size());
             all.get(1).add(nextAvailID);
@@ -327,7 +395,7 @@ public class CppHeaderAstsGenerator {
 
         Integer globalIndex;
         if((globalIndex = getGlobalIndexOf(node, childReplacement.getName(), ithOccurrence)) == null)return null;
-        allEntries.set(globalIndex, childReplacement);
+        currentCpph.getAllEntries().set(globalIndex, childReplacement);
 
         node.set(getLocalIndexOf(node, childReplacement.getName(), ithOccurrence), childReplacement);
 
@@ -431,7 +499,9 @@ public class CppHeaderAstsGenerator {
     }
 
     public static void resumeConstructionOf(CppHeaderAst cppH) {
-        allEntries = cppH.getAllEntries();
+        //save what we were doing. This is almost like the mindset behind process switching
+        currentCpph.setMostRecentParent(CppHeaderAstsGenerator.cppHeaderMostRecentParent);
+        currentCpph = cppH;
     }
 
 

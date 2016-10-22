@@ -1,8 +1,9 @@
 package edu.nyu.oop;
 
-import java.util.ArrayList;
-
 import xtc.tree.GNode;
+
+
+import java.util.*;
 
 public class CppHeaderAst {
 
@@ -11,7 +12,14 @@ public class CppHeaderAst {
     private GNode mostRecentParent;
 
     // TODO: have a list of GNodes pointing to all class bodies in the tree, also list of methods/fields
-    private ArrayList<MethodsAndFieldsList> classMethodsAndFields;
+    private ArrayList<MethodsAndFieldsSchematic> classMethodsAndFields;
+
+    public CppHeaderAst(String name) {
+        this.allEntries = new ArrayList<Object>();
+        this.root = CppHeaderAstsGenerator.createMappingNode(name);
+        this.allEntries.add(this.root);
+
+    }
 
     public CppHeaderAst(GNode root) {
         this.allEntries = new ArrayList<Object>();

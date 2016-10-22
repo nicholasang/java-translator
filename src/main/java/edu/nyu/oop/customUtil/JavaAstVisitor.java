@@ -94,6 +94,7 @@ public class JavaAstVisitor extends xtc.tree.Visitor {
             parent = CppHeaderAstsGenerator.createAndLinkDataFieldMappingNodeOneShot(parent, "Namespace", "Name", s);
 
             CppHeaderAstsGenerator.cppHeaderMostRecentParent = parent;
+            CppHeaderAstsGenerator.currentCpph.setMostRecentParent(parent);
 
         }
     }
@@ -101,13 +102,14 @@ public class JavaAstVisitor extends xtc.tree.Visitor {
     public void visitClassDeclaration(GNode n) {
 
 
-        GNode localParent = (GNode) CppHeaderAstsGenerator.addNode(CppHeaderAstsGenerator.cppHeaderMostRecentParent, CppHeaderAstsGenerator.createMappingNode("ClassWrapper"));
+        GNode parent = (GNode) CppHeaderAstsGenerator.addNode(CppHeaderAstsGenerator.cppHeaderMostRecentParent, CppHeaderAstsGenerator.createMappingNode("ClassWrapper"));
 
         //System.out.println("ENTERING CLASS BODY");
 
         visit(n);
 
-        CppHeaderAstsGenerator.cppHeaderMostRecentParent = localParent;
+        CppHeaderAstsGenerator.cppHeaderMostRecentParent = parent;
+        CppHeaderAstsGenerator.currentCpph.setMostRecentParent(parent);
 
         //System.out.println("EXITING CLASS BODY");
 

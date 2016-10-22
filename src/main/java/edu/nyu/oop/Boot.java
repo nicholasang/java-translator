@@ -19,6 +19,10 @@ import xtc.parser.ParseException;
 
 import java.net.*;
 
+import javax.tools.*;
+
+import java.util.*;
+
 
 /**
  * This is the entry point to your program. It configures the user interface, defining
@@ -126,82 +130,51 @@ public class Boot extends Tool {
 
             String workingDir = System.getProperty("user.dir");
 
+            System.out.println(System.getProperty("user.dir"));
 
-            Location nLocation = n.getLocation();
-            Location longLocation = new Location(workingDir + "/" + nLocation.file, nLocation.line, nLocation.column);
-            n.setLocation(longLocation);
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            File dir = new File("/src/test/java/inputs/test001/");
+            File[] files = dir.listFiles();
+            ArrayList<SimpleJavaFileObject> simpleFiles = new ArrayList<SimpleJavaFileObject>();
 
-            List<GNode> dependencies = GenerateJavaASTs.beginParse((GNode) n);
-
-            boolean flag = false;
-
-            for(GNode gn : dependencies) {
-
-                System.out.println("---------------------------------------------------");
-                if(flag)break;
-
-                flag = true;
-
-                try {
-
-                    try {
-                        //URL u = new URL();
-                        System.out.println(workingDir);
-
-                        String fileDir = "file://" + workingDir + "/src/test/java/inputs/";
-
-                        System.out.println(fileDir);
-
-                        URL[] urls = new URL[] {new URL(fileDir)};
-
-                        ClassLoader loader = new URLClassLoader(urls);
-
-                        Class c = loader.loadClass("inputs.testX1." + "TestX1");
-
-                        GNode g = GNode.create("wee");
-
-
-
-                    } catch(Exception ex) {
-                        System.err.println(ex.getStackTrace());
-                        System.exit(-1);
-                    }
-
-
-                    if(true == false) {
-
-                        String className = "src.main.test.java.inputs.testX1." + (String) NodeUtil.dfs(gn, "ClassDeclaration").get(1);
-
-                        ClassLoader classy = ClassLoader.getSystemClassLoader();
-
-                        System.out.println(className);
-
-                        Class toLoad = classy.loadClass(className);
-
-                        System.out.println("SOMETHING WORKED!");
-                    }
-
-
-                    //findMethodsExperiments.printSuperClassVirtualMethods(Boot.class);
-
-                } catch(ClassNotFoundException ex) {
-                    System.out.println("ABORTING");
-                    System.out.println("WEE " + workingDir);
-
-                    System.exit(-1);
-                }
-
+            for(File f : files) {
+                //simpleFiles.add(new SimpleJavaFileObject(f.toURI(), JavaFileObject.Kind.SOURCE));
             }
+
+            JavaCompiler.CompilationTask c = compiler.getTask(null,null,null,null,null, simpleFiles);
+
+            File root = new File(workingDir + "/src/test/java");
+
+// Load and instantiate compiled class.
+
+            Class<?> cls;
+            try {
+                URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { root.toURI().toURL() });
+                cls = Class.forName("inputs.test001.Test001", true, classLoader);
+
+                Object instance = cls.newInstance();
+
+                System.out.println(instance.getClass().getName());
+
+            } catch(Exception ex) {
+                System.out.println(Arrays.toString(ex.getStackTrace()));
+                System.exit(-1);
+            }
+
+            System.out.println("HUH");
+
 
         }
 
-
-
-
-
-
-        // if (runtime.test("Your command here.")) { ... don't forget to add it to init()
     }
+
+
+
+
+
+
+    // if (runtime.test("Your command here.")) { ... don't forget to add it to init()
+
 
 
 
