@@ -9,6 +9,7 @@ import edu.nyu.oop.customUtil.MappingNodeEntry.DataField;
 
 import edu.nyu.oop.customUtil.*;
 
+import javax.xml.crypto.Data;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -415,9 +416,6 @@ public class CppHeaderAstGenerator {
         GNode construct = createMappingNode(constructType);
         addNode(parent, construct);
 
-        for(String value : values) {
-        }
-
         StringBuilder sb = new StringBuilder();
         int s = 0;
         int bound = values.size() - 1;
@@ -558,6 +556,21 @@ public class CppHeaderAstGenerator {
         for(int i = 1; i < num; ++i) {
             Object o = node.get(i);
             if(o instanceof GNode)out.add((GNode)o);
+        }
+
+        return out;
+    }
+
+    public static ArrayList<Object> getAllLocalEntries(GNode node) {
+        if(node == null)return null;
+
+        ArrayList<Object> out = new ArrayList<Object>();
+
+        int num = node.size();
+
+        for(int i = 1; i < num; ++i) {
+            Object o = node.get(i);
+            if(o instanceof DataField || o instanceof GNode)out.add(o);
         }
 
         return out;
