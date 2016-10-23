@@ -28,7 +28,7 @@ public class CppHeaderAstsGenerator {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* VERSION 3 MAIN */
-    public static ArrayList<CppHeaderAst> generateNew(List<GNode> javaRoots, InheritanceHierarchyTree tree) {
+    public static ArrayList<CppHeaderAst> generateNew(List<GNode> javaRoots/*, InheritanceHierarchyTree tree*/) { //decided to create the tree inside this class
 
         int i = 0;
 
