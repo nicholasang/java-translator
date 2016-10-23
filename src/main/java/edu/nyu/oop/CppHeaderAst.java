@@ -24,6 +24,7 @@ public class CppHeaderAst {
     }
 
     public CppHeaderAst(GNode root) {
+        this.root = root;
         this.allEntries = new ArrayList<Object>();
         this.allEntries.add(root);
         this.classRefs = new ArrayList<ClassRef>();
