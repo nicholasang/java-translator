@@ -26,7 +26,7 @@ import java.util.*;
 import java.util.HashMap;
 
 public class GenerateJavaASTs {
-    private GenerateJavaASTs() {};
+    private GenerateJavaASTs() {}
 
     public static List<GNode> beginParse(GNode n) {
         HashMap<String, Boolean> fileNamesFound = new HashMap<String, Boolean>();
