@@ -280,7 +280,7 @@ public class CppHeaderAstsGenerator {
         all.add(new ArrayList<Integer>());
 
 
-        dataMap.put("ALL", all);
+        dataMap.put("%ALL", all);
 
         construct.add(new InvisiblePrintObject(dataMap));
 
@@ -295,7 +295,7 @@ public class CppHeaderAstsGenerator {
 
         ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(fieldNameKey);
 
-        ArrayList<ArrayList<Integer>> all = (ArrayList<ArrayList<Integer>>)dataMap.get("ALL");
+        ArrayList<ArrayList<Integer>> all = (ArrayList<ArrayList<Integer>>)dataMap.get("%ALL");
 
 
         DataField df;
@@ -428,7 +428,7 @@ public class CppHeaderAstsGenerator {
 
         ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(child.getName());
 
-        ArrayList<ArrayList<Integer>> all = (ArrayList<ArrayList<Integer>>)dataMap.get("ALL");
+        ArrayList<ArrayList<Integer>> all = (ArrayList<ArrayList<Integer>>)dataMap.get("%ALL");
 
 
         if(localGlobalIndices == null || localGlobalIndices.size() == 0) {
