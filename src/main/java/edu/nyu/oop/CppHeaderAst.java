@@ -17,7 +17,7 @@ public class CppHeaderAst {
 
     public CppHeaderAst(String name) {
         this.allEntries = new ArrayList<Object>();
-        this.root = CppHeaderAstsGenerator.createMappingNode(name);
+        this.root = CppHeaderAstGenerator.createMappingNode(name);
         this.allEntries.add(this.root);
         this.classRefs = new ArrayList<ClassRef>();
 
