@@ -598,7 +598,11 @@ public class CppHeaderAstsGenerator {
 
     public static void resumeConstructionOf(CppHeaderAst cppH) {
         //save what we were doing. This is almost like the mindset behind process switching
-        currentCpph.setMostRecentParent(CppHeaderAstsGenerator.cppHeaderMostRecentParent);
+
+        //decided to let the programmer explicitly decide whether to update the parent,
+        //the parent pointer is more of a special tool when using the visitors than
+        //something that should be done automatically
+        //currentCpph.setMostRecentParent(CppHeaderAstsGenerator.cppHeaderMostRecentParent);
         currentCpph = cppH;
     }
 
