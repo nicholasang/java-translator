@@ -1,11 +1,7 @@
 package edu.nyu.oop;
 
-import edu.nyu.oop.util.NodeUtil;
 import xtc.tree.GNode;
-import xtc.tree.Node;
 
-
-import edu.nyu.oop.customUtil.InheritanceHierarchyTreeGenerator.*;
 
 import edu.nyu.oop.customUtil.MappingNodeEntry.DataField;
 
@@ -13,11 +9,12 @@ import edu.nyu.oop.customUtil.MappingNodeEntry.DataField;
 
 import edu.nyu.oop.customUtil.*;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 
-public class CppHeaderAstsGenerator {
-    private CppHeaderAstsGenerator() {}
+public class CppHeaderAstGenerator {
+    private CppHeaderAstGenerator() {}
 
     public static ArrayList<CppHeaderAst> allCppHeaderAsts;
 
@@ -28,7 +25,7 @@ public class CppHeaderAstsGenerator {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* VERSION 3 MAIN */
-    public static ArrayList<CppHeaderAst> generateNew(List<GNode> javaRoots/*, InheritanceHierarchyTree tree*/) { //decided to create the tree inside this class
+    public static ArrayList<CppHeaderAst> generateNew(List<GNode> javaRoots/*, ClassHierarchyTree tree*/) { //decided to create the tree inside this class
 
         int i = 0;
 
@@ -205,6 +202,21 @@ public class CppHeaderAstsGenerator {
         XtcTestUtils.prettyPrintAst(cppHeaderAst);
 
         System.out.println("\n\n" + currentCpph.getAllEntries());
+
+        System.out.println("\n");
+
+        System.out.println("Testing getAllLocalDataFields");
+        ArrayList<DataField> al = getAllLocalDataFields((GNode)getInstanceOf(currentCpph.getRoot(), "Namespace", 0));
+
+        System.out.println(al);
+
+        System.out.println("Testing getAllLocalConstructs");
+
+        ArrayList<GNode> alC = getAllLocalConstructs(currentCpph.getRoot());
+
+        for(GNode n : alC) {
+            System.out.println(n.getName());
+        }
 
         System.exit(0);
         return null;
@@ -515,6 +527,37 @@ public class CppHeaderAstsGenerator {
         int len = localIndices.size();
         for(int i = 0; i < len; ++i) {
             out.add(node.get(localIndices.get(i)));
+        }
+
+        return out;
+    }
+
+    public static ArrayList<DataField> getAllLocalDataFields(GNode node) {
+        if(node == null)return null;
+
+        ArrayList<DataField> out = new ArrayList<DataField>();
+
+        int num = node.size();
+
+        for(int i = 1; i < num; ++i) {
+            Object o = node.get(i);
+            if(o instanceof DataField)out.add((DataField)o);
+        }
+
+        return out;
+
+    }
+
+    public static ArrayList<GNode> getAllLocalConstructs(GNode node) {
+        if(node == null)return null;
+
+        ArrayList<GNode> out = new ArrayList<GNode>();
+
+        int num = node.size();
+
+        for(int i = 1; i < num; ++i) {
+            Object o = node.get(i);
+            if(o instanceof GNode)out.add((GNode)o);
         }
 
         return out;
