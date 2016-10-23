@@ -591,9 +591,10 @@ public class CppHeaderAstsGenerator {
 
         if(o instanceof DataField) {
             ((DataField) o).setVal(value);
+            return node;
         }
 
-        return node;
+        return null;
     }
 
     public static void resumeConstructionOfClass(ClassRef cR) {

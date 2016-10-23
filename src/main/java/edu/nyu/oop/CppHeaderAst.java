@@ -30,15 +30,14 @@ public class CppHeaderAst {
     }
 
     public void addClassRefs(ClassRef cR) {
-        if(cR != null)
-            this.classRefs.add(cR);
+        if(cR != null)this.classRefs.add(cR);
     }
 
     public void addClassRefs(List<ClassRef> cRs) {
         if(cRs == null)return;
 
-        for(ClassRef cr : cRs) {
-            if(cr != null)this.classRefs.add(cr);
+        for(ClassRef cR : cRs) {
+            if(cR != null)this.classRefs.add(cR);
         }
 
     }
