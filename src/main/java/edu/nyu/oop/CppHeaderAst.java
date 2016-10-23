@@ -12,9 +12,6 @@ public class CppHeaderAst {
     private GNode mostRecentParent;
     private List<ClassRef> classRefs;
 
-    // TODO: have a list of GNodes pointing to all class bodies in the tree, also list of methods/fields
-    private ArrayList<MethodsAndFieldsSchematic> classMethodsAndFields;
-
     public CppHeaderAst(String name) {
         this.allEntries = new ArrayList<Object>();
         this.root = CppHeaderAstGenerator.createMappingNode(name);
