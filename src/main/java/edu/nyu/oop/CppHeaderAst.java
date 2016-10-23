@@ -10,7 +10,7 @@ public class CppHeaderAst {
     private GNode root;
     private ArrayList<Object> allEntries;
     private GNode mostRecentParent;
-    private ArrayList<GNode> classes;
+    private List<ClassRef> classRefs;
 
     // TODO: have a list of GNodes pointing to all class bodies in the tree, also list of methods/fields
     private ArrayList<MethodsAndFieldsSchematic> classMethodsAndFields;
@@ -19,19 +19,34 @@ public class CppHeaderAst {
         this.allEntries = new ArrayList<Object>();
         this.root = CppHeaderAstsGenerator.createMappingNode(name);
         this.allEntries.add(this.root);
-        this.classes = new ArrayList<GNode>();
+        this.classRefs = new ArrayList<ClassRef>();
 
     }
 
     public CppHeaderAst(GNode root) {
         this.allEntries = new ArrayList<Object>();
         this.allEntries.add(root);
-        this.classes = new ArrayList<GNode>();
+        this.classRefs = new ArrayList<ClassRef>();
     }
 
-    public void addClass(GNode c) {
-        this.classes.add(c);
+    public void addClassRefs(ClassRef cR) {
+        if(cR != null)
+            this.classRefs.add(cR);
     }
+
+    public void addClassRefs(List<ClassRef> cRs) {
+        if(cRs == null)return;
+
+        for(ClassRef cr : cRs) {
+            if(cr != null)this.classRefs.add(cr);
+        }
+
+    }
+
+    public List<ClassRef> getClassRefs() {
+        return this.classRefs;
+    }
+
     public GNode getRoot() {
         return this.root;
     }
