@@ -1,4 +1,4 @@
-package edu.nyu.oop.customUtil;
+package edu.nyu.oop.util;
 
 import edu.nyu.oop.CppHeaderAstGenerator;
 import edu.nyu.oop.ClassRef;
@@ -8,6 +8,10 @@ import xtc.tree.Node;
 
 import java.util.ArrayList;
 
+import static edu.nyu.oop.util.MappingNode.*;
+
+
+//4-tran
 public class JavaAstVisitor extends xtc.tree.Visitor {
     GNode cppHeaderAstRoot;
 
@@ -44,7 +48,7 @@ public class JavaAstVisitor extends xtc.tree.Visitor {
             //parent = namespace;
 
             //could be a one-liner:
-            parent = CppHeaderAstGenerator.createAndLinkDataFieldMappingNodeOneShot(parent, "Namespace", "Name", s);
+            parent = createAndLinkDataFieldMappingNodeOneShot(parent, "Namespace", "Name", s);
 
             CppHeaderAstGenerator.cppHeaderMostRecentParent = parent;
             CppHeaderAstGenerator.currentCpph.setMostRecentParent(parent);
@@ -55,7 +59,7 @@ public class JavaAstVisitor extends xtc.tree.Visitor {
     public void visitClassDeclaration(GNode n) {
 
 
-        GNode parent = (GNode) CppHeaderAstGenerator.addNode(CppHeaderAstGenerator.cppHeaderMostRecentParent, CppHeaderAstGenerator.createMappingNode("ClassWrapper"));
+        GNode parent = (GNode) addNode(CppHeaderAstGenerator.cppHeaderMostRecentParent, createMappingNode("ClassWrapper"));
 
         //System.out.println("ENTERING CLASS BODY");
 

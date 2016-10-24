@@ -11,7 +11,7 @@ public class ClassRef {
 
     //will probably have a CppProgramAst too
     private GNode cppAst;
-    private CppHeaderAst cppHAst;
+    private CppAst cppHAst;
     private GNode cppHStructBody;
     private GNode cppHVtableBody;
 
@@ -39,6 +39,7 @@ public class ClassRef {
     public GNode getJClassBody() {
         return this.jClassBody;
     }
+
     public void setJClassBody(GNode jClassBody) {
         this.jClassBody = jClassBody;
     }
@@ -50,10 +51,10 @@ public class ClassRef {
         this.cppAst = cppAst;
     }
 
-    public CppHeaderAst getCppHAstObj() {
+    public CppAst getCppHAstObj() {
         return this.cppHAst;
     }
-    public void setCppHAstObj(CppHeaderAst cppHAst) {
+    public void setCppHAstObj(CppAst cppHAst) {
         this.cppHAst = cppHAst;
     }
 

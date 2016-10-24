@@ -2,25 +2,26 @@ package edu.nyu.oop;
 
 import xtc.tree.GNode;
 
+import static edu.nyu.oop.util.MappingNode.*;
 
 import java.util.*;
 
-public class CppHeaderAst {
+public class CppAst {
 
     private GNode root;
     private ArrayList<Object> allEntries;
     private GNode mostRecentParent;
     private List<ClassRef> classRefs;
 
-    public CppHeaderAst(String name) {
+    public CppAst(String name) {
         this.allEntries = new ArrayList<Object>();
-        this.root = CppHeaderAstGenerator.createMappingNode(name);
+        this.root = createMappingNode(name);
         this.allEntries.add(this.root);
         this.classRefs = new ArrayList<ClassRef>();
 
     }
 
-    public CppHeaderAst(GNode root) {
+    public CppAst(GNode root) {
         this.root = root;
         this.allEntries = new ArrayList<Object>();
         this.allEntries.add(root);

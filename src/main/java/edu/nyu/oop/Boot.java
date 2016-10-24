@@ -121,7 +121,7 @@ public class Boot extends Tool {
 
             // TODO: Generate Inheritance hierarchy tree here when finding methods
 
-            List<CppHeaderAst> allCPPAsts = CppHeaderAstGenerator.generateNew(allAsts/*, null*/);
+            List<CppAst> allCPPAsts = CppHeaderAstGenerator.generateNew(allAsts);
         }
 
 

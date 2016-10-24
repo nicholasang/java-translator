@@ -1,9 +1,10 @@
-package edu.nyu.oop.customUtil;
+package edu.nyu.oop.util;
 
 
 import xtc.tree.GNode;
 import java.util.*;
 
+//4-tran
 public class ClassHierarchyTreeGenerator {
     private ClassHierarchyTreeGenerator() {}
 
