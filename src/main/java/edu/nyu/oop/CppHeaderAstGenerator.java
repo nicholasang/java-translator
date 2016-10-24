@@ -146,8 +146,7 @@ public class CppHeaderAstGenerator {
         CppAst cppHeaderAst = new CppAst("SomeBigWrapperNode");
         currentCpph = cppHeaderAst;
 
-
-        setEntryRepository(cppHeaderAst.getAllEntries());
+        System.out.println(getEntryRepository());
 
         //MappingNode.setEntryRepository();
 
@@ -180,30 +179,45 @@ public class CppHeaderAstGenerator {
         System.out.println(getGlobalIndexOf(preDirectives, "Name", 2));
 
 
-        /*
+
         System.out.println("\nTESTING REPLACE FIELD VALUE");
         replaceLocalDataFieldValue(preDirectives, "Name", "SOMEONE STOLE MY INCLUDE!", 1);
         XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
+
+        System.out.println(getEntryRepository());
 
         replaceLocalDataFieldValue(preDirectives, "Name", "#include \"java_lang.h\"", 1);
 
 
         XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
-        */
+
+        System.out.println(getEntryRepository());
+
         // TODO
         jav.visit(javaRoot, cppHeaderAst.getRoot());
 
         System.out.println(currentCpph.getAllEntries());
 
-        /*
+
+        XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
+
+        System.out.println(cppHeaderAst.getAllEntries());
+
+
+
         GNode replacement = createMappingNode("UsingNamespace");
         addDataFieldMapping(replacement, "Name", "java::lang's been REPLACED!!");
 
-        //replaceNode(cppHeaderAst.getRoot(), replacement, 0);
-        */
+
+        replaceNode(cppHeaderAst.getRoot(), replacement, 0);
+
 
 
         XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
+
+
+        System.out.println(cppHeaderAst.getAllEntries());
+
 
         System.out.println("\n\n" + currentCpph.getAllEntries());
 
@@ -237,6 +251,7 @@ public class CppHeaderAstGenerator {
             }
         }
         System.out.println("\n\n\n" + getAllOfType("Name"));
+
 
         System.exit(0);
         return null;
