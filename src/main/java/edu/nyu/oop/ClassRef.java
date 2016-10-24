@@ -64,7 +64,7 @@ public class ClassRef {
         this.cppHStructBody = cppHStructBody;
     }
 
-    public GNode getCppHVtableBodyBody() {
+    public GNode getCppHVtableBody() {
         return this.cppHVtableBody;
     }
     public void setCppHVtableBody(GNode cppHVtableBody) {
