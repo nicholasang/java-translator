@@ -22,7 +22,7 @@ public abstract class MappingNodeEntry {
             this.val = val;
         }
 
-        public String get() {
+        public String getVal() {
             return this.val;
         }
 
