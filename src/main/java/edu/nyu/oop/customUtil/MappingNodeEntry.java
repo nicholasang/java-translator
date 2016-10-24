@@ -1,7 +1,16 @@
 package edu.nyu.oop.customUtil;
 
+import java.util.ArrayList;
+
 public abstract class MappingNodeEntry {
     private MappingNodeEntry() {}
+
+    public ArrayList<Object> entryRepository;
+
+    public static void setEntryRepository(ArrayList<Object> repo)
+    {
+
+    }
 
     public static DataField createDataField(String key, String val, int ID) {
         return new DataField(key, val, ID);
@@ -22,7 +31,7 @@ public abstract class MappingNodeEntry {
             this.val = val;
         }
 
-        public String get() {
+        public String getVal() {
             return this.val;
         }
 
