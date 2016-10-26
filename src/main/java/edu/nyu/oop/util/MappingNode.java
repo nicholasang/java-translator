@@ -242,26 +242,7 @@ public abstract class MappingNode {
         return node;
     }
 
-    // NOTE: Better not to use UPDATE: Using this will break the entryRepositoryMap. BE CAREFUL (Please try not to use this)
-    @Deprecated
-    public static Object replaceNode(GNode node, GNode childReplacement, int ithOccurrence) {
 
-        if(node == null || childReplacement == null)return null;
-
-        LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
-
-        ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(childReplacement.getName());
-
-        if(localGlobalIndices == null || localGlobalIndices.size() == 0)return null;
-
-        Integer globalIndex;
-        if((globalIndex = getGlobalIndexOf(node, childReplacement.getName(), ithOccurrence)) == null)return null;
-        entryRepository.set(globalIndex, childReplacement);
-
-        node.set(getLocalIndexOf(node, childReplacement.getName(), ithOccurrence), childReplacement);
-
-        return node;
-    }
 
     public static Object getInstanceOf(GNode node, String key, int index) {
 
@@ -416,6 +397,27 @@ public abstract class MappingNode {
         }
 
         return null;
+    }
+
+    // NOTE: Better not to use UPDATE: Using this will break the entryRepositoryMap. BE CAREFUL (Please try not to use this)
+    @Deprecated
+    private static Object replaceNode(GNode node, GNode childReplacement, int ithOccurrence) {
+
+        if(node == null || childReplacement == null)return null;
+
+        LinkedHashMap<String, ArrayList<ArrayList<Integer>>> dataMap = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)((InvisiblePrintObject)node.get(0)).get();
+
+        ArrayList<ArrayList<Integer>> localGlobalIndices = (ArrayList<ArrayList<Integer>>)dataMap.get(childReplacement.getName());
+
+        if(localGlobalIndices == null || localGlobalIndices.size() == 0)return null;
+
+        Integer globalIndex;
+        if((globalIndex = getGlobalIndexOf(node, childReplacement.getName(), ithOccurrence)) == null)return null;
+        entryRepository.set(globalIndex, childReplacement);
+
+        node.set(getLocalIndexOf(node, childReplacement.getName(), ithOccurrence), childReplacement);
+
+        return node;
     }
 
 
