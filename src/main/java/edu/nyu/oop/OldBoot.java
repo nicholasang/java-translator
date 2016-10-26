@@ -52,10 +52,10 @@ public class OldBoot extends Tool {
         super.init();
         // Declare command line arguments.
         runtime.
-                bool("printJavaAst", "printJavaAst", false, "Print Java Ast.").
-                bool("printJavaCode", "printJavaCode", false, "Print Java code.").
-                bool("printJavaImportCode", "printJavaImportCode", false, "Print Java code for imports and package source.").
-                bool("parseJava", "parseJava", false, "Parse source file dependencies.");/*;*/
+        bool("printJavaAst", "printJavaAst", false, "Print Java Ast.").
+        bool("printJavaCode", "printJavaCode", false, "Print Java code.").
+        bool("printJavaImportCode", "printJavaImportCode", false, "Print Java code for imports and package source.").
+        bool("parseJava", "parseJava", false, "Parse source file dependencies.");/*;*/
 
         //DELETE THIS ONE LATER
         //bool("fvms", "fvms", false, "testing method finding, finding \"virtual\" methods in superclasses excluding those from Object");
@@ -201,6 +201,6 @@ public class OldBoot extends Tool {
      * @param args The command line arguments.
      */
     //public static void main(String[] args) {
-        //new OldBoot().run(args);
+    //new OldBoot().run(args);
     //}
 }

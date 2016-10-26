@@ -1,5 +1,6 @@
 package edu.nyu.oop.util;
 
+import edu.nyu.oop.CppAst;
 import edu.nyu.oop.CppHeaderAstGenerator;
 
 import xtc.tree.GNode;
@@ -12,10 +13,12 @@ import static edu.nyu.oop.util.MappingNode.*;
 
 //4-tran
 public class JavaAstVisitor extends xtc.tree.Visitor {
-    GNode cppHeaderAstRoot;
+    CppAst cpph;
+    GNode jAstRoot;
 
-    public void visit(Node n, GNode cppHeaderAstRoot) {
-        this.cppHeaderAstRoot = cppHeaderAstRoot;
+    public void visit(Node n, CppAst cppHeader) {
+        this.cpph = cppHeader;
+        this.jAstRoot = (GNode)n;
         visit(n);
     }
 
@@ -40,7 +43,7 @@ public class JavaAstVisitor extends xtc.tree.Visitor {
             packageNames.add((String)qualifiedIdentifier.get(i));
         }
 
-        GNode parent = this.cppHeaderAstRoot;
+        GNode parent = this.cpph.getRoot();
         GNode namespace = null;
         for(String s : packageNames) {
             //namespace = CppHeaderAstsGenerator.createAndLinkDataFieldOneShot(parent, "Namespace", "Name", s);
@@ -49,24 +52,21 @@ public class JavaAstVisitor extends xtc.tree.Visitor {
             //could be a one-liner:
             parent = createAndLinkDataFieldOneShot(parent, "Namespace", "Name", s);
 
-            CppHeaderAstGenerator.cppHeaderMostRecentParent = parent;
-            CppHeaderAstGenerator.currentCpph.setMostRecentParent(parent);
-
+            cpph.setMostRecentParent(parent);
         }
     }
 
     public void visitClassDeclaration(GNode n) {
 
 
-        GNode parent = (GNode) addNode(CppHeaderAstGenerator.cppHeaderMostRecentParent, createMappingNode("ClassWrapper"));
+        // TODO: Instead of linking the class wrappers immediately, this is where I'd use the list of class declarations to create the ClassRef objects (which I would put into a list that I would add to the CppAst
+        GNode parent = (GNode) addNode(cpph.getMostRecentParent(), createMappingNode("ClassWrapper"));
 
         //System.out.println("ENTERING CLASS BODY");
 
         visit(n);
 
-        CppHeaderAstGenerator.cppHeaderMostRecentParent = parent;
-        CppHeaderAstGenerator.currentCpph.setMostRecentParent(parent);
-
+        cpph.setMostRecentParent(parent);
         //System.out.println("EXITING CLASS BODY");
 
 

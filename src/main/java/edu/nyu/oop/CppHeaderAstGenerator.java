@@ -3,7 +3,6 @@ package edu.nyu.oop;
 import edu.nyu.oop.util.JavaAstVisitor;
 import xtc.tree.GNode;
 
-import static edu.nyu.oop.util.MappingNode.*;
 import edu.nyu.oop.util.MappingNode;
 import edu.nyu.oop.util.MappingNode.DataField;
 
@@ -17,10 +16,8 @@ public class CppHeaderAstGenerator {
 
     public static ArrayList<CppAst> allCppHeaderAsts;
 
-    public static CppAst currentCpph;
-
-    //most recent parent
-    public static GNode cppHeaderMostRecentParent;
+    //most recent parent moved to the CppAst class
+    //public static GNode cppHeaderMostRecentParent;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* VERSION 4 MAIN */ //NOTE: Not sure about return type yet, could return list of ClassRef + the hierarchy tree + other info
@@ -138,16 +135,19 @@ public class CppHeaderAstGenerator {
         // TODO: visitation order determination here
 
         GNode javaRoot = javaAsts.get(0);
-        //new visitor
-        JavaAstVisitor jav = new JavaAstVisitor();
+
 
         //create the cpp header AST
         CppAst cppHeaderAst = new CppAst("SomeBigWrapperNode");
-        currentCpph = cppHeaderAst;
+        //cpph = cppHeaderAst;
 
-        System.out.println(MappingNode.getEntryRepository());
 
-        //MappingNode.setEntryRepository();
+        //new visitor
+        JavaAstVisitor jav = new JavaAstVisitor();
+
+        //System.out.println(MappingNode.getEntryRepository());
+
+        MappingNode.setEntryRepository(cppHeaderAst.getAllEntries());
 
         //display the embedded hashmaps for debugging
         //InvisiblePrintObject.toggleInvisibilityCloak();
@@ -163,8 +163,9 @@ public class CppHeaderAstGenerator {
         //usingnamespace, "one-shot create and link with parent node" example
         GNode usingNamespace = MappingNode.createAndLinkDataFieldOneShot(cppHeaderAst.getRoot(),"UsingNamespace", "Name", "java::lang");
 
-        XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
+        //XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
 
+        /*
 
         System.out.println("\nTESTING");
         System.out.println(MappingNode.getInstanceOf(preDirectives, "Name", 2));
@@ -176,8 +177,10 @@ public class CppHeaderAstGenerator {
 
         System.out.println(MappingNode.getAllGlobalIndicesOf(preDirectives, "Name"));
         System.out.println(MappingNode.getGlobalIndexOf(preDirectives, "Name", 2));
+        */
 
 
+        /*
 
         System.out.println("\nTESTING REPLACE FIELD VALUE");
         MappingNode.replaceLocalDataFieldValue(preDirectives, "Name", "SOMEONE STOLE MY INCLUDE!", 1);
@@ -188,14 +191,21 @@ public class CppHeaderAstGenerator {
         MappingNode.replaceLocalDataFieldValue(preDirectives, "Name", "#include \"java_lang.h\"", 1);
 
 
-        XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
 
-        System.out.println(MappingNode.getEntryRepository());
+        //XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
+
+        //System.out.println(MappingNode.getEntryRepository());
+
+        */
 
         // TODO
-        jav.visit(javaRoot, cppHeaderAst.getRoot());
+        jav.visit(javaRoot, cppHeaderAst);
 
-        System.out.println(currentCpph.getAllEntries());
+
+        XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
+
+        /*
+        System.out.println(cppHeaderAst.getAllEntries());
 
 
         XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
@@ -210,18 +220,18 @@ public class CppHeaderAstGenerator {
         System.out.println(cppHeaderAst.getAllEntries());
 
 
-        System.out.println("\n\n" + currentCpph.getAllEntries());
+        System.out.println("\n\n" + cppHeaderAst.getAllEntries());
 
         System.out.println("\n");
 
         System.out.println("Testing getAllLocalDataFields");
-        ArrayList<DataField> al = MappingNode.getAllLocalDataFields((GNode)MappingNode.getInstanceOf(currentCpph.getRoot(), "Namespace", 0));
+        ArrayList<DataField> al = MappingNode.getAllLocalDataFields((GNode)MappingNode.getInstanceOf(cppHeaderAst.getRoot(), "Namespace", 0));
 
         System.out.println(al);
 
         System.out.println("Testing getAllLocalConstructs");
 
-        ArrayList<GNode> alC = MappingNode.getAllLocalConstructs(currentCpph.getRoot());
+        ArrayList<GNode> alC = MappingNode.getAllLocalConstructs(cppHeaderAst.getRoot());
 
         for(GNode n : alC) {
             System.out.println(n.getName());
@@ -265,8 +275,7 @@ public class CppHeaderAstGenerator {
 
 
 
-
-        System.exit(0);
+        */
         return null;
         //get namespace nodes
 

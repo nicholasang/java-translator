@@ -17,13 +17,6 @@ import xtc.util.Tool;
 import xtc.lang.JavaPrinter;
 import xtc.parser.ParseException;
 
-import java.net.*;
-
-import javax.tools.*;
-
-import java.util.*;
-
-
 /**
  * This is the entry point to your program. It configures the user interface, defining
  * the set of valid commands for your tool, provides feedback to the user about their inputs
@@ -52,11 +45,7 @@ public class Boot extends Tool {
         bool("printJavaAst", "printJavaAst", false, "Print Java Ast.").
         bool("printJavaCode", "printJavaCode", false, "Print Java code.").
         bool("printJavaImportCode", "printJavaImportCode", false, "Print Java code for imports and package source.").
-        bool("parseJava", "parseJava", false, "Parse source file dependencies.")/*;*/.
-
-        //DELETE THIS ONE LATER
-        bool("fvms", "fvms", false, "testing method finding, finding \"virtual\" methods in superclasses excluding those from Object");
-
+        bool("parseJava", "parseJava", false, "Parse source file dependencies.");
     }
 
     @Override
@@ -119,64 +108,18 @@ public class Boot extends Tool {
             }
             runtime.console().pln().flush();
 
-            // TODO: Generate Inheritance hierarchy tree here when finding methods
+            //temporarily disable, use the hardcoded version
+            //List<CppAst> allCPPAsts = CppHeaderAstGenerator.generateNew(allAsts);
 
-            List<CppAst> allCPPAsts = CppHeaderAstGenerator.generateNew(allAsts);
-        }
-
-
-        //DELETE THIS LATER (find superclass's "virtual" methods excluding object)
-        if(runtime.test("fvms")) {
-
-            String workingDir = System.getProperty("user.dir");
-
-            System.out.println(System.getProperty("user.dir"));
-
-            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            File dir = new File("/src/test/java/inputs/test001/");
-            File[] files = dir.listFiles();
-            ArrayList<SimpleJavaFileObject> simpleFiles = new ArrayList<SimpleJavaFileObject>();
-
-            for(File f : files) {
-                //simpleFiles.add(new SimpleJavaFileObject(f.toURI(), JavaFileObject.Kind.SOURCE));
-            }
-
-            JavaCompiler.CompilationTask c = compiler.getTask(null,null,null,null,null, simpleFiles);
-
-            File root = new File(workingDir + "/src/test/java");
-
-// Load and instantiate compiled class.
-
-            Class<?> cls;
-            try {
-                URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { root.toURI().toURL() });
-                cls = Class.forName("inputs.test001.Test001", true, classLoader);
-
-                Object instance = cls.newInstance();
-
-                System.out.println(instance.getClass().getName());
-
-            } catch(Exception ex) {
-                System.out.println(Arrays.toString(ex.getStackTrace()));
-                System.exit(-1);
-            }
-
-            System.out.println("HUH");
+            HardCodedTestCppHeaderAstGenerator.generateNew(allAsts);
 
 
         }
 
+
+
+        // if (runtime.test("Your command here.")) { ... don't forget to add it to init()
     }
-
-
-
-
-
-
-    // if (runtime.test("Your command here.")) { ... don't forget to add it to init()
-
-
-
 
     /**
      * Run Boot with the specified command line arguments.
