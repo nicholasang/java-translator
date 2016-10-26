@@ -1,11 +1,10 @@
 package edu.nyu.oop;
 
-import edu.nyu.oop.util.InvisiblePrintObject;
 import edu.nyu.oop.util.JavaAstVisitor;
-import static edu.nyu.oop.util.MappingNode.*;
 import xtc.tree.GNode;
 
-
+import static edu.nyu.oop.util.MappingNode.*;
+import edu.nyu.oop.util.MappingNode;
 import edu.nyu.oop.util.MappingNode.DataField;
 
 
@@ -146,7 +145,7 @@ public class CppHeaderAstGenerator {
         CppAst cppHeaderAst = new CppAst("SomeBigWrapperNode");
         currentCpph = cppHeaderAst;
 
-        System.out.println(getEntryRepository());
+        System.out.println(MappingNode.getEntryRepository());
 
         //MappingNode.setEntryRepository();
 
@@ -157,41 +156,41 @@ public class CppHeaderAstGenerator {
         //add preprocessor directives,
         //node must be linked with a parent before anything is added to it!
         // (Not really, it still works, but consistency is nice)
-        GNode preDirectives = createMappingNode("PreprocessorDirectives");
-        addNode(cppHeaderAst.getRoot(), preDirectives);
-        addDataFieldMappingMulti(preDirectives, "Name", new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")) );
+        GNode preDirectives = MappingNode.createMappingNode("PreprocessorDirectives");
+        MappingNode.addNode(cppHeaderAst.getRoot(), preDirectives);
+        MappingNode.addDataFieldMultiVals(preDirectives, "Name", new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")) );
 
         //usingnamespace, "one-shot create and link with parent node" example
-        GNode usingNamespace = createAndLinkDataFieldMappingNodeOneShot(cppHeaderAst.getRoot(),"UsingNamespace", "Name", "java::lang");
+        GNode usingNamespace = MappingNode.createAndLinkDataFieldOneShot(cppHeaderAst.getRoot(),"UsingNamespace", "Name", "java::lang");
 
         XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
 
 
         System.out.println("\nTESTING");
-        System.out.println(getInstanceOf(preDirectives, "Name", 2));
-        System.out.println(getAllInstancesOf(preDirectives, "Name"));
-        System.out.println(getAllInstancesOf(preDirectives, "WEE"));
+        System.out.println(MappingNode.getInstanceOf(preDirectives, "Name", 2));
+        System.out.println(MappingNode.getAllInstancesOf(preDirectives, "Name"));
+        System.out.println(MappingNode.getAllInstancesOf(preDirectives, "WEE"));
 
-        System.out.println(getAllLocalIndicesOf(preDirectives, "Name"));
-        System.out.println(getLocalIndexOf(preDirectives, "Name", 2));
+        System.out.println(MappingNode.getAllLocalIndicesOf(preDirectives, "Name"));
+        System.out.println(MappingNode.getLocalIndexOf(preDirectives, "Name", 2));
 
-        System.out.println(getAllGlobalIndicesOf(preDirectives, "Name"));
-        System.out.println(getGlobalIndexOf(preDirectives, "Name", 2));
+        System.out.println(MappingNode.getAllGlobalIndicesOf(preDirectives, "Name"));
+        System.out.println(MappingNode.getGlobalIndexOf(preDirectives, "Name", 2));
 
 
 
         System.out.println("\nTESTING REPLACE FIELD VALUE");
-        replaceLocalDataFieldValue(preDirectives, "Name", "SOMEONE STOLE MY INCLUDE!", 1);
+        MappingNode.replaceLocalDataFieldValue(preDirectives, "Name", "SOMEONE STOLE MY INCLUDE!", 1);
         XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
 
-        System.out.println(getEntryRepository());
+        System.out.println(MappingNode.getEntryRepository());
 
-        replaceLocalDataFieldValue(preDirectives, "Name", "#include \"java_lang.h\"", 1);
+        MappingNode.replaceLocalDataFieldValue(preDirectives, "Name", "#include \"java_lang.h\"", 1);
 
 
         XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
 
-        System.out.println(getEntryRepository());
+        System.out.println(MappingNode.getEntryRepository());
 
         // TODO
         jav.visit(javaRoot, cppHeaderAst.getRoot());
@@ -216,13 +215,13 @@ public class CppHeaderAstGenerator {
         System.out.println("\n");
 
         System.out.println("Testing getAllLocalDataFields");
-        ArrayList<DataField> al = getAllLocalDataFields((GNode)getInstanceOf(currentCpph.getRoot(), "Namespace", 0));
+        ArrayList<DataField> al = MappingNode.getAllLocalDataFields((GNode)MappingNode.getInstanceOf(currentCpph.getRoot(), "Namespace", 0));
 
         System.out.println(al);
 
         System.out.println("Testing getAllLocalConstructs");
 
-        ArrayList<GNode> alC = getAllLocalConstructs(currentCpph.getRoot());
+        ArrayList<GNode> alC = MappingNode.getAllLocalConstructs(currentCpph.getRoot());
 
         for(GNode n : alC) {
             System.out.println(n.getName());
@@ -231,7 +230,7 @@ public class CppHeaderAstGenerator {
 
 
 
-        for(Object o : getEntryRepository())
+        for(Object o : MappingNode.getEntryRepository())
         {
             if(o instanceof GNode)
             {
@@ -242,7 +241,7 @@ public class CppHeaderAstGenerator {
                 System.out.print(o + ", ");
             }
         }
-        System.out.println("\n\n\n" + getAllOfType("Name"));
+        System.out.println("\n\n\n" + MappingNode.getAllOfType("Name"));
 
 
 
@@ -250,7 +249,7 @@ public class CppHeaderAstGenerator {
 
 
         System.out.println("WEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
-        for(Object o : getEntryRepository())
+        for(Object o : MappingNode.getEntryRepository())
         {
             if(o instanceof GNode)
             {
@@ -261,7 +260,7 @@ public class CppHeaderAstGenerator {
                 System.out.print(o + ", ");
             }
         }
-        System.out.println("\n\n\n" + getAllOfType("Name"));
+        System.out.println("\n\n\n" + MappingNode.getAllOfType("Name"));
 
 
 
@@ -285,10 +284,10 @@ public class CppHeaderAstGenerator {
             GNode firstClass = createMappingNode("ClassWrapper");
             addNode(cppHeaderMostRecentParent, firstClass);
 
-            addDataFieldMapping(cppHeaderMostRecentParent, "WHAT AM I?", "A series of characters");
+            addDataField(cppHeaderMostRecentParent, "WHAT AM I?", "A series of characters");
 
 
-            addDataFieldMapping(cppHeaderAst, "PROGRAMMER'S NOTE", "THIS TREE IS STILL A SAPLING");
+            addDataField(cppHeaderAst, "PROGRAMMER'S NOTE", "THIS TREE IS STILL A SAPLING");
 
             XtcTestUtils.prettyPrintAst(cppHeaderAst);
         }
@@ -302,11 +301,11 @@ public class CppHeaderAstGenerator {
            GNode n = (GNode)addNode(cppHeaderMostRecentParent, createMappingNode("ClassWrapper"));
         }
 
-        addDataFieldMapping((GNode)getInstanceOf(cppHeaderMostRecentParent, "ClassWrapper", 0), "THIS_IS_A_TEST", "YEP");
+        addDataField((GNode)getInstanceOf(cppHeaderMostRecentParent, "ClassWrapper", 0), "THIS_IS_A_TEST", "YEP");
 
         addNode((GNode)getInstanceOf(cppHeaderMostRecentParent, "ClassWrapper", 0), createMappingNode("WHATAMIEVEN"));
 
-        addDataFieldMapping((GNode)getInstanceOf(cppHeaderMostRecentParent, "ClassWrapper", 0), "THIS_IS_A_TEST", "YEP2");
+        addDataField((GNode)getInstanceOf(cppHeaderMostRecentParent, "ClassWrapper", 0), "THIS_IS_A_TEST", "YEP2");
 
         replaceLocalDataFieldValue((GNode)getInstanceOf(cppHeaderMostRecentParent, "ClassWrapper", 0), "THIS_IS_A_TEST", "TEST_FINISHED", 0);
 

@@ -59,7 +59,7 @@ public abstract class MappingNode {
         return construct;
     }
 
-    public static Object addDataFieldMapping(GNode node, String fieldNameKey, String value) {
+    public static Object addDataField(GNode node, String fieldNameKey, String value) {
 
         if(node == null)return null;
 
@@ -117,19 +117,19 @@ public abstract class MappingNode {
         return node;
     }
 
-    public static Object addDataFieldMappingMulti(GNode node, String fieldNameKey, ArrayList<String> values) {
+    public static Object addDataFieldMultiVals(GNode node, String fieldNameKey, ArrayList<String> values) {
 
         if(node == null)return null;
 
         Object success = null;
         for(String value : values) {
-            if((success = addDataFieldMapping(node, fieldNameKey, value)) == null)return null;
+            if((success = addDataField(node, fieldNameKey, value)) == null)return null;
         }
         return success;
     }
 
     // TODO: IS A COMMA-DELIMITED STRING GOOD ENOUGH, OR SHOULD I MODIFY SO A LIST OF STRINGS IS CONTAINED, WOULD REQUIRE MORE WORK, BUT DOABLE
-    public static Object addDataFieldMappingAsList(GNode node, String fieldNameKey, ArrayList<String> values) {
+    public static Object addDataFieldConcatenatedList(GNode node, String fieldNameKey, ArrayList<String> values) {
 
         if(node == null)return null;
 
@@ -143,22 +143,22 @@ public abstract class MappingNode {
         }
         sb.append(values.get(s));
 
-        if((success = addDataFieldMapping(node, fieldNameKey, sb.toString())) == null)return null;
+        if((success = addDataField(node, fieldNameKey, sb.toString())) == null)return null;
 
         return success;
     }
 
-    public static GNode createAndLinkDataFieldMappingNodeOneShot(GNode parent, String constructType, String fieldNameKey, String value) {
+    public static GNode createAndLinkDataFieldOneShot(GNode parent, String constructType, String fieldNameKey, String value) {
 
         if(parent == null)return null;
 
         GNode construct = createMappingNode(constructType);
         addNode(parent, construct);
-        addDataFieldMapping(construct, fieldNameKey, value);
+        addDataField(construct, fieldNameKey, value);
         return construct;
     }
 
-    public static GNode createAndLinkDataFieldMappingNodeOneShotMulti(GNode parent, String constructType, String fieldNameKey, ArrayList<String> values) {
+    public static GNode createAndLinkDataFieldOneShotMultiVals(GNode parent, String constructType, String fieldNameKey, ArrayList<String> values) {
 
         if(parent == null)return null;
 
@@ -166,12 +166,12 @@ public abstract class MappingNode {
         addNode(parent, construct);
 
         for(String value : values) {
-            addDataFieldMapping(construct, fieldNameKey, value);
+            addDataField(construct, fieldNameKey, value);
         }
         return construct;
     }
 
-    public static GNode createAndLinkDataFieldMappingNodeOneShotAsList(GNode parent, String constructType, String fieldNameKey, ArrayList<String> values) {
+    public static GNode createAndLinkDataFieldOneShotConcatenatedList(GNode parent, String constructType, String fieldNameKey, ArrayList<String> values) {
 
         if(parent == null)return null;
 
@@ -187,7 +187,7 @@ public abstract class MappingNode {
         }
         sb.append(values.get(s));
 
-        addDataFieldMapping(construct, fieldNameKey, sb.toString());
+        addDataField(construct, fieldNameKey, sb.toString());
 
         return construct;
     }

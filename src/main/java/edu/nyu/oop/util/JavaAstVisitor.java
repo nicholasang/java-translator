@@ -1,7 +1,6 @@
 package edu.nyu.oop.util;
 
 import edu.nyu.oop.CppHeaderAstGenerator;
-import edu.nyu.oop.ClassRef;
 
 import xtc.tree.GNode;
 import xtc.tree.Node;
@@ -44,11 +43,11 @@ public class JavaAstVisitor extends xtc.tree.Visitor {
         GNode parent = this.cppHeaderAstRoot;
         GNode namespace = null;
         for(String s : packageNames) {
-            //namespace = CppHeaderAstsGenerator.createAndLinkDataFieldMappingNodeOneShot(parent, "Namespace", "Name", s);
+            //namespace = CppHeaderAstsGenerator.createAndLinkDataFieldOneShot(parent, "Namespace", "Name", s);
             //parent = namespace;
 
             //could be a one-liner:
-            parent = createAndLinkDataFieldMappingNodeOneShot(parent, "Namespace", "Name", s);
+            parent = createAndLinkDataFieldOneShot(parent, "Namespace", "Name", s);
 
             CppHeaderAstGenerator.cppHeaderMostRecentParent = parent;
             CppHeaderAstGenerator.currentCpph.setMostRecentParent(parent);
