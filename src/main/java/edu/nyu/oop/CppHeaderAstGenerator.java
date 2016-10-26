@@ -205,14 +205,6 @@ public class CppHeaderAstGenerator {
 
 
 
-        GNode replacement = createMappingNode("UsingNamespace");
-        addDataFieldMapping(replacement, "Name", "java::lang's been REPLACED!!");
-
-
-        replaceNode(cppHeaderAst.getRoot(), replacement, 0);
-
-
-
         XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
 
 
@@ -251,6 +243,28 @@ public class CppHeaderAstGenerator {
             }
         }
         System.out.println("\n\n\n" + getAllOfType("Name"));
+
+
+
+        XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
+
+
+        System.out.println("WEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+        for(Object o : getEntryRepository())
+        {
+            if(o instanceof GNode)
+            {
+                System.out.print(((GNode)o).getName() + ", " );
+            }
+            else
+            {
+                System.out.print(o + ", ");
+            }
+        }
+        System.out.println("\n\n\n" + getAllOfType("Name"));
+
+
+
 
 
         System.exit(0);
