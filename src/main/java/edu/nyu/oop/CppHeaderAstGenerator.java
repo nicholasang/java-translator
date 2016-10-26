@@ -1,6 +1,8 @@
 package edu.nyu.oop;
 
 import edu.nyu.oop.util.JavaAstVisitor;
+import edu.nyu.oop.util.InitVisitor;
+
 import xtc.tree.GNode;
 
 import edu.nyu.oop.util.MappingNode;
@@ -22,11 +24,6 @@ public class CppHeaderAstGenerator {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* VERSION 4 MAIN */ //NOTE: Not sure about return type yet, could return list of ClassRef + the hierarchy tree + other info
     public static ArrayList<CppAst> generateNew(List<GNode> javaAsts) { //decided to create the tree inside this class
-
-        allCppHeaderAsts = new ArrayList<CppAst>();
-
-
-
 
         //some algorithm to build the ASTs in order of class hiararchy (superclasses to subclasses) (topological sort?)
         //track every item added, in order
@@ -136,203 +133,23 @@ public class CppHeaderAstGenerator {
 
         GNode javaRoot = javaAsts.get(0);
 
-
-        //create the cpp header AST
         CppAst cppHeaderAst = new CppAst("SomeBigWrapperNode");
-        //cpph = cppHeaderAst;
 
-
-        //new visitor
-        JavaAstVisitor jav = new JavaAstVisitor();
-
-        //System.out.println(MappingNode.getEntryRepository());
-
+        InitVisitor jav = new InitVisitor();
         MappingNode.setEntryRepository(cppHeaderAst.getAllEntries());
 
-        //display the embedded hashmaps for debugging
-        //InvisiblePrintObject.toggleInvisibilityCloak();
-
-
-        //add preprocessor directives,
-        //node must be linked with a parent before anything is added to it!
-        // (Not really, it still works, but consistency is nice)
         GNode preDirectives = MappingNode.createMappingNode("PreprocessorDirectives");
         MappingNode.addNode(cppHeaderAst.getRoot(), preDirectives);
         MappingNode.addDataFieldMultiVals(preDirectives, "Name", new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")) );
 
-        //usingnamespace, "one-shot create and link with parent node" example
         GNode usingNamespace = MappingNode.createAndLinkDataFieldOneShot(cppHeaderAst.getRoot(),"UsingNamespace", "Name", "java::lang");
 
-        //XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
-
-        /*
-
-        System.out.println("\nTESTING");
-        System.out.println(MappingNode.getInstanceOf(preDirectives, "Name", 2));
-        System.out.println(MappingNode.getAllInstancesOf(preDirectives, "Name"));
-        System.out.println(MappingNode.getAllInstancesOf(preDirectives, "WEE"));
-
-        System.out.println(MappingNode.getAllLocalIndicesOf(preDirectives, "Name"));
-        System.out.println(MappingNode.getLocalIndexOf(preDirectives, "Name", 2));
-
-        System.out.println(MappingNode.getAllGlobalIndicesOf(preDirectives, "Name"));
-        System.out.println(MappingNode.getGlobalIndexOf(preDirectives, "Name", 2));
-        */
-
-
-        /*
-
-        System.out.println("\nTESTING REPLACE FIELD VALUE");
-        MappingNode.replaceLocalDataFieldValue(preDirectives, "Name", "SOMEONE STOLE MY INCLUDE!", 1);
-        XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
-
-        System.out.println(MappingNode.getEntryRepository());
-
-        MappingNode.replaceLocalDataFieldValue(preDirectives, "Name", "#include \"java_lang.h\"", 1);
-
-
-
-        //XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
-
-        //System.out.println(MappingNode.getEntryRepository());
-
-        */
-
-        // TODO
         jav.visit(javaRoot, cppHeaderAst);
 
-
         XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
 
-        /*
-        System.out.println(cppHeaderAst.getAllEntries());
-
-
-        XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
-
-        System.out.println(cppHeaderAst.getAllEntries());
-
-
-
-        XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
-
-
-        System.out.println(cppHeaderAst.getAllEntries());
-
-
-        System.out.println("\n\n" + cppHeaderAst.getAllEntries());
-
-        System.out.println("\n");
-
-        System.out.println("Testing getAllLocalDataFields");
-        ArrayList<DataField> al = MappingNode.getAllLocalDataFields((GNode)MappingNode.getInstanceOf(cppHeaderAst.getRoot(), "Namespace", 0));
-
-        System.out.println(al);
-
-        System.out.println("Testing getAllLocalConstructs");
-
-        ArrayList<GNode> alC = MappingNode.getAllLocalConstructs(cppHeaderAst.getRoot());
-
-        for(GNode n : alC) {
-            System.out.println(n.getName());
-        }
-
-
-
-
-        for(Object o : MappingNode.getEntryRepository())
-        {
-            if(o instanceof GNode)
-            {
-                System.out.print(((GNode)o).getName() + ", " );
-            }
-            else
-            {
-                System.out.print(o + ", ");
-            }
-        }
-        System.out.println("\n\n\n" + MappingNode.getAllOfType("Name"));
-
-
-
-        XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
-
-
-        System.out.println("WEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
-        for(Object o : MappingNode.getEntryRepository())
-        {
-            if(o instanceof GNode)
-            {
-                System.out.print(((GNode)o).getName() + ", " );
-            }
-            else
-            {
-                System.out.print(o + ", ");
-            }
-        }
-        System.out.println("\n\n\n" + MappingNode.getAllOfType("Name"));
-
-
-
-
-        */
         return null;
-        //get namespace nodes
 
-        //System.out.println(allEntries);
-
-        //XtcTestUtils.prettyPrintAst(cppHeaderAst);
-
-        //find every ClassDeclaration
-        //List<Node> allClassDeclarations = NodeUtil.dfsAll(javaRoot, "ClassDeclaration");
-
-
-        //testing
-        /*
-        {
-            GNode firstClass = createMappingNode("ClassWrapper");
-            addNode(cppHeaderMostRecentParent, firstClass);
-
-            addDataField(cppHeaderMostRecentParent, "WHAT AM I?", "A series of characters");
-
-
-            addDataField(cppHeaderAst, "PROGRAMMER'S NOTE", "THIS TREE IS STILL A SAPLING");
-
-            XtcTestUtils.prettyPrintAst(cppHeaderAst);
-        }
-        */
-
-
-
-        /*MORE TESTS
-        for(Node c : allClassDeclarations)
-        {
-           GNode n = (GNode)addNode(cppHeaderMostRecentParent, createMappingNode("ClassWrapper"));
-        }
-
-        addDataField((GNode)getInstanceOf(cppHeaderMostRecentParent, "ClassWrapper", 0), "THIS_IS_A_TEST", "YEP");
-
-        addNode((GNode)getInstanceOf(cppHeaderMostRecentParent, "ClassWrapper", 0), createMappingNode("WHATAMIEVEN"));
-
-        addDataField((GNode)getInstanceOf(cppHeaderMostRecentParent, "ClassWrapper", 0), "THIS_IS_A_TEST", "YEP2");
-
-        replaceLocalDataFieldValue((GNode)getInstanceOf(cppHeaderMostRecentParent, "ClassWrapper", 0), "THIS_IS_A_TEST", "TEST_FINISHED", 0);
-
-        System.out.println(getInstanceOf(cppHeaderMostRecentParent, "ClassWrapper", 1) == allEntries.get(getGlobalIndexOf(cppHeaderMostRecentParent, "ClassWrapper", 1)));
-        */
-
-
-        //XtcTestUtils.prettyPrintAst(cppHeaderAst);
-
-
-        //XtcTestUtils.prettyPrintAst(javaRoot);
-
-
-        //comment out the above block please and do the following:
-
-        //call jav.visit on each class in allClassDeclarations
-        //add a bunch of visitors and follow the logic of the methods/objects I created plus their relationship
-        //with this class to build the tree top-to-bottom
 
 
 

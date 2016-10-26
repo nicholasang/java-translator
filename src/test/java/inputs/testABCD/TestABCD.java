@@ -1,8 +1,7 @@
 package inputs.testABCD;
 
 
-public class TestABCD
-{
+public class TestABCD {
     public static void main(String[] args) {
         System.out.println("Hello, world!");
     }

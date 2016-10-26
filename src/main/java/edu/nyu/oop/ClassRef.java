@@ -7,19 +7,27 @@ import xtc.tree.GNode;
 public class ClassRef {
     private String name;
     private GNode jAst;
-    private GNode jClassBody;
+    private GNode jClassDeclaration;
 
-    //will probably have a CppProgramAst too
+    //TODO : I will probably use a CppAst object to represent the .cpp Ast as well (instead of just a GNode reference)
     private GNode cppAst;
+    private GNode cppAstLinkPoint;
     private CppAst cppHAst;
+    private GNode cppHAstLinkPoint;
+
     private GNode cppHStructBody;
     private GNode cppHVtableBody;
 
     private ClassRef parentClassRef;
-    private LayoutSchematic tables;
+    private LayoutSchematic schematic;
 
+    //constructors
     public ClassRef() {
-        this.tables = new LayoutSchematic();
+        this.schematic = new LayoutSchematic();
+    }
+    public ClassRef(String name) {
+        this.schematic = new LayoutSchematic();
+        this.name = name;
     }
 
     public String getName() {
@@ -36,35 +44,49 @@ public class ClassRef {
         this.jAst = jAst;
     }
 
-    public GNode getJClassBody() {
-        return this.jClassBody;
+    public GNode getJClassDeclaration() {
+        return this.jClassDeclaration;
+    }
+    public void setJClassDeclaration(GNode jClassBody) {
+        this.jClassDeclaration = jClassBody;
     }
 
-    public void setJClassBody(GNode jClassBody) {
-        this.jClassBody = jClassBody;
-    }
-
+    //TODO: (.cpp-relevant, for later)
     public GNode getCppAst() {
         return this.cppAst;
     }
     public void setCppAst(GNode cppAst) {
         this.cppAst = cppAst;
     }
+    public GNode getCppAstLinkPoint() {
+        return this.cppAstLinkPoint;
+    }
+    public void setCppAstLinkPoint(GNode cppAstLinkPoint) {
+        this.cppAstLinkPoint = cppAstLinkPoint;
+    }
 
-    public CppAst getCppHAstObj() {
+    //for CppAst header
+    public CppAst getCppHAst() {
         return this.cppHAst;
     }
-    public void setCppHAstObj(CppAst cppHAst) {
+    public void setCppHAst(CppAst cppHAst) {
         this.cppHAst = cppHAst;
     }
+    public GNode getCppHAstLinkPoint() {
+        return this.cppHAstLinkPoint;
+    }
+    public void setCppHAstLinkPoint(GNode cppHAstLinkPoint) {
+        this.cppHAstLinkPoint = cppHAstLinkPoint;
+    }
 
+    //direct links to the struct bodies
     public GNode getCppHStructBody() {
         return this.cppHStructBody;
     }
     public void setCppHStructBody(GNode cppHStructBody) {
         this.cppHStructBody = cppHStructBody;
     }
-
+    //
     public GNode getCppHVtableBody() {
         return this.cppHVtableBody;
     }
@@ -72,6 +94,7 @@ public class ClassRef {
         this.cppHVtableBody = cppHVtableBody;
     }
 
+    //parent ClassRef in inheritance hierarchy
     public ClassRef getParentClassRef() {
         return this.parentClassRef;
     }
@@ -80,10 +103,15 @@ public class ClassRef {
     }
 
     public LayoutSchematic getLayoutSchematic() {
-        return this.tables;
+        return this.schematic;
     }
-    public void setLayoutSchematic(LayoutSchematic tables) {
-        this.tables = tables;
+    public void setLayoutSchematic(LayoutSchematic schematic) {
+        this.schematic = schematic;
+    }
+
+    @Override
+    public String toString() {
+        return this.name;
     }
 
 
