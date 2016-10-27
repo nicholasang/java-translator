@@ -25,18 +25,17 @@ import java.util.*;
 
 import java.util.HashMap;
 
-public class GenerateDependencyASTs {
-    private GenerateDependencyASTs() {};
+public class GenerateJavaASTs {
+    private GenerateJavaASTs() {}
 
     public static List<GNode> beginParse(GNode n) {
         HashMap<String, Boolean> fileNamesFound = new HashMap<String, Boolean>();
-        List<GNode> dependencyASTs = new ArrayList<GNode>();
-        beginParse(n, fileNamesFound, dependencyASTs);
-
-        return dependencyASTs;
+        List<GNode> jAsts = new ArrayList<GNode>();
+        beginParse(n, fileNamesFound, jAsts);
+        return jAsts;
     }
 
-    private static void beginParse(GNode n, HashMap<String, Boolean> fileNamesFound, List<GNode> dependencyASTs) {
+    private static void beginParse(GNode n, HashMap<String, Boolean> fileNamesFound, List<GNode> jAsts) {
 
         //enqueue nodes and find dependencies until no files left to explore
         Queue<GNode> nodesToCheck = new ArrayDeque<GNode>();
@@ -55,7 +54,7 @@ public class GenerateDependencyASTs {
             //add to list of dependencies, examine all dependency children
             fileNamesFound.put(loc, true);
 
-            dependencyASTs.add(next);
+            jAsts.add(next);
 
             nodesToCheck.addAll(JavaFiveImportParser.parse(next));
         }

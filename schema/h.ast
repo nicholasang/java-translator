@@ -1,0 +1,190 @@
+
+C-Header AST (aka Cheddar ;3 )
+
+From Karl: in the .cpp one, how do we handle blocks, ifs, loops, etc. regardless of the fact that the syntax is basically the same? Kate: not sure what you mean? Anyways, this phase is just the header file :P
+I thought phase 2 was header and cpp,
+If not, then that helps I guess? Just the header.
+
+
+
+NamespaceDeclaration(
+  //stuff from package
+)
+
+
+using namespace java::lang;
+//using namespace std; <-also in .cpp
+
+^ I’m not sure what this stuff is but the AST is down there ▼▼▼<-shouldn’t we have the pragma once, includes, etc. as a node as the first node under SomeBigWrapperNode?
+
+// Kate’s notes to self:
+  Field has a Modifier node in case an object has a private variable or something
+  Modifier in MemberFunction should hold static and also access modifiers as needed
+
+
+WIP AST below: highlights are stuff that needs more work
+//ModuleWrapper more fitting name? :P <-
+SomeBigWrapperNode( // <- great name
+
+PreprocessingDirectives( //string literals
+“#pragma once”
+“#include \"java_lang.h\"”
+“#include <stdint.h>”
+“#include <string>”
+)
+  UsingNamespace(
+    Name = java::lang
+  )
+
+
+  Namespace(
+    Name = inputs
+    nullptr
+    Namespace(
+      Name = test001
+
+      ClassWrapper( // A
+        StructDeclaration (
+          Name = __A
+        )
+        StructDeclaration (
+          Name = __A_VT
+        )
+        TypeDefinition(
+          Type = __A*
+          Name = A
+        )
+
+        Struct(
+          Name = __A
+          Field (
+            Modifiers(nullptr)
+            Type = __A_VT*
+            Name = __vptr
+          )
+          Constructor(
+            Params(nullptr)
+          )
+          MemberFunction(
+            Modifiers(static)
+            Return = String
+            Name = toString
+            ParamTypes( // just params’ types
+              Type = A
+            )
+          )
+          MemberFunction(
+            Modifiers(static)
+            Return = Class
+            Name = __class
+            ParamTypes(nullptr)
+          )
+          Field (
+            Modifiers(null)
+            Type = __A_VT
+            Name = __vtable
+          )
+        )
+        StructVTable(
+          Name = __A_VT
+          Field(
+            Modifiers(null)
+            Type = Class
+            Name = __isa
+          )
+          FunctionPointer(
+            Name = hashCode
+            Return = int32_t
+            ParamTypes(A)
+          )
+          FunctionPointer(
+            Name = equals
+            Return = bool
+            ParamTypes(A, Object)
+          )
+          FunctionPointer(
+            Name = getClass
+            Return = Class
+            ParamTypes()
+          )
+          FunctionPointer(
+            Name = toString
+            Return = String
+            ParamTypes(A)
+          )
+
+        // constructor pasted below so less scrolling
+        // __A_VT(): <- this is the constructor
+        //__isa(__A::__class()),
+        //hashCode((int32_t(*)(A) //&__Obj::hashCode),
+        //equals((bool(*)(A, Object)) //&__Object::equals),
+        //getClass((Class(*)(A)) //&__Object::getClass),
+        //toString(&__A::toString)
+       Constructor(
+          Params(null)
+          InitializationList(
+            // add stuff here
+          )
+        )
+        )
+      )
+
+
+
+      ClassWrapper( //Test001
+        StructDeclaration (
+          Name = __Test001
+        )
+        StructDeclaration (
+          Name = __Test001_VT
+        )
+        TypeDefinition(
+          Type = __Test001*
+          Name = Test001
+        )
+
+        Struct(
+          Name = __Test001
+          SuperClass = Object
+          Field (
+            Access = public // or null since default
+            Type = __Test001_VT*
+            Name = __vptr
+          )
+          MemberFunction(
+            Modifer(static)
+            Return = void
+            Name = main
+            ParamTypes( // just params’ types
+              String[]
+            )
+          )
+          MemberFunction(
+            Modifiers(static)
+            Return = Class
+            Name = __class
+            ParamTypes(nullptr)
+          )
+          Field (
+            Modifier(null)
+            Type = __Test001_VT
+            Name = __vtable
+          )
+
+        )
+        Struct(
+          Name = __Test001_VT
+
+          //more stuff
+        )
+      )
+
+    )
+  )
+)
+
+
+
+
+
+
