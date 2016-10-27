@@ -5,6 +5,11 @@ package inputs.testX;
  */
 public class testMain {
     public static void main(String args[]) {
+
         testDependency X = new testDependency();
+        int x = 7;
+        int y = x + 1;
+
+        int[] testArray = {x, y};
     }
 }

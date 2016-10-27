@@ -110,8 +110,8 @@ public class Boot extends Tool {
 
             //temporarily disable, use the hardcoded version
             //List<CppAst> allCPPAsts = CppHeaderAstGenerator.generateNew(allAsts);
-            HardCodedTestCppHeaderAstGenerator.generateNew(allAsts);
-
+            //HardCodedTestCppHeaderAstGenerator.generateNew(allAsts);
+            CppCommands.convertToCpp(allAsts);
 
         }
 
