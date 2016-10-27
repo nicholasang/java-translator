@@ -70,6 +70,44 @@ public class CppHeaderAstGenerator {
         "D" {AST1}
         /*
 
+        int jk = 0;
+        for(GNode jAst : javaAsts) {
+            System.out.println("\n\n");
+            XtcTestUtils.prettyPrintAst(javaAsts.get(jk++));
+            List<Node> classDeclarations = NodeUtil.dfsAll(jAst, "ClassDeclaration");
+
+            for(Node classDec : classDeclarations) {
+                ClassRef curCR = new ClassRef("__" + classDec.get(1));
+                curCR.setCppHAst(headerAst);
+                curCR.setJAst(jAst);
+                curCR.setJClassDeclaration((GNode)classDec);
+                curCR.setCppAstLinkPoint(linkPoint);
+
+                System.out.println(">>>>>>>> " + classDec.get(1) + " : " + mainFound + " <<<<<<<<<");
+                //check if main class
+                if(!mainFound) {
+                    List<Node> methodDecs = NodeUtil.dfsAll(classDec, "MethodDeclaration");
+                    for (Node methodDec : methodDecs) {
+                        if (methodDec.get(3).equals("main")) {
+                            System.out.println("FOUND >> " + classDec.get(1));
+                            mainClassRef = curCR;
+                            mainFound = true;
+                        }
+                    }
+                }
+
+                if(curCR != mainClassRef) {
+                    hierarchy.putNameToRef(curCR.getName(), curCR);
+
+                    GNode layer = (GNode)classDec.get(3);
+                    if(layer != null) {
+                        layer = (GNode)(((GNode) (layer.get(0))).get(0));
+                        String extension = (String) layer.get(0);
+                        hierarchy.putChildToParent(curCR.getName(), "__" + extension);
+                    }
+
+                    cRefs.add(curCR);
+                }
 
          */
 
