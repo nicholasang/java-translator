@@ -19,7 +19,7 @@ public class CppHeaderAstGenerator {
     //prevent direct instantiation
     private CppHeaderAstGenerator() {}
 
-    public static ArrayList<CppAst> generateNew(List<GNode> javaAsts) { //decided to create the tree inside this class
+    public static CppAst generateNew(List<GNode> javaAsts) { //decided to create the tree inside this class
 
         CppAst headerAst = new CppAst("SomeBigWrapperNode");
 
@@ -40,9 +40,6 @@ public class CppHeaderAstGenerator {
         determineClassOrder(javaAsts, headerAst);
 
         setForwardDeclarations(headerAst);
-
-        //XtcTestUtils.prettyPrintAst(headerAst.getRoot());
-        //System.out.println(headerAst.getClassRefs());
 
         return null;
     }
