@@ -23,87 +23,132 @@ public class CppHeaderAstGenerator {
 
     public static ArrayList<CppAst> generateNew(List<GNode> javaAsts) { //decided to create the tree inside this class
 
-        //array of ClassRef
-        ArrayList<ClassRef> cRefs = new ArrayList<ClassRef>();
-
         CppAst headerAst = new CppAst("SomeBigWrapperNode");
 
         InitVisitor classBodyInit = new InitVisitor();
         MappingNode.setEntryRepository(headerAst.getAllEntries());
-
-        //System.out.println(headerAst.getAllEntries());
-        //System.out.println(MappingNode.getEntryRepository());
-        //System.out.println(MappingNode.getAllOfType("SomeBigWrapperNode"));
-
-
-        //System.exit(0);
+        MappingNode.setEntryRepositoryMap(headerAst.getAllEntriesMap());
 
         GNode preDirectives = MappingNode.createMappingNode("PreprocessorDirectives");
         MappingNode.addNode(headerAst.getRoot(), preDirectives);
         MappingNode.addDataFieldMultiVals(preDirectives, "Name", new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")) );
 
 
-        ArrayList<Object> o2 = (MappingNode.getAllOfType("PreprocessorDirectives"));
+        System.out.println(headerAst.getAllEntries().size());
+        //System.out.println(headerAst.getAllEntriesMap());
 
-        System.out.println(o2);
-
-        for (Object ob : o2)
-        {
-            if (ob instanceof GNode)
-            {
-                System.out.println(((GNode) ob).getName());
-            }
-            else
-            {
-                System.out.println(((DataField) ob).getKey());
-            }
-        }
-
-        System.exit(0);
         GNode usingNamespace = MappingNode.createAndLinkDataFieldOneShot(headerAst.getRoot(),"UsingNamespace", "Name", "java::lang");
 
         classBodyInit.visit(javaAsts.get(0), headerAst);
 
+        determineClassOrder(javaAsts, headerAst);
+
         // TODO: auto forward declarations (no issue, will add later)
 
-        List<GNode> classDeclarations = new ArrayList<GNode>();
+        System.out.println(headerAst.getClassRefs());
 
-        for(GNode jAst : javaAsts)
-        {
-            List<Node> result = NodeUtil.dfsAll(jAst, "ClassDeclaration");
-            for(Node n : result)
-            {
-                classDeclarations.add((GNode)n);
-            }
-        }
-
-        ArrayList<Object> o = MappingNode.getAllOfType("Namespace");
-
-        /*
-        for(Object ob : o)
-        {
-            if(ob instanceof GNode)
-            {
-                System.out.println(((GNode) ob).getName());
-            }
-            else
-            {
-                System.out.println(((DataField)ob).getKey());
-            }
-        }
-        */
-
-        System.exit(0);
-
-        ClassHierarchyTree hierarchy = new ClassHierarchyTree();
-
-        XtcTestUtils.prettyPrintAst(javaAsts.get(0));
         return null;
     }
 
-    public static void determineClassOrder(List<GNode> javaAsts)
-    {
+    public static void determineClassOrder(List<GNode> javaAsts, CppAst headerAst) {
 
+        List<ClassRef> cRefs = new ArrayList<ClassRef>();
+        ClassRef mainClassRef = null;
+        boolean mainFound = false;
+        ClassHierarchyTree hierarchy = new ClassHierarchyTree();
+
+        XtcTestUtils.prettyPrintAst(javaAsts.get(0));
+
+        ArrayList<Object> namespaces = getAllOfType("Namespace");
+        GNode linkPoint;
+        if(namespaces == null) {
+            linkPoint = headerAst.getRoot();
+        } else {
+            linkPoint = (GNode)namespaces.get(namespaces.size() - 1);
+        }
+
+        for(GNode jAst : javaAsts) {
+            List<Node> classDeclarations = NodeUtil.dfsAll(jAst, "ClassDeclaration");
+
+            for(Node classDec : classDeclarations) {
+                ClassRef curCR = new ClassRef("__" + classDec.get(1));
+                curCR.setCppHAst(headerAst);
+                curCR.setJAst(jAst);
+                curCR.setJClassDeclaration((GNode)classDec);
+                curCR.setCppAstLinkPoint(linkPoint);
+
+                //check if main class
+                if(!mainFound) {
+                    List<Node> methodDecs = NodeUtil.dfsAll(classDec, "MethodDeclaration");
+                    for (Node methodDec : methodDecs) {
+                        if (methodDec.get(3).equals("main")) {
+                            mainClassRef = curCR;
+                            mainFound = true;
+                        }
+                    }
+                }
+
+                if(curCR != mainClassRef) {
+
+                    hierarchy.putNameToRef(curCR.getName(), curCR);
+
+                    GNode layer = (GNode)classDec.get(3);
+                    if(layer != null) {
+                        layer = (GNode)(((GNode) (layer.get(0))).get(0));
+                        String extension = (String) layer.get(0);
+                        hierarchy.putChildToParent(curCR.getName(), "__" + extension);
+                    }
+
+                    cRefs.add(curCR);
+                }
+
+            }
+
+        }
+
+        System.out.println(cRefs);
+
+        for(ClassRef cR : cRefs) {
+            String superClassName = hierarchy.getChildToParent(cR.getName());
+
+            hierarchy.putParentToChildren(superClassName, cR.getName());
+
+            cR.setParentClassRef(hierarchy.getNameToRef(superClassName));
+        }
+
+        for(ClassRef cR : cRefs) {
+            System.out.println(cR + " -> " + cR.getParentClassRef());
+        }
+
+        headerAst.setMainClassRef(mainClassRef);
+
+        ClassRef start = null;
+        for(ClassRef cR : cRefs) {
+            ClassRef parent = cR.getParentClassRef();
+            if(parent == null) {
+                topologicalSorting(cR, hierarchy, headerAst);
+            }
+        }
+    }
+
+    public static void topologicalSorting(ClassRef start, ClassHierarchyTree hierarchy, CppAst headerAst) {
+        ArrayDeque<ClassRef> Q = new ArrayDeque<ClassRef>();
+        Q.add(start);
+
+        while(!Q.isEmpty()) {
+            ClassRef curCR = Q.poll();
+
+            headerAst.addClassRefs(curCR);
+
+            ArrayList<String> childList = hierarchy.getParentToChildren(curCR.getName());
+
+            if(childList != null) {
+
+                for (String childName : childList) {
+                    Q.add(hierarchy.getNameToRef(childName));
+                }
+            }
+        }
     }
 
 
