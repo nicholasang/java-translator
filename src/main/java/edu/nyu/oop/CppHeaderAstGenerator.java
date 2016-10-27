@@ -61,6 +61,8 @@ public class CppHeaderAstGenerator {
         }
 
         XtcTestUtils.prettyPrintAst(headerAst.getRoot());
+        System.out.println(headerAst.getClassRefs());
+
 
         return null;
     }
