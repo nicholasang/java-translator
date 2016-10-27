@@ -39,7 +39,28 @@ public class CppHeaderAstGenerator {
 
         determineClassOrder(javaAsts, headerAst);
 
-        // TODO: auto forward declarations (no issue, will add later)
+        for(ClassRef cR : headerAst.getClassRefs())
+        {
+            //forward declaration struct
+            GNode construct = MappingNode.createMappingNode("ForwardDeclaration");
+            MappingNode.addNode(headerAst.getMostRecentParent(), construct);
+            MappingNode.addDataField(construct, "Type", "struct");
+            MappingNode.addDataField(construct, "Declaration", cR.getName() );
+
+            //forward declaration struct Vtable
+            construct = MappingNode.createMappingNode("ForwardDeclaration");
+            MappingNode.addNode(headerAst.getMostRecentParent(), construct);
+            MappingNode.addDataField(construct, "Type", "struct");
+            MappingNode.addDataField(construct, "Declaration", cR.getName() + "_VT");
+
+            //typedef
+            construct = MappingNode.createMappingNode("TypeDefinition");
+            MappingNode.addNode(headerAst.getMostRecentParent(), construct);
+            MappingNode.addDataField(construct, "Type", cR.getName() + "*");
+            MappingNode.addDataField(construct, "Definition", cR.getName().substring(2));
+        }
+
+        XtcTestUtils.prettyPrintAst(headerAst.getRoot());
 
         return null;
     }
@@ -113,7 +134,6 @@ public class CppHeaderAstGenerator {
 
         headerAst.setMainClassRef(mainClassRef);
 
-        ClassRef start = null;
         for(ClassRef cR : cRefs) {
             ClassRef parent = cR.getParentClassRef();
             if(parent == null) {
