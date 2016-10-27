@@ -38,17 +38,6 @@ public class LayoutSchematic {
         public ArrayList<Constructor> constructorList = new ArrayList<Constructor>();
     }
 
-
-    private static class MethodPointer {
-        public String name;
-        public String returnType;
-        public ArrayList<String> parameterTypes = new ArrayList<String>();
-    }
-
-    private static class Initializer {
-        public String fieldName;
-        public Field initializeTo;
-    }
 //
 //        private static class MethodPointerInitializer {
 //            public String name;
@@ -89,6 +78,17 @@ public class LayoutSchematic {
     // field:
     //  name = __String::__class()
     //  type = Class
+
+//    private static class MethodPointer {
+//        public String name;
+//        public String returnType;
+//        public ArrayList<String> parameterTypes = new ArrayList<String>();
+//    }
+
+    private static class Initializer {
+        public String fieldName;
+        public Field initializeTo;
+    }
 
     private static class VtableStruct {
 //            public Field isaField = new Field();
