@@ -33,10 +33,6 @@ public class CppHeaderAstGenerator {
         MappingNode.addNode(headerAst.getRoot(), preDirectives);
         MappingNode.addDataFieldMultiVals(preDirectives, "Name", new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")) );
 
-
-        System.out.println(headerAst.getAllEntries().size());
-        //System.out.println(headerAst.getAllEntriesMap());
-
         GNode usingNamespace = MappingNode.createAndLinkDataFieldOneShot(headerAst.getRoot(),"UsingNamespace", "Name", "java::lang");
 
         classBodyInit.visit(javaAsts.get(0), headerAst);
@@ -44,8 +40,6 @@ public class CppHeaderAstGenerator {
         determineClassOrder(javaAsts, headerAst);
 
         // TODO: auto forward declarations (no issue, will add later)
-
-        System.out.println(headerAst.getClassRefs());
 
         return null;
     }
@@ -106,7 +100,6 @@ public class CppHeaderAstGenerator {
 
         }
 
-        System.out.println(cRefs);
 
         for(ClassRef cR : cRefs) {
             String superClassName = hierarchy.getChildToParent(cR.getName());
@@ -116,9 +109,7 @@ public class CppHeaderAstGenerator {
             cR.setParentClassRef(hierarchy.getNameToRef(superClassName));
         }
 
-        for(ClassRef cR : cRefs) {
-            System.out.println(cR + " -> " + cR.getParentClassRef());
-        }
+
 
         headerAst.setMainClassRef(mainClassRef);
 
@@ -150,6 +141,14 @@ public class CppHeaderAstGenerator {
             }
         }
     }
+
+        /*
+        // TODO:
+        public static void someSuperClassTest(....)
+        for(ClassRef cR : cRefs) {
+            System.out.println(cR + " -> " + cR.getParentClassRef());
+        }
+        */
 
 
 
