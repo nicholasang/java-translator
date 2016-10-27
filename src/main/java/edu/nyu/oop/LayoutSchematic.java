@@ -102,6 +102,7 @@ public class LayoutSchematic {
     public ClassStruct classStruct;
     public VtableStruct vtableStruct;
 
+
     LayoutSchematic(String className) {
         classStruct = new ClassStruct();
 
