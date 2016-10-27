@@ -16,10 +16,8 @@ import java.util.*;
 
 
 public class CppHeaderAstGenerator {
+    //prevent direct instantiation
     private CppHeaderAstGenerator() {}
-
-
-    public static ArrayList<CppAst> allCppHeaderAsts;
 
     public static ArrayList<CppAst> generateNew(List<GNode> javaAsts) { //decided to create the tree inside this class
 
@@ -35,34 +33,16 @@ public class CppHeaderAstGenerator {
 
         GNode usingNamespace = MappingNode.createAndLinkDataFieldOneShot(headerAst.getRoot(),"UsingNamespace", "Name", "java::lang");
 
-        classBodyInit.visit(javaAsts.get(0), headerAst);
+        for(GNode javaAst : javaAsts) {
+            classBodyInit.visit(javaAst, headerAst);
+        }
 
         determineClassOrder(javaAsts, headerAst);
 
-        for(ClassRef cR : headerAst.getClassRefs())
-        {
-            //forward declaration struct
-            GNode construct = MappingNode.createMappingNode("ForwardDeclaration");
-            MappingNode.addNode(headerAst.getMostRecentParent(), construct);
-            MappingNode.addDataField(construct, "Type", "struct");
-            MappingNode.addDataField(construct, "Declaration", cR.getName() );
+        setForwardDeclarations(headerAst);
 
-            //forward declaration struct Vtable
-            construct = MappingNode.createMappingNode("ForwardDeclaration");
-            MappingNode.addNode(headerAst.getMostRecentParent(), construct);
-            MappingNode.addDataField(construct, "Type", "struct");
-            MappingNode.addDataField(construct, "Declaration", cR.getName() + "_VT");
-
-            //typedef
-            construct = MappingNode.createMappingNode("TypeDefinition");
-            MappingNode.addNode(headerAst.getMostRecentParent(), construct);
-            MappingNode.addDataField(construct, "Type", cR.getName() + "*");
-            MappingNode.addDataField(construct, "Definition", cR.getName().substring(2));
-        }
-
-        XtcTestUtils.prettyPrintAst(headerAst.getRoot());
-        System.out.println(headerAst.getClassRefs());
-
+        //XtcTestUtils.prettyPrintAst(headerAst.getRoot());
+        //System.out.println(headerAst.getClassRefs());
 
         return null;
     }
@@ -73,8 +53,6 @@ public class CppHeaderAstGenerator {
         ClassRef mainClassRef = null;
         boolean mainFound = false;
         ClassHierarchyTree hierarchy = new ClassHierarchyTree();
-
-        XtcTestUtils.prettyPrintAst(javaAsts.get(0));
 
         ArrayList<Object> namespaces = getAllOfType("Namespace");
         GNode linkPoint;
@@ -94,7 +72,7 @@ public class CppHeaderAstGenerator {
                 curCR.setJClassDeclaration((GNode)classDec);
                 curCR.setCppAstLinkPoint(linkPoint);
 
-                //check if main class
+                //check if current class is the main class, if so, save as own field (separate from other classes)
                 if(!mainFound) {
                     List<Node> methodDecs = NodeUtil.dfsAll(classDec, "MethodDeclaration");
                     for (Node methodDec : methodDecs) {
@@ -133,7 +111,6 @@ public class CppHeaderAstGenerator {
         }
 
 
-
         headerAst.setMainClassRef(mainClassRef);
 
         for(ClassRef cR : cRefs) {
@@ -164,15 +141,25 @@ public class CppHeaderAstGenerator {
         }
     }
 
-        /*
-        // TODO:
-        public static void someSuperClassTest(....)
-        for(ClassRef cR : cRefs) {
-            System.out.println(cR + " -> " + cR.getParentClassRef());
+    public static void setForwardDeclarations(CppAst headerAst) {
+        for (ClassRef cR : headerAst.getClassRefs()) {
+            //forward declaration struct
+            GNode construct = MappingNode.createMappingNode("ForwardDeclaration");
+            MappingNode.addNode(headerAst.getMostRecentParent(), construct);
+            MappingNode.addDataField(construct, "Type", "struct");
+            MappingNode.addDataField(construct, "Declaration", cR.getName());
+
+            //forward declaration struct vtable
+            construct = MappingNode.createMappingNode("ForwardDeclaration");
+            MappingNode.addNode(headerAst.getMostRecentParent(), construct);
+            MappingNode.addDataField(construct, "Type", "struct");
+            MappingNode.addDataField(construct, "Declaration", cR.getName() + "_VT");
+
+            //typedef
+            construct = MappingNode.createMappingNode("TypeDefinition");
+            MappingNode.addNode(headerAst.getMostRecentParent(), construct);
+            MappingNode.addDataField(construct, "Type", cR.getName() + "*");
+            MappingNode.addDataField(construct, "Definition", cR.getName().substring(2));
         }
-        */
-
-
-
-
+    }
 }
