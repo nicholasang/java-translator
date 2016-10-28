@@ -41,7 +41,7 @@ public class CppHeaderAstGenerator {
 
         setForwardDeclarations(headerAst);
 
-        return null;
+        return headerAst;
     }
 
     public static ClassHierarchyTree determineClassOrder(List<GNode> javaAsts, CppAst headerAst) {
