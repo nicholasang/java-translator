@@ -1,7 +1,6 @@
 package inputs.testABCD;
 
-class B extends A
-{
+class B extends A {
     private String privateDataB = "dataB";
 
     @Override
