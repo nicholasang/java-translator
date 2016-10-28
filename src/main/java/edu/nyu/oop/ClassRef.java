@@ -1,5 +1,6 @@
 package edu.nyu.oop;
 
+import edu.nyu.oop.util.ClassHierarchyTree;
 import xtc.tree.GNode;
 
 //instead of using several hash-maps, encapulate relationships between classes in
@@ -20,6 +21,8 @@ public class ClassRef {
 
     private ClassRef parentClassRef;
     private LayoutSchematic schematic;
+
+    private static ClassHierarchyTree hierarchy;
 
     //constructors
     private ClassRef() {
@@ -108,6 +111,14 @@ public class ClassRef {
     public void setLayoutSchematic(LayoutSchematic schematic) {
         this.schematic = schematic;
     }
+
+    public static ClassHierarchyTree getHierarchy() {
+        return hierarchy;
+    }
+    public static void setHierarchy(ClassHierarchyTree hierarchy) {
+        ClassRef.hierarchy = hierarchy;
+    }
+
 
     @Override
     public String toString() {
