@@ -23,7 +23,7 @@ public class CppHeaderAstGenerator {
 
         CppAst headerAst = new CppAst("SomeBigWrapperNode");
 
-        InitVisitor classBodyInit = new InitVisitor();
+        InitVisitor classDecInit = new InitVisitor();
         MappingNode.setEntryRepository(headerAst.getAllEntries());
         MappingNode.setEntryRepositoryMap(headerAst.getAllEntriesMap());
 
@@ -31,20 +31,20 @@ public class CppHeaderAstGenerator {
         MappingNode.addNode(headerAst.getRoot(), preDirectives);
         MappingNode.addDataFieldMultiVals(preDirectives, "Name", new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")) );
 
-        GNode usingNamespace = MappingNode.createAndLinkDataFieldOneShot(headerAst.getRoot(),"UsingNamespace", "Name", "java::lang");
+        MappingNode.createAndLinkDataFieldOneShot(headerAst.getRoot(),"UsingNamespace", "Name", "java::lang");
 
         for(GNode javaAst : javaAsts) {
-            classBodyInit.visit(javaAst, headerAst);
+            classDecInit.visit(javaAst, headerAst);
         }
 
-        determineClassOrder(javaAsts, headerAst);
+        ClassRef.setHierarchy(determineClassOrder(javaAsts, headerAst));
 
         setForwardDeclarations(headerAst);
 
         return null;
     }
 
-    public static void determineClassOrder(List<GNode> javaAsts, CppAst headerAst) {
+    public static ClassHierarchyTree determineClassOrder(List<GNode> javaAsts, CppAst headerAst) {
 
         List<ClassRef> cRefs = new ArrayList<ClassRef>();
         ClassRef mainClassRef = null;
@@ -116,6 +116,8 @@ public class CppHeaderAstGenerator {
                 topologicalSorting(cR, hierarchy, headerAst);
             }
         }
+
+        return hierarchy;
     }
 
     public static void topologicalSorting(ClassRef start, ClassHierarchyTree hierarchy, CppAst headerAst) {
@@ -157,6 +159,20 @@ public class CppHeaderAstGenerator {
             MappingNode.addNode(headerAst.getMostRecentParent(), construct);
             MappingNode.addDataField(construct, "Type", cR.getName() + "*");
             MappingNode.addDataField(construct, "Definition", cR.getName().substring(2));
+        }
+    }
+
+
+    public static void displayCppHEntryList(CppAst header) {
+        ArrayList<Object> backingList = header.getAllEntries();
+        for(int i = 0; i < header.getAllEntries().size(); ++i) {
+            Object o = backingList.get(i);
+            if(o instanceof GNode) {
+                System.out.println(i + " " + ((GNode)(backingList.get(i))).getName());
+            } else if(o instanceof MappingNode.DataField) {
+                System.out.println(i + " " + ((MappingNode.DataField)(backingList.get(i))).getVal());
+
+            }
         }
     }
 }
