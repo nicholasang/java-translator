@@ -10,21 +10,34 @@ public class CppAst {
 
     private GNode root;
     private ArrayList<Object> allEntries;
+    private LinkedHashMap<String, ArrayList<Object>> allEntriesMap;
     private GNode mostRecentParent;
     private List<ClassRef> classRefs;
 
+    private ClassRef mainClassRef;
+
     public CppAst(String name) {
-        this.allEntries = new ArrayList<Object>();
         this.root = createMappingNode(name);
+
+        this.allEntries = new ArrayList<Object>();
         this.allEntries.add(this.root);
+
+        this.allEntriesMap = new LinkedHashMap<String, ArrayList<Object>>();
+        this.allEntriesMap.put(this.root.getName(), new ArrayList<Object>(Arrays.asList(this.root)));
+
         this.classRefs = new ArrayList<ClassRef>();
 
     }
 
     public CppAst(GNode root) {
         this.root = root;
+
         this.allEntries = new ArrayList<Object>();
-        this.allEntries.add(root);
+        this.allEntries.add(this.root);
+
+        this.allEntriesMap = new LinkedHashMap<String, ArrayList<Object>>();
+        this.allEntriesMap.put(this.root.getName(), new ArrayList<Object>(Arrays.asList(this.root)));
+
         this.classRefs = new ArrayList<ClassRef>();
     }
 
@@ -59,6 +72,17 @@ public class CppAst {
 
     public ArrayList<Object> getAllEntries() {
         return this.allEntries;
+    }
+
+    public LinkedHashMap<String, ArrayList<Object>> getAllEntriesMap() {
+        return this.allEntriesMap;
+    }
+
+    public ClassRef getMainClassRef() {
+        return this.mainClassRef;
+    }
+    public void setMainClassRef(ClassRef mainClassRef) {
+        this.mainClassRef = mainClassRef;
     }
 
     public String toString() {

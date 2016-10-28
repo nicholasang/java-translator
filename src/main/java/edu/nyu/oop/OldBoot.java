@@ -130,7 +130,7 @@ public class OldBoot extends Tool {
             System.out.println(allAsts);
             System.out.println(allAsts.size());
             //TEMPORARILY DEACTIVATED, use the test class with hard-coded sample data for the schematic testing
-            List<CppAst> allCPPAsts = CppHeaderAstGenerator.generateNew(allAsts);
+            //List<CppAst> allCPPAsts = CppHeaderAstGenerator.generateNew(allAsts);
 
 
             //XtcTestUtils.prettyPrintAst(allAsts.get(0));

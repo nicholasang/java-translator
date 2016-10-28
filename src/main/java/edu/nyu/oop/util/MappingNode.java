@@ -15,6 +15,9 @@ public abstract class MappingNode {
     public static void setEntryRepository(ArrayList<Object> repo) {
         entryRepository = repo;
     }
+    public static void setEntryRepositoryMap(LinkedHashMap<String, ArrayList<Object>> repoMap) {
+        entryRepositoryMap = repoMap;
+    }
 
     public static ArrayList<Object> getEntryRepository() {
         return entryRepository;
@@ -33,7 +36,6 @@ public abstract class MappingNode {
             entryRepositoryMap.put(key, entries);
         } else {
             entries.add(toAdd);
-            entryRepositoryMap.put(key, entries);
         }
     }
 
@@ -54,7 +56,7 @@ public abstract class MappingNode {
         construct.add(new InvisiblePrintObject(dataMap));
 
 
-        addToEntryRepositoryMap(construct.getName(), construct);
+        //addToEntryRepositoryMap(construct.getName(), construct);
 
         return construct;
     }
@@ -382,6 +384,7 @@ public abstract class MappingNode {
         return out;
     }
 
+
     public static Object replaceLocalDataFieldValue(GNode node, String key, String value, int ithOccurrence) {
 
         if(node == null)return null;
@@ -436,6 +439,9 @@ public abstract class MappingNode {
             this.ID  =  ID;
         }
 
+        public String getKey() {
+            return this.key;
+        }
         public void setVal(String val) {
             this.val = val;
         }

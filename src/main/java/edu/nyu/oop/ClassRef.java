@@ -22,9 +22,9 @@ public class ClassRef {
     private LayoutSchematic schematic;
 
     //constructors
-    public ClassRef() {
-        this.schematic = new LayoutSchematic();
+    private ClassRef() {
     }
+
     public ClassRef(String name) {
         this.schematic = new LayoutSchematic();
         this.name = name;
