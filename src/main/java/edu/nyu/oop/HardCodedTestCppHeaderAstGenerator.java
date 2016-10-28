@@ -1,6 +1,5 @@
 package edu.nyu.oop;
 
-import edu.nyu.oop.util.JavaAstVisitor;
 import edu.nyu.oop.util.InitVisitor;
 
 import edu.nyu.oop.util.NodeUtil;
@@ -16,7 +15,6 @@ import java.util.*;
 
 
 import edu.nyu.oop.util.MappingNode;
-import edu.nyu.oop.util.MappingNode.DataField;
 
 public abstract class HardCodedTestCppHeaderAstGenerator {
     public static CppAst generateNew(List<GNode> javaAsts) {

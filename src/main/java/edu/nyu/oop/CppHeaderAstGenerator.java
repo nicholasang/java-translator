@@ -1,79 +1,67 @@
 package edu.nyu.oop;
 
-import edu.nyu.oop.util.JavaAstVisitor;
+import edu.nyu.oop.util.ClassHierarchyTree;
 import edu.nyu.oop.util.InitVisitor;
 
+import edu.nyu.oop.util.NodeUtil;
 import xtc.tree.GNode;
 
 import edu.nyu.oop.util.MappingNode;
-import edu.nyu.oop.util.MappingNode.DataField;
+import static edu.nyu.oop.util.MappingNode.*;
+
+import xtc.tree.Node;
 
 
 import java.util.*;
 
 
 public class CppHeaderAstGenerator {
+    //prevent direct instantiation
     private CppHeaderAstGenerator() {}
 
+    public static CppAst generateNew(List<GNode> javaAsts) { //decided to create the tree inside this class
 
-    public static ArrayList<CppAst> allCppHeaderAsts;
+        CppAst headerAst = new CppAst("SomeBigWrapperNode");
 
-    //most recent parent moved to the CppAst class
-    //public static GNode cppHeaderMostRecentParent;
+        InitVisitor classBodyInit = new InitVisitor();
+        MappingNode.setEntryRepository(headerAst.getAllEntries());
+        MappingNode.setEntryRepositoryMap(headerAst.getAllEntriesMap());
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /* VERSION 4 MAIN */ //NOTE: Not sure about return type yet, could return list of ClassRef + the hierarchy tree + other info
-    public static ArrayList<CppAst> generateNew(List<GNode> javaAsts) { //decided to create the tree inside this class
+        GNode preDirectives = MappingNode.createMappingNode("PreprocessorDirectives");
+        MappingNode.addNode(headerAst.getRoot(), preDirectives);
+        MappingNode.addDataFieldMultiVals(preDirectives, "Name", new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")) );
 
-        //some algorithm to build the ASTs in order of class hiararchy (superclasses to subclasses) (topological sort?)
-        //track every item added, in order
+        GNode usingNamespace = MappingNode.createAndLinkDataFieldOneShot(headerAst.getRoot(),"UsingNamespace", "Name", "java::lang");
 
-        //since multiple classes in one header may extend from classes in other files, we may need to jump back and forth between
-        //partially-finished trees and create pieces of class bodies here and there, rejoin later. I need to create an ArrayList of GNode pointers
-        //to the class bodies
+        for(GNode javaAst : javaAsts) {
+            classBodyInit.visit(javaAst, headerAst);
+        }
 
-        //Need a hierarchy tree:
-        /*EX:
+        determineClassOrder(javaAsts, headerAst);
 
-        C and D in file 1, AST1
-        B and A in file 2, AST2
+        setForwardDeclarations(headerAst);
 
+        // layout stufffffff
 
-        C -> B -> A   D
+        return null;
+    }
 
+    public static void determineClassOrder(List<GNode> javaAsts, CppAst headerAst) {
 
-        HashMap<String, String>:
+        List<ClassRef> cRefs = new ArrayList<ClassRef>();
+        ClassRef mainClassRef = null;
+        boolean mainFound = false;
+        ClassHierarchyTree hierarchy = new ClassHierarchyTree();
 
-        //child-to-parent tree-map
+        ArrayList<Object> namespaces = getAllOfType("Namespace");
+        GNode linkPoint;
+        if(namespaces == null) {
+            linkPoint = headerAst.getRoot();
+        } else {
+            linkPoint = (GNode)namespaces.get(namespaces.size() - 1);
+        }
 
-        "A" {}
-        "B" {"A}
-        "C" {"B"}
-        "D" {}
-
-        in addition, need one to map names to ptrs
-
-        HashMap<String, GNode>:
-
-        "A" {classBodyA}
-        "B" {classBodyB}
-        "C" {classBodyC}
-        "D" {classBodyD}
-
-        and ptrs to ASTs
-
-        HashMap<GNode, GNode>:
-
-        "A" {AST2}
-        "B" {AST2}
-        "C" {AST1}
-        "D" {AST1}
-        /*
-
-        int jk = 0;
         for(GNode jAst : javaAsts) {
-            System.out.println("\n\n");
-            XtcTestUtils.prettyPrintAst(javaAsts.get(jk++));
             List<Node> classDeclarations = NodeUtil.dfsAll(jAst, "ClassDeclaration");
 
             for(Node classDec : classDeclarations) {
@@ -83,13 +71,11 @@ public class CppHeaderAstGenerator {
                 curCR.setJClassDeclaration((GNode)classDec);
                 curCR.setCppAstLinkPoint(linkPoint);
 
-                System.out.println(">>>>>>>> " + classDec.get(1) + " : " + mainFound + " <<<<<<<<<");
-                //check if main class
+                //check if current class is the main class, if so, save as own field (separate from other classes)
                 if(!mainFound) {
                     List<Node> methodDecs = NodeUtil.dfsAll(classDec, "MethodDeclaration");
                     for (Node methodDec : methodDecs) {
                         if (methodDec.get(3).equals("main")) {
-                            System.out.println("FOUND >> " + classDec.get(1));
                             mainClassRef = curCR;
                             mainFound = true;
                         }
@@ -97,6 +83,7 @@ public class CppHeaderAstGenerator {
                 }
 
                 if(curCR != mainClassRef) {
+
                     hierarchy.putNameToRef(curCR.getName(), curCR);
 
                     GNode layer = (GNode)classDec.get(3);
@@ -109,91 +96,69 @@ public class CppHeaderAstGenerator {
                     cRefs.add(curCR);
                 }
 
-         */
-
-        //SOMETHING LIKE THIS: (OR use a class wrapper object to contain more info like ClassRef (made the skeleton)
-
-        /*
-        HashMap<GNode, GNode> classToJAstMap = new HashMap<GNode, GNode>();
-
-        for(GNode file : javaRoots)
-        {
-            CppAst h = new CppAst("SomeBigWrapperNode");
-
-            List<Node> classes = NodeUtil.dfsAll(file, "ClassDeclaration");
-
-            for(Node n : classes)
-            {
-                h.addClass((GNode)n);
-                classToJAstMap.put((GNode)n, file);
             }
-
-
-            allCppHeaderAsts.add(h);
 
         }
 
-        HashMap<String, String> childNametoParentNameMap = new HashMap<String, String>();
-        HashMap<String, GNode> classNameToBodyMap = new HashMap<String, GNode>();
+
+        for(ClassRef cR : cRefs) {
+            String superClassName = hierarchy.getChildToParent(cR.getName());
+
+            hierarchy.putParentToChildren(superClassName, cR.getName());
+
+            cR.setParentClassRef(hierarchy.getNameToRef(superClassName));
+        }
 
 
-        XtcTestUtils.prettyPrintAst(javaRoots.get(0));
-        System.exit(0);
-        /*
+        headerAst.setMainClassRef(mainClassRef);
 
-         */
-        /*
-        We need to jump around so we can fill the vtables/structs in order of increasing number of parents
-
-        -also an intermediary structure to contain entries in our structs per class--one per our Class object (GNode pointing to class body)
-        -probably will contain a linear list of methods as well as a linear list of fields, two of each for public/package private and private/static
-
-        create a default intermediary structure with information from Object, save it (I will call the intermediary structure a schematic for now)
-        Start with A or D:
-
-        EX: D:
-        see that it has no parent, create a full copy of the Object schematic, assign it to parent somehow (Another HashMap is fine)
-
-        move to class A, see the same as for D, create a full copy of Object's schematic, assign
-
-        ...somehow use topological sorting to figure where to go next, or something simpler if available.
-
-        visit B next, see that its parent is A-- make a full copy of A's *public/package private schematic, but since the parent isn't Object, maybe
-        simultaneously figure which methods and fields in A override A's methods and fields instead of making a full copy first. Possibly use some sort of ordered set
-
-        visit C next, etc.
-
-        I included ways to track the current AST and also what is the most recent parent to which we added something (manually updated since sometimes
-        making that automatic wouldn't be helpful) NodeUtils.dfs would also work most of the time, but both the recent parent pointer and that may be helpful
-         */
-
-        // TODO: visitation order determination here
-
-        GNode javaRoot = javaAsts.get(0);
-
-        CppAst cppHeaderAst = new CppAst("SomeBigWrapperNode");
-
-        InitVisitor jav = new InitVisitor();
-        MappingNode.setEntryRepository(cppHeaderAst.getAllEntries());
-
-        GNode preDirectives = MappingNode.createMappingNode("PreprocessorDirectives");
-        MappingNode.addNode(cppHeaderAst.getRoot(), preDirectives);
-        MappingNode.addDataFieldMultiVals(preDirectives, "Name", new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")) );
-
-        GNode usingNamespace = MappingNode.createAndLinkDataFieldOneShot(cppHeaderAst.getRoot(),"UsingNamespace", "Name", "java::lang");
-
-        jav.visit(javaRoot, cppHeaderAst);
-
-        XtcTestUtils.prettyPrintAst(cppHeaderAst.getRoot());
-
-        return null;
-
-
-
-
+        for(ClassRef cR : cRefs) {
+            ClassRef parent = cR.getParentClassRef();
+            if(parent == null) {
+                topologicalSorting(cR, hierarchy, headerAst);
+            }
+        }
     }
 
+    public static void topologicalSorting(ClassRef start, ClassHierarchyTree hierarchy, CppAst headerAst) {
+        ArrayDeque<ClassRef> Q = new ArrayDeque<ClassRef>();
+        Q.add(start);
 
+        while(!Q.isEmpty()) {
+            ClassRef curCR = Q.poll();
 
+            headerAst.addClassRefs(curCR);
 
+            ArrayList<String> childList = hierarchy.getParentToChildren(curCR.getName());
+
+            if(childList != null) {
+
+                for (String childName : childList) {
+                    Q.add(hierarchy.getNameToRef(childName));
+                }
+            }
+        }
+    }
+
+    public static void setForwardDeclarations(CppAst headerAst) {
+        for (ClassRef cR : headerAst.getClassRefs()) {
+            //forward declaration struct
+            GNode construct = MappingNode.createMappingNode("ForwardDeclaration");
+            MappingNode.addNode(headerAst.getMostRecentParent(), construct);
+            MappingNode.addDataField(construct, "Type", "struct");
+            MappingNode.addDataField(construct, "Declaration", cR.getName());
+
+            //forward declaration struct vtable
+            construct = MappingNode.createMappingNode("ForwardDeclaration");
+            MappingNode.addNode(headerAst.getMostRecentParent(), construct);
+            MappingNode.addDataField(construct, "Type", "struct");
+            MappingNode.addDataField(construct, "Declaration", cR.getName() + "_VT");
+
+            //typedef
+            construct = MappingNode.createMappingNode("TypeDefinition");
+            MappingNode.addNode(headerAst.getMostRecentParent(), construct);
+            MappingNode.addDataField(construct, "Type", cR.getName() + "*");
+            MappingNode.addDataField(construct, "Definition", cR.getName().substring(2));
+        }
+    }
 }

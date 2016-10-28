@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class LayoutSchematic {
     // static v-table field, v-table pointer, __class() method, in v-table: __isa
 
-    private class Method {
+    public static class Method {
         public String name;
         public ArrayList<String> parameterTypes = new ArrayList<String>();
         public String returnType;
@@ -16,29 +16,82 @@ public class LayoutSchematic {
         public boolean isStatic;
     }
 
-    private static class Field {
+    public static class Field {
         public String name;
         public String type;
         public String accessModifier;
         public boolean isStatic;
     }
 
-    private static class Parameter {
+    public static class Parameter {
         public String name;
         public String type;
     }
 
-    private static class Constructor {
+    public static class Constructor {
         public ArrayList<Parameter> parameterList = new ArrayList<Parameter>();
     }
 
-    private static class ClassStruct {
+    public static class ClassStruct {
         public ArrayList<Method> methodList = new ArrayList<Method>();
         public ArrayList<Field> fieldList = new ArrayList<Field>();
         public ArrayList<Constructor> constructorList = new ArrayList<Constructor>();
     }
 
-//
+    public static class Initializer {
+        public String fieldName;
+        public Field initializeTo;
+    }
+
+    public static class VtableStruct {
+        public ArrayList<Field> fieldList = new ArrayList<Field>();
+        public ArrayList<Initializer> initializerList = new ArrayList<Initializer>();
+    }
+
+    public ClassStruct classStruct;
+    public VtableStruct vtableStruct;
+
+
+    LayoutSchematic(String className) {
+        classStruct = new ClassStruct();
+
+        Method __class = new Method();
+        __class.name = "__class";
+        __class.returnType = "Class";
+        classStruct.methodList.add(__class);
+
+        Field vptr = new Field();
+        vptr.name = "__vptr";
+        vptr.type = "__" + className + "_VT*";
+        classStruct.fieldList.add(vptr);
+
+        Field vtable = new Field();
+        vtable.name = "__vtable";
+        vtable.type = "__" + className + "_VT";
+        vtable.isStatic = true;
+        classStruct.fieldList.add(vtable);
+
+        vtableStruct = new VtableStruct();
+
+        Field isa = new Field();
+        isa.name = "__isa";
+        isa.type = "Class";
+        vtableStruct.fieldList.add(isa);
+
+        Initializer isaInit = new Initializer();
+        isaInit.fieldName = "__isa";
+        Field setIsaTo = new Field();
+        setIsaTo.name = "__String::__class()";
+        setIsaTo.type = "Class";
+        isaInit.initializeTo = setIsaTo;
+    }
+
+    public LayoutSchematic getCopy() {
+        // return copy so we dont mess it up...... (?)
+        return null;
+    }
+
+    //
 //        private static class MethodPointerInitializer {
 //            public String name;
 //            public boolean isInherited;
@@ -85,62 +138,4 @@ public class LayoutSchematic {
 //        public ArrayList<String> parameterTypes = new ArrayList<String>();
 //    }
 
-    private static class Initializer {
-        public String fieldName;
-        public Field initializeTo;
-    }
-
-    private static class VtableStruct {
-//            public Field isaField = new Field();
-//            public ArrayList<MethodPointer> methodPointerList = new ArrayList<MethodPointer>();
-//            public ArrayList<MethodPointerInitializer> initializerList = new ArrayList<MethodPointerInitializer>();
-
-        public ArrayList<Field> fieldList = new ArrayList<Field>();
-        public ArrayList<Initializer> initializerList = new ArrayList<Initializer>();
-    }
-
-    public ClassStruct classStruct;
-    public VtableStruct vtableStruct;
-
-
-    LayoutSchematic(String className) {
-        classStruct = new ClassStruct();
-
-        Method __class = new Method();
-        __class.name = "__class";
-        __class.returnType = "Class";
-        classStruct.methodList.add(__class);
-
-        Field vptr = new Field();
-        vptr.name = "__vptr";
-        vptr.type = "__" + className + "_VT*";
-        classStruct.fieldList.add(vptr);
-
-        Field vtable = new Field();
-        vtable.name = "__vtable";
-        vtable.type = "__" + className + "_VT";
-        vtable.isStatic = true;
-        classStruct.fieldList.add(vtable);
-
-        vtableStruct = new VtableStruct();
-
-        Field isa = new Field();
-        isa.name = "__isa";
-        isa.type = "Class";
-        vtableStruct.fieldList.add(isa);
-
-        Initializer isaInit = new Initializer();
-        isaInit.fieldName = "__isa";
-        Field setIsaTo = new Field();
-        setIsaTo.name = "__String::__class()";
-        setIsaTo.type = "Class";
-        isaInit.initializeTo = setIsaTo;
-
-//            vtableStruct.isaField.name = "__isa";
-//            vtableStruct.isaField.type = "Class";
-//
-//            FieldInitializer isa = new FieldInitializer();
-//            isa.name = "__isa";
-//            isa.methodName = "__class()";
-    }
 }

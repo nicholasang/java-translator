@@ -31,7 +31,7 @@ public class InvisiblePrintObject {
 
     public String toString() {
         LinkedHashMap<String, ArrayList<ArrayList<Integer>>> map = (LinkedHashMap<String, ArrayList<ArrayList<Integer>>>)o;
-        return (InvisiblePrintObject.invisibleCloakIsInactive) ? o.toString() : "{numTypes=" + Integer.toString((map.size() - 1)) + "}";
+        return (InvisiblePrintObject.invisibleCloakIsInactive) ? o.toString() : ""/*"{numTypes=" + Integer.toString((map.size() - 1)) + "}"*/;
 
     }
 }
