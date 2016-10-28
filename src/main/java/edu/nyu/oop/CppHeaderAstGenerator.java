@@ -41,7 +41,11 @@ public class CppHeaderAstGenerator {
 
         setForwardDeclarations(headerAst);
 
-        // layout stufffffff
+        FillLayoutSchematic.fillClasses(headerAst);
+        for (ClassRef classRef : headerAst.getClassRefs()) {
+            System.out.println(classRef.getName());
+            System.out.println(classRef.getLayoutSchematic());
+        }
 
         return null;
     }

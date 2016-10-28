@@ -33,6 +33,11 @@ class D {
 }
 
 class A {
+
+    public A(String thing) {
+    }
+
+
     public String publicDataA = "publicDataA";
     protected String protectedDataA = "protectedDataA";
     private String privateDataA = "privateDataA";

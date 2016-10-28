@@ -29,6 +29,7 @@ public class LayoutSchematic {
     }
 
     public static class Constructor {
+        public String accessModifier;
         public ArrayList<Parameter> parameterList = new ArrayList<Parameter>();
     }
 
@@ -81,14 +82,40 @@ public class LayoutSchematic {
         Initializer isaInit = new Initializer();
         isaInit.fieldName = "__isa";
         Field setIsaTo = new Field();
-        setIsaTo.name = "__String::__class()";
+        setIsaTo.name = className + "::__class()";
         setIsaTo.type = "Class";
         isaInit.initializeTo = setIsaTo;
+        vtableStruct.initializerList.add(isaInit);
     }
 
-    public LayoutSchematic getCopy() {
-        // return copy so we dont mess it up...... (?)
-        return null;
+//    public LayoutSchematic getCopy() {
+//        // return copy so we dont mess it up...... (?)
+//        return null;
+//    }
+
+    public String toString() {
+        String string = "";
+
+        string += "Class:\n";
+        for (Method method : classStruct.methodList) {
+            string += "\t Method: " + method.accessModifier + " " + method.name + "\n";
+        }
+        for (Field field : classStruct.fieldList) {
+            string += "\t Field: " + field.accessModifier + " " + field.name + "\n";
+        }
+        for (Constructor constructor : classStruct.constructorList) {
+            string += "\t Constructor: # of args = " + constructor.parameterList.size() + "\n";
+        }
+
+        string += "Vtable:\n";
+        for (Field field : vtableStruct.fieldList) {
+            string += "\t Field: " + field.name + "\n";
+        }
+        for (Initializer initializer : vtableStruct.initializerList) {
+            string += "\t Initializer: " + initializer.fieldName + " = " + initializer.initializeTo.name + "\n";
+        }
+
+        return string;
     }
 
     //
