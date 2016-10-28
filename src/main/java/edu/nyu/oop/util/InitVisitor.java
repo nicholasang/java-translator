@@ -17,10 +17,14 @@ public class InitVisitor extends xtc.tree.Visitor {
     GNode jAstRoot;
     HashSet<String> uniqueNamespaces;
 
+    public InitVisitor()
+    {
+        this.uniqueNamespaces = new HashSet<String>();
+    }
+
     public void visit(Node n, CppAst cppHeader) {
         this.cpph = cppHeader;
         this.jAstRoot = (GNode)n;
-        this.uniqueNamespaces = new HashSet<String>();
         visit(n);
     }
 
@@ -52,6 +56,8 @@ public class InitVisitor extends xtc.tree.Visitor {
             {
                 parent = createAndLinkDataFieldOneShot(parent, "Namespace", "Name", namespace);
                 cpph.setMostRecentParent(parent);
+
+                uniqueNamespaces.add(namespace);
             }
 
         }
