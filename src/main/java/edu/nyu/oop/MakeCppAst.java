@@ -21,6 +21,9 @@ public class MakeCppAst extends Visitor{
         else if(n.get(0).equals("long")){
             n.set(0, "int64_t");
         }
+        else if(n.get(0).equals("boolean")){
+            n.set(0, "bool");
+        }
         System.out.println(n.get(0));
         visit(n);
     }
