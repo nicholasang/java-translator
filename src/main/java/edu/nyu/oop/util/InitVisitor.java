@@ -17,8 +17,7 @@ public class InitVisitor extends xtc.tree.Visitor {
     GNode jAstRoot;
     HashSet<String> uniqueNamespaces;
 
-    public InitVisitor()
-    {
+    public InitVisitor() {
         this.uniqueNamespaces = new HashSet<String>();
     }
 
@@ -52,8 +51,7 @@ public class InitVisitor extends xtc.tree.Visitor {
         GNode parent = this.cpph.getRoot();
         for(String namespace : packageNames) {
 
-            if(!uniqueNamespaces.contains(namespace))
-            {
+            if(!uniqueNamespaces.contains(namespace)) {
                 parent = createAndLinkDataFieldOneShot(parent, "Namespace", "Name", namespace);
                 cpph.setMostRecentParent(parent);
 
