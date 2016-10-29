@@ -258,7 +258,7 @@ public abstract class MappingNode {
         return node.get(localGlobalIndices.get(0).get(index));
     }
 
-    public static ArrayList<Object> getAllInstancesOf(GNode node, String key) {
+    public static ArrayList<Object> getAllLocalInstancesOf(GNode node, String key) {
 
         if(node == null)return null;
 
