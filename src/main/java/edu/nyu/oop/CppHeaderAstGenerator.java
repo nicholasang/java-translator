@@ -1,17 +1,15 @@
 package edu.nyu.oop;
 
-import edu.nyu.oop.util.ClassHierarchyTree;
-import edu.nyu.oop.util.InitVisitor;
+import edu.nyu.oop.util.*;
 
-import edu.nyu.oop.util.NodeUtil;
 import xtc.tree.GNode;
 
-import edu.nyu.oop.util.MappingNode;
 import static edu.nyu.oop.util.MappingNode.*;
 
 import xtc.tree.Node;
 
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -40,6 +38,11 @@ public class CppHeaderAstGenerator {
         ClassRef.setHierarchy(determineClassOrder(javaAsts, headerAst));
 
         setForwardDeclarations(headerAst);
+
+        CppHVisitor outputHeader = new CppHVisitor();
+
+        outputHeader.visit(headerAst);
+
 
         return headerAst;
     }

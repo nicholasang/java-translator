@@ -452,9 +452,13 @@ public abstract class MappingNode {
             return this.val;
         }
 
-        public int getID() { return this.ID; }
+        public int getID() {
+            return this.ID;
+        }
 
-        public static void togglePrintValOnly() { DataField.printValOnly = !DataField.printValOnly; }
+        public static void togglePrintValOnly() {
+            DataField.printValOnly = !DataField.printValOnly;
+        }
 
         @Override
         public String toString() {
