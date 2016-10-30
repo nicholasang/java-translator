@@ -141,7 +141,7 @@ public class CppHeaderAstGenerator {
     }
 
     public static void setForwardDeclarations(CppAst headerAst) {
-        for (ClassRef cR : headerAst.getClassRefs()) {
+        for(ClassRef cR : headerAst.getClassRefs()) {
             //forward declaration struct
             GNode construct = MappingNode.createMappingNode("ForwardDeclaration");
             MappingNode.addNode(headerAst.getMostRecentParent(), construct);
