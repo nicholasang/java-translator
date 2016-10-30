@@ -433,7 +433,7 @@ public abstract class MappingNode {
         private String val;
         private int     ID;
 
-        private static boolean displayValOnly;
+        private static boolean printValOnly;
 
         public DataField(String key, String val, int ID) {
             this.key = key;
@@ -454,11 +454,11 @@ public abstract class MappingNode {
 
         public int getID() { return this.ID; }
 
-        public static void toggleDisplayValOnly() { DataField.displayValOnly = !DataField.displayValOnly; }
+        public static void togglePrintValOnly() { DataField.printValOnly = !DataField.printValOnly; }
 
         @Override
         public String toString() {
-            return (DataField.displayValOnly) ? this.val : this.key + " = " + this.val;
+            return (DataField.printValOnly) ? this.val : this.key + " = " + this.val;
         }
     }
 }
