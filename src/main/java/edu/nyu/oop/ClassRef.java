@@ -126,9 +126,11 @@ public class ClassRef {
     }
 
 
+    /*
     private static class LayoutSchematic {
         // TODO: Methods and Fields, public/package private and private/static
     }
+    */
 
 
 
