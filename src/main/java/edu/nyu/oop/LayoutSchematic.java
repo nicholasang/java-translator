@@ -53,7 +53,7 @@ public class LayoutSchematic {
     public VtableStruct vtableStruct;
 
 
-    LayoutSchematic(String className) {
+    public LayoutSchematic(String className) {
         classStruct = new ClassStruct();
 
         Method __class = new Method();
@@ -88,20 +88,15 @@ public class LayoutSchematic {
         vtableStruct.initializerList.add(isaInit);
     }
 
-//    public LayoutSchematic getCopy() {
-//        // return copy so we dont mess it up...... (?)
-//        return null;
-//    }
-
     public String toString() {
         String string = "";
 
         string += "Class:\n";
         for (Method method : classStruct.methodList) {
-            string += "\t Method: " + method.accessModifier + " " + method.name + "\n";
+            string += "\t Method: " + method.accessModifier + " " + (method.isStatic? "static " : "") + method.name + "\n";
         }
         for (Field field : classStruct.fieldList) {
-            string += "\t Field: " + field.accessModifier + " " + field.name + "\n";
+            string += "\t Field: " + field.accessModifier + " " + (field.isStatic? "static " : "") + field.name + "\n";
         }
         for (Constructor constructor : classStruct.constructorList) {
             string += "\t Constructor: # of args = " + constructor.parameterList.size() + "\n";
@@ -112,57 +107,10 @@ public class LayoutSchematic {
             string += "\t Field: " + field.name + "\n";
         }
         for (Initializer initializer : vtableStruct.initializerList) {
-            string += "\t Initializer: " + initializer.fieldName + " = " + initializer.initializeTo.name + "\n";
+            string += "\t Initializer: " + initializer.fieldName + " = " + initializer.initializeTo.type + " " + initializer.initializeTo.name + "\n";
         }
 
         return string;
     }
-
-    //
-//        private static class MethodPointerInitializer {
-//            public String name;
-//            public boolean isInherited;
-//            public String classInheritedFrom;
-//            public String methodName; // <- only used for __isa, b/c it is actually the __class() method
-//            public String returnType;
-//            public ArrayList<String> parameterType = new ArrayList<String>();
-//        }
-//
-//        private static class FieldInitializer {
-//            public String name;
-//            public String methodName;
-//
-//        }
-
-    // field: name, type, access modifier, isStatic
-    //  name = hashCode
-    //  type = int32_t (*) (String)
-    //  no access / static
-
-    // init:
-    //  for field "hashcode"
-    //  set to:
-    // field:
-    //  name = &__String::hashcode
-    //  type = int32_t (*) (String) (aka casting)
-
-
-    // field:
-    //  name: __isa
-    //  type: Class
-    //  no access / static
-
-    // init:
-    //  field: __isa
-    //  set to:
-    // field:
-    //  name = __String::__class()
-    //  type = Class
-
-//    private static class MethodPointer {
-//        public String name;
-//        public String returnType;
-//        public ArrayList<String> parameterTypes = new ArrayList<String>();
-//    }
 
 }

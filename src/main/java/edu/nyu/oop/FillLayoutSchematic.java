@@ -3,8 +3,6 @@ package edu.nyu.oop;
 import java.util.*;
 
 import edu.nyu.oop.util.NodeUtil;
-import sun.text.CollatorUtilities;
-import xtc.lang.cpp.Syntax;
 import xtc.tree.GNode;
 import xtc.tree.Node;
 
@@ -21,14 +19,17 @@ public class FillLayoutSchematic {
         List<ClassRef> classList = topNode.getClassRefs();
 
         for (ClassRef classRef : classList) {
+
+
             populateClassStruct(classRef.getLayoutSchematic().classStruct, classRef.getJClassDeclaration());
-            // class struct: non-static, non-private fields inherited???
 
             if (classRef.getParentClassRef() != null) {
-                getInheritedVtable(classRef.getLayoutSchematic().vtableStruct, classRef.getParentClassRef().getLayoutSchematic().vtableStruct);
+                getInheritedFields(classRef.getLayoutSchematic().classStruct, classRef.getParentClassRef().getLayoutSchematic().classStruct);
+                getInheritedVtable(classRef.getLayoutSchematic().vtableStruct, classRef.getParentClassRef().getLayoutSchematic().vtableStruct, classRef.getName());
             }
             else {
-                getInheritedVtable(classRef.getLayoutSchematic().vtableStruct, objectLayoutSchematic.vtableStruct);
+                getInheritedFields(classRef.getLayoutSchematic().classStruct, objectLayoutSchematic.classStruct);
+                getInheritedVtable(classRef.getLayoutSchematic().vtableStruct, objectLayoutSchematic.vtableStruct, classRef.getName());
             }
 
             populateVtableFromClassStruct(classRef.getLayoutSchematic().vtableStruct, classRef.getLayoutSchematic().classStruct, classRef.getName());
@@ -134,6 +135,12 @@ public class FillLayoutSchematic {
             if (method.name.equals("__class")) {
                 continue;
             }
+            else if (method.isStatic) {
+                continue;
+            }
+            else if ("private".equals(method.accessModifier)) {
+                continue;
+            }
 
             LayoutSchematic.Field methodPointer;
             LayoutSchematic.Field setTo;
@@ -198,19 +205,26 @@ public class FillLayoutSchematic {
         return null;
     }
 
-    private static void getInheritedVtable(LayoutSchematic.VtableStruct childVtable, LayoutSchematic.VtableStruct parentVtable) {
+    private static void getInheritedVtable(LayoutSchematic.VtableStruct childVtable, LayoutSchematic.VtableStruct parentVtable, String childClass) {
+        // in Java, private methods are not really inherited (subclass does not "know" about them), but here, in order for other
+        // inherited methods to work (say, inherited methods that call those private methods), the subclass must have these private methods
+
         for (LayoutSchematic.Field field : parentVtable.fieldList) {
             if (field.name.equals("__isa")) {
                 continue;
             }
-            childVtable.fieldList.add(copyField(field));
+            LayoutSchematic.Field fieldCopy = copyField(field);
+            changeTypeOfThis(fieldCopy, childClass);
+            childVtable.fieldList.add(fieldCopy);
         }
 
         for (LayoutSchematic.Initializer initializer : parentVtable.initializerList) {
             if (initializer.fieldName.equals("__isa")) {
                 continue;
             }
-            childVtable.initializerList.add(copyInitializer(initializer));
+            LayoutSchematic.Initializer initCopy = copyInitializer(initializer);
+            changeTypeOfThis(initCopy.initializeTo, childClass);
+            childVtable.initializerList.add(initCopy);
         }
     }
 
@@ -232,6 +246,34 @@ public class FillLayoutSchematic {
         copy.isStatic = field.isStatic;
 
         return copy;
+    }
+
+    private static void changeTypeOfThis(LayoutSchematic.Field field, String className) {
+        int lastOpeningParen = field.type.lastIndexOf('(');
+        int firstCommaOrClosingParen = field.type.indexOf(',');
+        if (firstCommaOrClosingParen == -1) {
+            firstCommaOrClosingParen = field.type.lastIndexOf(')');
+        }
+
+        field.type = field.type.substring(0, lastOpeningParen + 1) + className + field.type.substring(firstCommaOrClosingParen);
+    }
+
+    private static void getInheritedFields(LayoutSchematic.ClassStruct childClassStruct, LayoutSchematic.ClassStruct parentClassStruct) {
+        for (LayoutSchematic.Field field : parentClassStruct.fieldList) {
+            if ("__vtable".equals(field.name) || "__vptr".equals(field.name)) {
+                continue;
+            }
+            else if (field.isStatic) {
+                continue;
+            }
+
+            // technically, in Java, subclasses do NOT inherit private fields
+            // HOWEVER, the C++ "subclass" needs to be able to have/access all the same field as its parent class
+            // in order for inherited getter / setter methods to work, so here private fields are "inherited"
+
+            LayoutSchematic.Field fieldCopy = copyField(field);
+            childClassStruct.fieldList.add(fieldCopy);
+        }
     }
 
     private static void populateClassStruct(LayoutSchematic.ClassStruct classStruct, GNode classNode) {
@@ -265,21 +307,16 @@ public class FillLayoutSchematic {
         LayoutSchematic.Method method = new LayoutSchematic.Method();
 
         GNode modifiers = (GNode) methodNode.getNode(0);
-        if (modifiers.size() > 0) {
-            Node modifier = modifiers.getNode(0);
-            if (modifier.get(0).getClass().equals((new String()).getClass())) {
-                if (modifier.getString(0).equals("static")) {
+
+        for (int i = 0; i < modifiers.size(); i++) {
+            Node modNode = modifiers.getNode(i);
+            if (modNode.getName().equals("Modifier")) {
+                String modifier = modNode.getString(0);
+                if (modifier.equals("static")) {
                     method.isStatic = true;
-                } else {
-                    method.accessModifier = modifier.getString(0);
-
-                    if (modifiers.size() > 1) {
-                        modifier = modifiers.getNode(1);
-                        if (modifier.getString(0).equals("static")) {
-                            method.isStatic = true;
-                        }
-
-                    }
+                }
+                else {
+                    method.accessModifier = modifier;
                 }
             }
         }
@@ -316,19 +353,16 @@ public class FillLayoutSchematic {
             field.name = name;
 
             GNode modifiers = (GNode) fieldNode.getNode(0);
-            if (modifiers.size() > 0) {
-                Node modifier = modifiers.getNode(0);
-                if (modifier.getString(0).equals("static")) {
-                    field.isStatic = true;
-                } else {
-                    field.accessModifier = modifier.getString(0);
 
-                    if (modifiers.size() > 1) {
-                        modifier = modifiers.getNode(1);
-                        if (modifier.getString(0).equals("static")) {
-                            field.isStatic = true;
-                        }
-
+            for (int j = 0; j < modifiers.size(); j++) {
+                Node modNode = modifiers.getNode(j);
+                if (modNode.getName().equals("Modifier")) {
+                    String modifier = modNode.getString(0);
+                    if (modifier.equals("static")) {
+                        field.isStatic = true;
+                    }
+                    else {
+                        field.accessModifier = modifier;
                     }
                 }
             }
@@ -362,10 +396,12 @@ public class FillLayoutSchematic {
         LayoutSchematic.Constructor constructor = new LayoutSchematic.Constructor();
 
         Node modifiers = constructorNode.getNode(0);
-        if (modifiers != null) { // access modifier and isStatic
-            Node modifier = modifiers.getNode(0);
-            if (modifier != null) {
-                constructor.accessModifier = modifier.getString(0);
+
+        for (int i = 0; i < modifiers.size(); i++) {
+            Node modNode = modifiers.getNode(i);
+            if (modNode.getName().equals("Modifier")) {
+                String modifier = modNode.getString(0);
+                constructor.accessModifier = modifier;
             }
         }
 
