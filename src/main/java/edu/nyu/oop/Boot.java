@@ -94,6 +94,8 @@ public class Boot extends Tool {
         }
 
         if (runtime.test("parseJava")) {
+            // NOTE: must type in EXACT filename (same case!!) or file is added twice by dependency parser
+
             String workingDir = System.getProperty("user.dir");
 
             Location nLocation = n.getLocation();

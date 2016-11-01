@@ -1,6 +1,7 @@
 package edu.nyu.oop;
 
 import xtc.tree.GNode;
+import java.util.*;
 
 //instead of using several hash-maps, encapulate relationships between classes in
 //different ASTs, parts of different ASTs, and other classes in a ClassRef object
@@ -26,7 +27,7 @@ public class ClassRef {
     }
 
     public ClassRef(String name) {
-        this.schematic = new LayoutSchematic();
+        this.schematic = new LayoutSchematic(name);
         this.name = name;
     }
 
@@ -113,12 +114,5 @@ public class ClassRef {
     public String toString() {
         return this.name;
     }
-
-
-    private static class LayoutSchematic {
-        // TODO: Methods and Fields, public/package private and private/static
-    }
-
-
 
 }
