@@ -14,29 +14,29 @@ public class FillLayoutSchematic {
     public static LayoutSchematic objectLayoutSchematic;
 
     public static void fillClasses(CppAst topNode) {
-        createObjectSchematic();
-
         List<ClassRef> classList = topNode.getClassRefs();
 
         for (ClassRef classRef : classList) {
-
-
-            populateClassStruct(classRef.getLayoutSchematic().classStruct, classRef.getJClassDeclaration());
-
-            if (classRef.getParentClassRef() != null) {
-                getInheritedFields(classRef.getLayoutSchematic().classStruct, classRef.getParentClassRef().getLayoutSchematic().classStruct);
-                getInheritedVtable(classRef.getLayoutSchematic().vtableStruct, classRef.getParentClassRef().getLayoutSchematic().vtableStruct, classRef.getName());
-            }
-            else {
-                getInheritedFields(classRef.getLayoutSchematic().classStruct, objectLayoutSchematic.classStruct);
-                getInheritedVtable(classRef.getLayoutSchematic().vtableStruct, objectLayoutSchematic.vtableStruct, classRef.getName());
-            }
-
-            populateVtableFromClassStruct(classRef.getLayoutSchematic().vtableStruct, classRef.getLayoutSchematic().classStruct, classRef.getName());
+            fillClass(classRef);
         }
     }
 
-    private static void createObjectSchematic() {
+    public static void fillClass(ClassRef classRef) {
+        populateClassStruct(classRef.getLayoutSchematic().classStruct, classRef.getJClassDeclaration());
+
+        if (classRef.getParentClassRef() != null) {
+            getInheritedFields(classRef.getLayoutSchematic().classStruct, classRef.getParentClassRef().getLayoutSchematic().classStruct);
+            getInheritedVtable(classRef.getLayoutSchematic().vtableStruct, classRef.getParentClassRef().getLayoutSchematic().vtableStruct, classRef.getName());
+        }
+        else {
+            getInheritedFields(classRef.getLayoutSchematic().classStruct, objectLayoutSchematic.classStruct);
+            getInheritedVtable(classRef.getLayoutSchematic().vtableStruct, objectLayoutSchematic.vtableStruct, classRef.getName());
+        }
+
+        populateVtableFromClassStruct(classRef.getLayoutSchematic().vtableStruct, classRef.getLayoutSchematic().classStruct, classRef.getName());
+    }
+
+    static {
         objectLayoutSchematic = new LayoutSchematic("__Object");
 
         LayoutSchematic.ClassStruct classStruct = objectLayoutSchematic.classStruct;
@@ -136,9 +136,6 @@ public class FillLayoutSchematic {
                 continue;
             }
             else if (method.isStatic) {
-                continue;
-            }
-            else if ("private".equals(method.accessModifier)) {
                 continue;
             }
 
@@ -321,20 +318,14 @@ public class FillLayoutSchematic {
             }
         }
 
-        Node type = methodNode.getNode(2);
-        if (type.getName().equals("VoidType")) {
-            method.returnType = "void";
-        } else {
-            method.returnType = type.getNode(0).getString(0);
-        }
+        method.returnType = getType((GNode) methodNode.getNode(2));
 
         method.name = methodNode.getString(3);
 
         GNode parameters = (GNode) methodNode.getNode(4);
         for (int i = 0; i < parameters.size(); i++) {
             Node parameter = parameters.getNode(i);
-            Node parameterType = parameter.getNode(1);
-            method.parameterTypes.add(parameterType.getNode(0).getString(0));
+            method.parameterTypes.add(getType((GNode) parameter.getNode(1)));
         }
 
         return method;
@@ -367,8 +358,7 @@ public class FillLayoutSchematic {
                 }
             }
 
-            Node type = fieldNode.getNode(1);
-            field.type = type.getNode(0).getString(0);
+            field.type = getType((GNode) fieldNode.getNode(1));
 
             fields.add(field);
         }
@@ -410,7 +400,7 @@ public class FillLayoutSchematic {
             LayoutSchematic.Parameter parameter = new LayoutSchematic.Parameter();
             Node parameterNode = parameters.getNode(i);
 
-            parameter.type = parameterNode.getNode(1).getNode(0).getString(0);
+            parameter.type = getType((GNode) parameterNode.getNode(1));
             parameter.name = parameterNode.getString(3);
 
             constructor.parameterList.add(parameter);
@@ -419,4 +409,42 @@ public class FillLayoutSchematic {
         return constructor;
     }
 
+    private static String getType(GNode typeNode) {
+        if (typeNode.size() == 0 || typeNode.getName().equals("VoidType")) { // void (e.g. method return type)
+            return "void";
+        }
+        else {
+            String innerType = getCType(typeNode.getNode(0).getString(0));
+            if (typeNode.get(1) != null) { // is an array
+                return "__rt::Array<" + innerType + ">*";
+            }
+            return innerType;
+        }
+    }
+
+    private static String getCType(String javaType) {
+        String cType;
+        switch (javaType) {
+            case "int":
+                cType = "int32_t";
+                break;
+            case "long":
+                cType = "int64_t";
+                break;
+            case "short":
+                cType = "int_16t";
+                break;
+            case "byte":
+                cType = "int_8t";
+                break;
+            case "boolean":
+                cType = "bool";
+                break;
+            default:
+                cType = javaType;
+                break;
+        }
+
+        return cType;
+    }
 }

@@ -96,7 +96,7 @@ public class LayoutSchematic {
             string += "\t Method: " + method.accessModifier + " " + (method.isStatic? "static " : "") + method.name + "\n";
         }
         for (Field field : classStruct.fieldList) {
-            string += "\t Field: " + field.accessModifier + " " + (field.isStatic? "static " : "") + field.name + "\n";
+            string += "\t Field: " + field.accessModifier + " " + (field.isStatic? "static " : "") + field.type + " " + field.name + "\n";
         }
         for (Constructor constructor : classStruct.constructorList) {
             string += "\t Constructor: # of args = " + constructor.parameterList.size() + "\n";
@@ -104,7 +104,7 @@ public class LayoutSchematic {
 
         string += "Vtable:\n";
         for (Field field : vtableStruct.fieldList) {
-            string += "\t Field: " + field.name + "\n";
+            string += "\t Field: " + field.type + " " + field.name + "\n";
         }
         for (Initializer initializer : vtableStruct.initializerList) {
             string += "\t Initializer: " + initializer.fieldName + " = " + initializer.initializeTo.type + " " + initializer.initializeTo.name + "\n";
