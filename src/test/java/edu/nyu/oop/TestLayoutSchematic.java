@@ -41,12 +41,12 @@ public class TestLayoutSchematic {
         List<LayoutSchematic.Field> fields = layout.vtableStruct.fieldList;
         List<LayoutSchematic.Initializer> initializers = layout.vtableStruct.initializerList;
 
-        assertEquals(2 + 4 + 1, fields.size()); // 2 from TestClass, 4 inherited (including toString), 1 is __isa
-        assertEquals(2 + 4 + 1, initializers.size()); // see above
+        assertEquals(1 + 4 + 1, fields.size()); // 2 from TestClass (not private method), 4 inherited (including toString), 1 is __isa
+        assertEquals(1 + 4 + 1, initializers.size()); // see above
 
         // since field and initializer lists are very similar, just testing initializer list for correctness
 
-        boolean hashcode = false, equals = false, getClass = false, toString = false, mainish = false, privateMethod = false;
+        boolean hashcode = false, equals = false, getClass = false, toString = false, mainish = false;
         for (LayoutSchematic.Initializer initializer : initializers) {
             LayoutSchematic.Field initTo = initializer.initializeTo;
             switch (initializer.fieldName) {
@@ -62,16 +62,13 @@ public class TestLayoutSchematic {
             case "toString":
                 toString = initTo.type.equals("String (*) (__TestClass)") && initTo.name.equals("&__TestClass::toString");
                 break;
-            case "privateMethod":
-                privateMethod = initTo.type.equals("void (*) (__TestClass, String, int32_t)") && initTo.name.equals("&__TestClass::privateMethod");
-                break;
             case "mainish":
                 mainish = initTo.type.equals("__rt::Array<bool>* (*) (__TestClass, __rt::Array<String>*)") && initTo.name.equals("&__TestClass::mainish");
                 break;
             }
         }
 
-        assert(hashcode && equals && getClass && toString && mainish && privateMethod);
+        assert(hashcode && equals && getClass && toString && mainish);
         logger.info("Vtable struct laoyut correct");
     }
 
