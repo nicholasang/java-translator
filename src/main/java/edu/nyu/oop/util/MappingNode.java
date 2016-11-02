@@ -258,7 +258,7 @@ public abstract class MappingNode {
         return node.get(localGlobalIndices.get(0).get(index));
     }
 
-    public static ArrayList<Object> getAllInstancesOf(GNode node, String key) {
+    public static ArrayList<Object> getAllLocalInstancesOf(GNode node, String key) {
 
         if(node == null)return null;
 
@@ -433,6 +433,8 @@ public abstract class MappingNode {
         private String val;
         private int     ID;
 
+        private static boolean printValOnly;
+
         public DataField(String key, String val, int ID) {
             this.key = key;
             this.val = val;
@@ -450,9 +452,17 @@ public abstract class MappingNode {
             return this.val;
         }
 
+        public int getID() {
+            return this.ID;
+        }
+
+        public static void togglePrintValOnly() {
+            DataField.printValOnly = !DataField.printValOnly;
+        }
+
         @Override
         public String toString() {
-            return this.key + " = " + this.val;
+            return (DataField.printValOnly) ? this.val : this.key + " = " + this.val;
         }
     }
 }

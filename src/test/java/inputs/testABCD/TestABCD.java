@@ -7,24 +7,6 @@ public class TestABCD {
     }
 }
 
-
-
-class B extends A {
-    private String privateDataB = "dataB";
-
-    @Override
-    public String getArbitraryData() {
-        return this.privateDataB;
-    }
-
-}
-
-class C extends A {
-
-
-
-}
-
 class D {
 
     void allByMyself() {

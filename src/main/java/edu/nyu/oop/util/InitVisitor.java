@@ -6,6 +6,7 @@ import xtc.tree.GNode;
 import xtc.tree.Node;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import static edu.nyu.oop.util.MappingNode.*;
 
@@ -14,6 +15,11 @@ import static edu.nyu.oop.util.MappingNode.*;
 public class InitVisitor extends xtc.tree.Visitor {
     CppAst cpph;
     GNode jAstRoot;
+    HashSet<String> uniqueNamespaces;
+
+    public InitVisitor() {
+        this.uniqueNamespaces = new HashSet<String>();
+    }
 
     public void visit(Node n, CppAst cppHeader) {
         this.cpph = cppHeader;
@@ -43,16 +49,14 @@ public class InitVisitor extends xtc.tree.Visitor {
         }
 
         GNode parent = this.cpph.getRoot();
-        GNode namespace = null;
-        for(String s : packageNames) {
-            //namespace = CppHeaderAstsGenerator.createAndLinkDataFieldOneShot(parent, "Namespace", "Name", s);
-            //parent = namespace;
+        for(String namespace : packageNames) {
 
-            //could be a one-liner:
-            parent = createAndLinkDataFieldOneShot(parent, "Namespace", "Name", s);
+            if(!uniqueNamespaces.contains(namespace)) {
+                parent = createAndLinkDataFieldOneShot(parent, "Namespace", "Name", namespace);
+                cpph.setMostRecentParent(parent);
 
-
-            cpph.setMostRecentParent(parent);
+                uniqueNamespaces.add(namespace);
+            }
 
         }
     }

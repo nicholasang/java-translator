@@ -104,12 +104,6 @@ public class Boot extends Tool {
 
             List<GNode> allAsts = GenerateJavaASTs.beginParse((GNode) n);
 
-            runtime.console().pln();
-            for(Node node : allAsts) {
-                runtime.console().pln(node.getLocation().file);
-            }
-            runtime.console().pln().flush();
-
             CppAst headerCppAst = CppHeaderAstGenerator.generateNew(allAsts);
 
 
