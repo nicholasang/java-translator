@@ -39,10 +39,11 @@ public class CppHeaderAstGenerator {
 
         setForwardDeclarations(headerAst);
 
+        FillLayoutSchematic.fillClasses(headerAst);
+
         CppHVisitor outputHeader = new CppHVisitor();
 
         outputHeader.visit(headerAst);
-
 
         return headerAst;
     }
