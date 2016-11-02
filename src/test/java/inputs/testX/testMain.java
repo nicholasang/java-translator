@@ -11,5 +11,9 @@ public class testMain {
         int y = x + 1;
 
         int[] testArray = {x, y};
+
+        String s = "hi";
+        Object o = null;
+        System.out.println(x);
     }
 }
