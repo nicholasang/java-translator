@@ -138,6 +138,10 @@ public class FillLayoutSchematic {
             else if (method.isStatic) {
                 continue;
             }
+            else if ("private".equals(method.accessModifier)) {
+                continue;
+            }
+            // ^ private & static methods not in
 
             LayoutSchematic.Field methodPointer;
             LayoutSchematic.Field setTo;
