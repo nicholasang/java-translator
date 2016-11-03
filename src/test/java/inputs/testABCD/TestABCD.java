@@ -16,7 +16,11 @@ class D {
 
 class A {
 
-    public A(String thing) {
+    public A() {
+
+    }
+
+    public A(String item) {
     }
 
 
@@ -32,5 +36,6 @@ class A {
     public static String[] Love() {
         return new String[] {"is", "all", "you", "need"};
     }
+
 
 }

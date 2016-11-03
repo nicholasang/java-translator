@@ -5,11 +5,11 @@ import edu.nyu.oop.util.*;
 import xtc.tree.GNode;
 
 import static edu.nyu.oop.util.MappingNode.*;
+import static edu.nyu.oop.LayoutSchematic.*;
+
 
 import xtc.tree.Node;
 
-
-import java.io.IOException;
 import java.util.*;
 
 
@@ -41,12 +41,174 @@ public class CppHeaderAstGenerator {
 
         FillLayoutSchematic.fillClasses(headerAst);
 
-        CppHVisitor outputHeader = new CppHVisitor();
+        populateClassWrappers(headerAst);
 
-        outputHeader.visit(headerAst);
+        XtcTestUtils.prettyPrintAst(headerAst.getRoot());
+        //CppHVisitor outputHeader = new CppHVisitor();
+
+        //outputHeader.visit(headerAst);
 
         return headerAst;
     }
+
+    public static void populateClassWrappers(CppAst headerAst) {
+
+        List<ClassRef> classes = headerAst.getClassRefs();
+
+        for(ClassRef cR: classes) {
+            GNode linkPoint = cR.getCppHAstLinkPoint();
+            LayoutSchematic lS = cR.getLayoutSchematic();
+
+            GNode cW = MappingNode.createMappingNode("ClassWrapper");
+            MappingNode.addNode(linkPoint, cW);
+            MappingNode.addDataField(cW, "Name", cR.getName());
+
+            linkPoint = cW;
+            //create, link, and populate struct
+            populateClassStruct(linkPoint, lS, cR);
+            //create, link, and populate struct
+            populateVtableStruct(linkPoint, lS, cR);
+        }
+
+    }
+
+    public static void populateClassStruct(GNode linkPoint, LayoutSchematic lS, ClassRef cR) {
+        GNode struct = MappingNode.createMappingNode("struct");
+        MappingNode.addNode(linkPoint, struct);
+        linkPoint = struct;
+        MappingNode.addDataField(struct, "Name", cR.getName());
+
+        LayoutSchematic.ClassStruct cStruct = lS.classStruct;
+
+        for(Field f : cStruct.fieldList) {
+            GNode fieldNode = MappingNode.createMappingNode("Field");
+            MappingNode.addNode(linkPoint, fieldNode);
+
+            MappingNode.addDataField(fieldNode, "AccessModifier", f.accessModifier);
+            MappingNode.addDataField(fieldNode, "IsStatic", Boolean.toString(f.isStatic));
+            MappingNode.addDataField(fieldNode, "Type", f.type);
+            MappingNode.addDataField(fieldNode, "Name", f.name);
+        }
+
+
+        for(Constructor c : cStruct.constructorList) {
+            GNode constructorNode = MappingNode.createMappingNode("Constructor");
+            MappingNode.addNode(linkPoint, constructorNode);
+
+            MappingNode.addDataField(constructorNode, "AccessModifier", c.accessModifier);
+            MappingNode.addDataField(constructorNode, "Name", cR.getName());
+
+            GNode pL = MappingNode.createMappingNode("ParameterList");
+            MappingNode.addNode(constructorNode, pL);
+
+            if(c.parameterList.size() > 0) {
+                for (Parameter p : c.parameterList) {
+                    GNode paramNode = MappingNode.createMappingNode("Parameter");
+                    MappingNode.addNode(pL, paramNode);
+
+                    MappingNode.addDataField(paramNode, "Type", p.type);
+                    MappingNode.addDataField(paramNode, "Name", p.name);
+
+                }
+            }
+
+        }
+
+
+        for(Method m : cStruct.methodList) {
+            GNode constructorNode = MappingNode.createMappingNode("Method");
+            MappingNode.addNode(linkPoint, constructorNode);
+
+            MappingNode.addDataField(constructorNode, "AccessModifier", m.accessModifier);
+            MappingNode.addDataField(constructorNode, "IsStatic", Boolean.toString(m.isStatic));
+            MappingNode.addDataField(constructorNode, "ReturnType", m.returnType);
+            MappingNode.addDataField(constructorNode, "Name", m.name);
+
+
+            GNode pL = MappingNode.createMappingNode("ParameterList");
+            MappingNode.addNode(constructorNode, pL);
+
+            if(m.parameterTypes.size() > 0) {
+                for(String paramType : m.parameterTypes) {
+                    GNode paramNode = MappingNode.createMappingNode("Parameter");
+                    MappingNode.addNode(pL, paramNode);
+
+                    MappingNode.addDataField(paramNode, "Type", paramType);
+                }
+            }
+
+        }
+    }
+
+    public static void populateVtableStruct(GNode linkPoint, LayoutSchematic lS, ClassRef cR) {
+        GNode struct = MappingNode.createMappingNode("struct");
+        MappingNode.addNode(linkPoint, struct);
+        linkPoint = struct;
+        MappingNode.addDataField(struct, "Name", cR.getName() + "_VT");
+
+        LayoutSchematic.VtableStruct vtStruct = lS.vtableStruct;
+
+        for(Field f : vtStruct.fieldList) {
+            GNode fieldNode = MappingNode.createMappingNode("Field");
+            MappingNode.addNode(linkPoint, fieldNode);
+
+            MappingNode.addDataField(fieldNode, "AccessModifier", f.accessModifier);
+            MappingNode.addDataField(fieldNode, "IsStatic", Boolean.toString(f.isStatic));
+            MappingNode.addDataField(fieldNode, "Type", f.type);
+            MappingNode.addDataField(fieldNode, "Name", f.name);
+        }
+
+        GNode constructorNode = MappingNode.createMappingNode("Constructor");
+        MappingNode.addNode(linkPoint, constructorNode);
+
+        MappingNode.addDataField(constructorNode, "AccessModifier", "public ????????");
+        MappingNode.addDataField(constructorNode, "Name", cR.getName());
+
+        GNode pL = MappingNode.createMappingNode("ParameterList");
+        MappingNode.addNode(constructorNode, pL);
+
+        if(vtStruct.initializerList.size() > 0) {
+            for(Initializer init : vtStruct.initializerList) {
+                GNode initNode = MappingNode.createMappingNode("Init");
+                MappingNode.addNode(constructorNode, initNode);
+
+                MappingNode.addDataField(initNode, "Name", init.fieldName);
+
+                Field f = init.initializeTo;
+
+                GNode fieldNode = MappingNode.createMappingNode("Field");
+                MappingNode.addNode(initNode, fieldNode);
+
+
+                MappingNode.addDataField(fieldNode, "Type", f.type);
+                MappingNode.addDataField(fieldNode, "Name", f.name);
+
+            }
+        }
+
+    }
+
+    //hmmmm something is wrong
+    /*
+
+     Name = getClass
+     Type = Class (*) (__C),
+     Name = &__Object::getClass
+
+     Name = add
+     Type = int32_t (*) (__C, int32_t, int32_t),
+     Name = &__C::add
+
+         __String_VT()
+        : __isa(__String::__class()),
+          hashCode(&__String::hashCode),
+          equals(&__String::equals),
+          getClass((Class(*)(String))&__Object::getClass),
+          toString(&__String::toString),
+          length(&__String::length),
+          charAt(&__String::charAt)
+
+     */
 
     public static ClassHierarchyTree determineClassOrder(List<GNode> javaAsts, CppAst headerAst) {
 
@@ -71,7 +233,7 @@ public class CppHeaderAstGenerator {
                 curCR.setCppHAst(headerAst);
                 curCR.setJAst(jAst);
                 curCR.setJClassDeclaration((GNode)classDec);
-                curCR.setCppAstLinkPoint(linkPoint);
+                curCR.setCppHAstLinkPoint(linkPoint);
 
                 //check if current class is the main class, if so, save as own field (separate from other classes)
                 if(!mainFound) {

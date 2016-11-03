@@ -27,8 +27,7 @@ public class FillLayoutSchematic {
         if (classRef.getParentClassRef() != null) {
             getInheritedFields(classRef.getLayoutSchematic().classStruct, classRef.getParentClassRef().getLayoutSchematic().classStruct);
             getInheritedVtable(classRef.getLayoutSchematic().vtableStruct, classRef.getParentClassRef().getLayoutSchematic().vtableStruct, classRef.getName());
-        }
-        else {
+        } else {
             getInheritedFields(classRef.getLayoutSchematic().classStruct, objectLayoutSchematic.classStruct);
             getInheritedVtable(classRef.getLayoutSchematic().vtableStruct, objectLayoutSchematic.vtableStruct, classRef.getName());
         }
@@ -134,11 +133,9 @@ public class FillLayoutSchematic {
         for (LayoutSchematic.Method method : methodList) {
             if (method.name.equals("__class")) {
                 continue;
-            }
-            else if (method.isStatic) {
+            } else if (method.isStatic) {
                 continue;
-            }
-            else if ("private".equals(method.accessModifier)) {
+            } else if ("private".equals(method.accessModifier)) {
                 continue;
             }
             // ^ private & static methods not in
@@ -153,8 +150,7 @@ public class FillLayoutSchematic {
                 methodPointer = getFieldWithName(method.name, vtableStruct.fieldList);
                 initializer = getInitializerFor(method.name, vtableStruct.initializerList);
                 setTo = initializer.initializeTo;
-            }
-            else {
+            } else {
                 methodPointer = new LayoutSchematic.Field();
                 vtableStruct.fieldList.add(methodPointer);
                 setTo = new LayoutSchematic.Field();
@@ -263,8 +259,7 @@ public class FillLayoutSchematic {
         for (LayoutSchematic.Field field : parentClassStruct.fieldList) {
             if ("__vtable".equals(field.name) || "__vptr".equals(field.name)) {
                 continue;
-            }
-            else if (field.isStatic) {
+            } else if (field.isStatic) {
                 continue;
             }
 
@@ -315,8 +310,7 @@ public class FillLayoutSchematic {
                 String modifier = modNode.getString(0);
                 if (modifier.equals("static")) {
                     method.isStatic = true;
-                }
-                else {
+                } else {
                     method.accessModifier = modifier;
                 }
             }
@@ -355,8 +349,7 @@ public class FillLayoutSchematic {
                     String modifier = modNode.getString(0);
                     if (modifier.equals("static")) {
                         field.isStatic = true;
-                    }
-                    else {
+                    } else {
                         field.accessModifier = modifier;
                     }
                 }
@@ -416,8 +409,7 @@ public class FillLayoutSchematic {
     private static String getType(GNode typeNode) {
         if (typeNode.size() == 0 || typeNode.getName().equals("VoidType")) { // void (e.g. method return type)
             return "void";
-        }
-        else {
+        } else {
             String innerType = getCType(typeNode.getNode(0).getString(0));
             if (typeNode.get(1) != null) { // is an array
                 return "__rt::Array<" + innerType + ">*";
@@ -429,24 +421,24 @@ public class FillLayoutSchematic {
     private static String getCType(String javaType) {
         String cType;
         switch (javaType) {
-            case "int":
-                cType = "int32_t";
-                break;
-            case "long":
-                cType = "int64_t";
-                break;
-            case "short":
-                cType = "int_16t";
-                break;
-            case "byte":
-                cType = "int_8t";
-                break;
-            case "boolean":
-                cType = "bool";
-                break;
-            default:
-                cType = javaType;
-                break;
+        case "long":
+            cType = "int64_t";
+            break;
+        case "int":
+            cType = "int32_t";
+            break;
+        case "short":
+            cType = "int16_t";
+            break;
+        case "byte":
+            cType = "int8_t";
+            break;
+        case "boolean":
+            cType = "bool";
+            break;
+        default:
+            cType = javaType;
+            break;
         }
 
         return cType;

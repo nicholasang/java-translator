@@ -4,7 +4,7 @@ import edu.nyu.oop.util.ClassHierarchyTree;
 import xtc.tree.GNode;
 import java.util.*;
 
-//instead of using several hash-maps, encapulate relationships between classes in
+//instead of using several hash-maps, encapsulate relationships between classes in
 //different ASTs, parts of different ASTs, and other classes in a ClassRef object
 public class ClassRef {
     private String name;
