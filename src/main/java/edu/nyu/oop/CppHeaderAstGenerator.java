@@ -188,27 +188,6 @@ public class CppHeaderAstGenerator {
 
     }
 
-    //hmmmm something is wrong
-    /*
-
-     Name = getClass
-     Type = Class (*) (__C),
-     Name = &__Object::getClass
-
-     Name = add
-     Type = int32_t (*) (__C, int32_t, int32_t),
-     Name = &__C::add
-
-         __String_VT()
-        : __isa(__String::__class()),
-          hashCode(&__String::hashCode),
-          equals(&__String::equals),
-          getClass((Class(*)(String))&__Object::getClass),
-          toString(&__String::toString),
-          length(&__String::length),
-          charAt(&__String::charAt)
-
-     */
 
     public static ClassHierarchyTree determineClassOrder(List<GNode> javaAsts, CppAst headerAst) {
 
