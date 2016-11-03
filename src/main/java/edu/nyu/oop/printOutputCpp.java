@@ -109,4 +109,16 @@ public class printOutputCpp extends xtc.tree.Visitor{
         printContents(0, n.size(), n);
         visit(n);
     }*/
+
+    ////////////////new stuff//////////////////////////////
+
+    public void visitNullLiteral(GNode n){
+        try{
+            pen.write("0");
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+        visit(n);
+    }
 }

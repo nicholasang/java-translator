@@ -4,6 +4,7 @@ import xtc.tree.GNode;
 import xtc.tree.Node;
 import xtc.tree.Visitor;
 import edu.nyu.oop.util.NodeUtil;
+import java.lang.StringBuffer;
 
 /**
  * Created by alex on 10/26/16.
@@ -54,14 +55,17 @@ public class MakeCppAst extends Visitor{
         //n.get(2) = println / print
         if(n.size() > 2 && n.get(2) instanceof String){
             String arg = n.get(2).toString();
-            if(arg.equals("print")){
-                n.set(2, "cout << ");
+            if(arg.equals("print") || arg.equals("println")){
+                String sb = findPrintItems("", (GNode)n.get(3));
+                if (arg.equals("println")){
+                    n.set(2, "cout << " + sb + "<< endl;");
+                }
+                else{
+                    n.set(2, "cout << " + sb + ";");
+                }
             }
-            //printer will need to test for this and put
-            //arg in the middle of the <<'s
-            else if (arg.equals("println")){
-                n.set(2, "cout << << endl");
-            }
+
+
         }
         visit(n);
     }
@@ -71,8 +75,7 @@ public class MakeCppAst extends Visitor{
             switch (n.get(0).toString()){
                 //and whatever else becomes null cascade here
                 case "System": n.set(0, null); break;
-    //testing
-                default: System.out.println("0 pi is" + n.get(0));
+
             }
 
         }
@@ -86,8 +89,6 @@ public class MakeCppAst extends Visitor{
                 case "Object": n.set(0, "__Object"); break;
             }
         }
-        System.out.println("QI: " + n.get(0));
-
         visit(n);
     }
 
@@ -132,17 +133,63 @@ public class MakeCppAst extends Visitor{
         else {visit(n);}
     }
 
-    /*public void visitStringLiteral(GNode n){
-        if(n.get(0) instanceof String){
-            System.out.println("original string: " + n.get(0));
-            String str = n.get(0).toString();
-            if (str.startsWith("\"\\")){
-                str = str.substring(2);
+    public void visitDeclarator(GNode n){
+        String ln = "";
+        if (NodeUtil.dfs(n, "ArrayInitializer") != null){
+            for (Object o : n){
+                if (o instanceof Node){
+                    ln = findArrayItems(ln, (GNode)o);
+                }
             }
-            if (str.endsWith("\\\"\"")){
-                str = str.substring(0, str.length() - 2);
+            //cut off the last ", "
+            if(ln.endsWith(", ")){
+                ln = ln.substring(0, ln.length() - 2);
             }
-            n.set(0, str);
+            n.set(0, n.get(0).toString() + " = {" + ln + "}" );
         }
-    } */
+
+        else{
+            n.set(0, n.get(0).toString() + " = ");
+        }
+
+        visit(n);
+    }
+
+    //for print functions, puts together the items to print
+    public String findPrintItems(String line, GNode n){
+        for (Object o : n){
+            if (o instanceof String){
+                if(o.toString().equals("+") && line.endsWith("\" ")){
+                    System.out.println("found a plus");
+                    line = line + "<< ";
+                }
+                else if (o.toString().startsWith("\"") && line.endsWith("+ ")){
+                        line = line.substring(0, line.length() - 2) + "<< " + o.toString() + " ";
+                }
+                else{
+                    line = line + o.toString() + " ";
+                }
+                n.set(n.indexOf(o), null);
+                System.out.println("line: " + line);
+            }
+            else if (o instanceof Node) {
+                line = findPrintItems(line, (GNode) o);
+            }
+        }
+        return line;
+    }
+
+    //concatenating array items into a list with commas
+    public String findArrayItems(String line, GNode n){
+        for (Object o : n){
+            if (o instanceof String){
+                line = line + o.toString() + ", ";
+                n.set(n.indexOf(o), null);
+            }
+            else if (o instanceof Node) {
+                line = findArrayItems(line, (GNode) o);
+            }
+        }
+        return line;
+    }
 }

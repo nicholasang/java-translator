@@ -14,6 +14,7 @@ public class testMain {
 
         String s = "hi";
         Object o = null;
-        System.out.println(x);
+        System.out.println(x + y);
+        System.out.println("hi" + "gh");
     }
 }
