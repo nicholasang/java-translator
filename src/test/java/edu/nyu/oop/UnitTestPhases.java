@@ -65,7 +65,7 @@ public class UnitTestPhases {
 
     @Test
     public void b0_TestPhase2() {
-        testPhase2HardCodedHeaderTreeSectionA();
+        testPhase2HardCodedHeaderTreeSection();
         testPhase2Namespace();
         testPhase2ClassRefAndClassOrder();
         testForwardDeclarations();
@@ -73,7 +73,7 @@ public class UnitTestPhases {
     }
 
 
-    public void testPhase2HardCodedHeaderTreeSectionA() {
+    public void testPhase2HardCodedHeaderTreeSection() {
 
         headerAst = new CppAst("SomeBigWrapperNode");
 
