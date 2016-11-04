@@ -40,12 +40,12 @@ public class FillLayoutSchematic {
 
         LayoutSchematic.ClassStruct classStruct = objectLayoutSchematic.classStruct;
 
-        LayoutSchematic.Method hashcode = new LayoutSchematic.Method();
-        hashcode.name = "hashcode";
-        hashcode.parameterTypes.add("Object");
-        hashcode.returnType = "int32_t";
-        hashcode.accessModifier = "public";
-        classStruct.methodList.add(hashcode);
+        LayoutSchematic.Method hashCode = new LayoutSchematic.Method();
+        hashCode.name = "hashCode";
+        hashCode.parameterTypes.add("Object");
+        hashCode.returnType = "int32_t";
+        hashCode.accessModifier = "public";
+        classStruct.methodList.add(hashCode);
 
         LayoutSchematic.Method equals = new LayoutSchematic.Method();
         equals.name = "equals";
@@ -73,10 +73,10 @@ public class FillLayoutSchematic {
 
         LayoutSchematic.VtableStruct vtableStruct = objectLayoutSchematic.vtableStruct;
 
-        LayoutSchematic.Field hashcodePtr = new LayoutSchematic.Field();
-        hashcodePtr.name = "hashcode";
-        hashcodePtr.type = "int32_t (*) (Object)";
-        vtableStruct.fieldList.add(hashcodePtr);
+        LayoutSchematic.Field hashCodePtr = new LayoutSchematic.Field();
+        hashCodePtr.name = "hashCode";
+        hashCodePtr.type = "int32_t (*) (Object)";
+        vtableStruct.fieldList.add(hashCodePtr);
 
         LayoutSchematic.Field equalsPtr = new LayoutSchematic.Field();
         equalsPtr.name = "equals";
@@ -93,13 +93,13 @@ public class FillLayoutSchematic {
         toStringPtr.type = "String (*) (Object)";
         vtableStruct.fieldList.add(toStringPtr);
 
-        LayoutSchematic.Initializer hashcodeInit = new LayoutSchematic.Initializer();
-        hashcodeInit.fieldName = "hashcode";
-        hashcodePtr = new LayoutSchematic.Field();
-        hashcodePtr.name = "&__Object::hashcode";
-        hashcodePtr.type = "int32_t (*) (Object)";
-        hashcodeInit.initializeTo = hashcodePtr;
-        vtableStruct.initializerList.add(hashcodeInit);
+        LayoutSchematic.Initializer hashCodeInit = new LayoutSchematic.Initializer();
+        hashCodeInit.fieldName = "hashCode";
+        hashCodePtr = new LayoutSchematic.Field();
+        hashCodePtr.name = "&__Object::hashCode";
+        hashCodePtr.type = "int32_t (*) (Object)";
+        hashCodeInit.initializeTo = hashCodePtr;
+        vtableStruct.initializerList.add(hashCodeInit);
 
         LayoutSchematic.Initializer equalsInit = new LayoutSchematic.Initializer();
         equalsInit.fieldName = "equals";
