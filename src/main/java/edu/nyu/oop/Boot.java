@@ -102,8 +102,10 @@ public class Boot extends Tool {
             Location longLocation = new Location(workingDir + "/" + nLocation.file, nLocation.line, nLocation.column);
             n.setLocation(longLocation);
 
+            //phase 1
             List<GNode> allAsts = GenerateJavaASTs.beginParse((GNode) n);
 
+            //phase 2
             CppAst headerCppAst = CppHeaderAstGenerator.generateNew(allAsts);
 
 

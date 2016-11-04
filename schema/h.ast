@@ -1,190 +1,856 @@
+//C++ Header AST Example, uses testABCD
 
-C-Header AST (aka Cheddar ;3 )
-
-From Karl: in the .cpp one, how do we handle blocks, ifs, loops, etc. regardless of the fact that the syntax is basically the same? Kate: not sure what you mean? Anyways, this phase is just the header file :P
-I thought phase 2 was header and cpp,
-If not, then that helps I guess? Just the header.
-
-
-
-NamespaceDeclaration(
-  //stuff from package
-)
-
-
-using namespace java::lang;
-//using namespace std; <-also in .cpp
-
-^ I’m not sure what this stuff is but the AST is down there ▼▼▼<-shouldn’t we have the pragma once, includes, etc. as a node as the first node under SomeBigWrapperNode?
-
-// Kate’s notes to self:
-  Field has a Modifier node in case an object has a private variable or something
-  Modifier in MemberFunction should hold static and also access modifiers as needed
-
-
-WIP AST below: highlights are stuff that needs more work
-//ModuleWrapper more fitting name? :P <-
-SomeBigWrapperNode( // <- great name
-
-PreprocessingDirectives( //string literals
-“#pragma once”
-“#include \"java_lang.h\"”
-“#include <stdint.h>”
-“#include <string>”
-)
+SomeBigWrapperNode(
+  ,
+  PreprocessorDirectives(
+    ,
+    Name = #pragma once,
+    Name = #include "java_lang.h",
+    Name = #include <stdint.h>,
+    Name = #include <string>
+  ),
   UsingNamespace(
+    ,
     Name = java::lang
-  )
-
-
+  ),
   Namespace(
-    Name = inputs
-    nullptr
+    ,
+    Name = inputs,
     Namespace(
-      Name = test001
-
-      ClassWrapper( // A
-        StructDeclaration (
-          Name = __A
-        )
-        StructDeclaration (
-          Name = __A_VT
-        )
-        TypeDefinition(
-          Type = __A*
-          Name = A
-        )
-
+      ,
+      Name = testABCD,
+      ForwardDeclaration(
+        ,
+        Type = struct,
+        Declaration = __D
+      ),
+      ForwardDeclaration(
+        ,
+        Type = struct,
+        Declaration = __D_VT
+      ),
+      TypeDefinition(
+        ,
+        Type = __D*,
+        Definition = D
+      ),
+      ForwardDeclaration(
+        ,
+        Type = struct,
+        Declaration = __A
+      ),
+      ForwardDeclaration(
+        ,
+        Type = struct,
+        Declaration = __A_VT
+      ),
+      TypeDefinition(
+        ,
+        Type = __A*,
+        Definition = A
+      ),
+      ForwardDeclaration(
+        ,
+        Type = struct,
+        Declaration = __C
+      ),
+      ForwardDeclaration(
+        ,
+        Type = struct,
+        Declaration = __C_VT
+      ),
+      TypeDefinition(
+        ,
+        Type = __C*,
+        Definition = C
+      ),
+      ForwardDeclaration(
+        ,
+        Type = struct,
+        Declaration = __B
+      ),
+      ForwardDeclaration(
+        ,
+        Type = struct,
+        Declaration = __B_VT
+      ),
+      TypeDefinition(
+        ,
+        Type = __B*,
+        Definition = B
+      ),
+      ClassWrapper(
+        ,
         Struct(
-          Name = __A
-          Field (
-            Modifiers(nullptr)
-            Type = __A_VT*
-            Name = __vptr
-          )
-          Constructor(
-            Params(nullptr)
-          )
-          MemberFunction(
-            Modifiers(static)
-            Return = String
-            Name = toString
-            ParamTypes( // just params’ types
-              Type = A
-            )
-          )
-          MemberFunction(
-            Modifiers(static)
-            Return = Class
-            Name = __class
-            ParamTypes(nullptr)
-          )
-          Field (
-            Modifiers(null)
-            Type = __A_VT
-            Name = __vtable
-          )
-        )
-        StructVTable(
-          Name = __A_VT
+          ,
+          Type = struct,
+          Name = __D,
           Field(
-            Modifiers(null)
-            Type = Class
-            Name = __isa
-          )
-          FunctionPointer(
-            Name = hashCode
-            Return = int32_t
-            ParamTypes(A)
-          )
-          FunctionPointer(
-            Name = equals
-            Return = bool
-            ParamTypes(A, Object)
-          )
-          FunctionPointer(
-            Name = getClass
-            Return = Class
-            ParamTypes()
-          )
-          FunctionPointer(
-            Name = toString
-            Return = String
-            ParamTypes(A)
-          )
-
-        // constructor pasted below so less scrolling
-        // __A_VT(): <- this is the constructor
-        //__isa(__A::__class()),
-        //hashCode((int32_t(*)(A) //&__Obj::hashCode),
-        //equals((bool(*)(A, Object)) //&__Object::equals),
-        //getClass((Class(*)(A)) //&__Object::getClass),
-        //toString(&__A::toString)
-       Constructor(
-          Params(null)
-          InitializationList(
-            // add stuff here
-          )
-        )
-        )
-      )
-
-
-
-      ClassWrapper( //Test001
-        StructDeclaration (
-          Name = __Test001
-        )
-        StructDeclaration (
-          Name = __Test001_VT
-        )
-        TypeDefinition(
-          Type = __Test001*
-          Name = Test001
-        )
-
-        Struct(
-          Name = __Test001
-          SuperClass = Object
-          Field (
-            Access = public // or null since default
-            Type = __Test001_VT*
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = __D_VT*,
             Name = __vptr
-          )
-          MemberFunction(
-            Modifer(static)
-            Return = void
-            Name = main
-            ParamTypes( // just params’ types
-              String[]
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = true,
+            Type = __D_VT,
+            Name = __vtable
+          ),
+          Constructor(
+            ,
+            AccessModifier = public,
+            Name = __D,
+            ParameterList(
+
+            )
+          ),
+          Method(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            ReturnType = Class,
+            Name = __class,
+            ParameterList(
+
+            )
+          ),
+          Method(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            ReturnType = void,
+            Name = allByMyself,
+            ParameterList(
+
             )
           )
-          MemberFunction(
-            Modifiers(static)
-            Return = Class
-            Name = __class
-            ParamTypes(nullptr)
-          )
-          Field (
-            Modifier(null)
-            Type = __Test001_VT
-            Name = __vtable
-          )
-
-        )
+        ),
         Struct(
-          Name = __Test001_VT
+          ,
+          Type = struct,
+          Name = __D_VT,
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = Class,
+            Name = __isa
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = int32_t (*) (__D),
+            Name = hashCode
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = bool (*) (__D, Object),
+            Name = equals
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = Class (*) (__D),
+            Name = getClass
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = String (*) (__D),
+            Name = toString
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = void (*) (__D),
+            Name = allByMyself
+          ),
+          Constructor(
+            ,
+            AccessModifier = public,
+            Name = __D,
+            ParameterList(
 
-          //more stuff
+            ),
+            InitializationList(
+              ,
+              InitField(
+                ,
+                Name = __isa,
+                InitFieldWith(
+                  ,
+                  Type = Class,
+                  Name = __D::__class()
+                )
+              ),
+              InitField(
+                ,
+                Name = hashCode,
+                InitFieldWith(
+                  ,
+                  Type = int32_t (*) (__D),
+                  Name = &__Object::hashCode
+                )
+              ),
+              InitField(
+                ,
+                Name = equals,
+                InitFieldWith(
+                  ,
+                  Type = bool (*) (__D, Object),
+                  Name = &__Object::equals
+                )
+              ),
+              InitField(
+                ,
+                Name = getClass,
+                InitFieldWith(
+                  ,
+                  Type = Class (*) (__D),
+                  Name = &__Object::getClass
+                )
+              ),
+              InitField(
+                ,
+                Name = toString,
+                InitFieldWith(
+                  ,
+                  Type = String (*) (__D),
+                  Name = &__Object::toString
+                )
+              ),
+              InitField(
+                ,
+                Name = allByMyself,
+                InitFieldWith(
+                  ,
+                  Type = void (*) (__D),
+                  Name = &__D::allByMyself
+                )
+              )
+            )
+          )
+        )
+      ),
+      ClassWrapper(
+        ,
+        Struct(
+          ,
+          Type = struct,
+          Name = __A,
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = __A_VT*,
+            Name = __vptr
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = true,
+            Type = __A_VT,
+            Name = __vtable
+          ),
+          Field(
+            ,
+            AccessModifier = public,
+            IsStatic = false,
+            Type = String,
+            Name = publicDataA
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = String,
+            Name = protectedDataA
+          ),
+          Field(
+            ,
+            AccessModifier = private,
+            IsStatic = false,
+            Type = String,
+            Name = privateDataA
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = true,
+            Type = String,
+            Name = staticDataA
+          ),
+          Constructor(
+            ,
+            AccessModifier = public,
+            Name = __A,
+            ParameterList(
+
+            )
+          ),
+          Constructor(
+            ,
+            AccessModifier = public,
+            Name = __A,
+            ParameterList(
+              ,
+              Parameter(
+                ,
+                Type = String,
+                Name = item
+              )
+            )
+          ),
+          Method(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            ReturnType = Class,
+            Name = __class,
+            ParameterList(
+
+            )
+          ),
+          Method(
+            ,
+            AccessModifier = public,
+            IsStatic = false,
+            ReturnType = String,
+            Name = getArbitraryData,
+            ParameterList(
+
+            )
+          ),
+          Method(
+            ,
+            AccessModifier = public,
+            IsStatic = true,
+            ReturnType = String,
+            Name = Love,
+            ParameterList(
+
+            )
+          )
+        ),
+        Struct(
+          ,
+          Type = struct,
+          Name = __A_VT,
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = Class,
+            Name = __isa
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = int32_t (*) (__A),
+            Name = hashCode
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = bool (*) (__A, Object),
+            Name = equals
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = Class (*) (__A),
+            Name = getClass
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = String (*) (__A),
+            Name = toString
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = String (*) (__A),
+            Name = getArbitraryData
+          ),
+          Constructor(
+            ,
+            AccessModifier = public,
+            Name = __A,
+            ParameterList(
+
+            ),
+            InitializationList(
+              ,
+              InitField(
+                ,
+                Name = __isa,
+                InitFieldWith(
+                  ,
+                  Type = Class,
+                  Name = __A::__class()
+                )
+              ),
+              InitField(
+                ,
+                Name = hashCode,
+                InitFieldWith(
+                  ,
+                  Type = int32_t (*) (__A),
+                  Name = &__Object::hashCode
+                )
+              ),
+              InitField(
+                ,
+                Name = equals,
+                InitFieldWith(
+                  ,
+                  Type = bool (*) (__A, Object),
+                  Name = &__Object::equals
+                )
+              ),
+              InitField(
+                ,
+                Name = getClass,
+                InitFieldWith(
+                  ,
+                  Type = Class (*) (__A),
+                  Name = &__Object::getClass
+                )
+              ),
+              InitField(
+                ,
+                Name = toString,
+                InitFieldWith(
+                  ,
+                  Type = String (*) (__A),
+                  Name = &__Object::toString
+                )
+              ),
+              InitField(
+                ,
+                Name = getArbitraryData,
+                InitFieldWith(
+                  ,
+                  Type = String (*) (__A),
+                  Name = &__A::getArbitraryData
+                )
+              )
+            )
+          )
+        )
+      ),
+      ClassWrapper(
+        ,
+        Struct(
+          ,
+          Type = struct,
+          Name = __C,
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = __C_VT*,
+            Name = __vptr
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = true,
+            Type = __C_VT,
+            Name = __vtable
+          ),
+          Field(
+            ,
+            AccessModifier = public,
+            IsStatic = false,
+            Type = String,
+            Name = publicDataA
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = String,
+            Name = protectedDataA
+          ),
+          Field(
+            ,
+            AccessModifier = private,
+            IsStatic = false,
+            Type = String,
+            Name = privateDataA
+          ),
+          Constructor(
+            ,
+            AccessModifier = public,
+            Name = __C,
+            ParameterList(
+
+            )
+          ),
+          Method(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            ReturnType = Class,
+            Name = __class,
+            ParameterList(
+
+            )
+          ),
+          Method(
+            ,
+            AccessModifier = public,
+            IsStatic = false,
+            ReturnType = int32_t,
+            Name = add,
+            ParameterList(
+              ,
+              Parameter(
+                ,
+                Type = int32_t
+              ),
+              Parameter(
+                ,
+                Type = int32_t
+              )
+            )
+          )
+        ),
+        Struct(
+          ,
+          Type = struct,
+          Name = __C_VT,
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = Class,
+            Name = __isa
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = int32_t (*) (__C),
+            Name = hashCode
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = bool (*) (__C, Object),
+            Name = equals
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = Class (*) (__C),
+            Name = getClass
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = String (*) (__C),
+            Name = toString
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = String (*) (__C),
+            Name = getArbitraryData
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = int32_t (*) (__C, int32_t, int32_t),
+            Name = add
+          ),
+          Constructor(
+            ,
+            AccessModifier = public,
+            Name = __C,
+            ParameterList(
+
+            ),
+            InitializationList(
+              ,
+              InitField(
+                ,
+                Name = __isa,
+                InitFieldWith(
+                  ,
+                  Type = Class,
+                  Name = __C::__class()
+                )
+              ),
+              InitField(
+                ,
+                Name = hashCode,
+                InitFieldWith(
+                  ,
+                  Type = int32_t (*) (__C),
+                  Name = &__Object::hashCode
+                )
+              ),
+              InitField(
+                ,
+                Name = equals,
+                InitFieldWith(
+                  ,
+                  Type = bool (*) (__C, Object),
+                  Name = &__Object::equals
+                )
+              ),
+              InitField(
+                ,
+                Name = getClass,
+                InitFieldWith(
+                  ,
+                  Type = Class (*) (__C),
+                  Name = &__Object::getClass
+                )
+              ),
+              InitField(
+                ,
+                Name = toString,
+                InitFieldWith(
+                  ,
+                  Type = String (*) (__C),
+                  Name = &__Object::toString
+                )
+              ),
+              InitField(
+                ,
+                Name = getArbitraryData,
+                InitFieldWith(
+                  ,
+                  Type = String (*) (__C),
+                  Name = &__A::getArbitraryData
+                )
+              ),
+              InitField(
+                ,
+                Name = add,
+                InitFieldWith(
+                  ,
+                  Type = int32_t (*) (__C, int32_t, int32_t),
+                  Name = &__C::add
+                )
+              )
+            )
+          )
+        )
+      ),
+      ClassWrapper(
+        ,
+        Struct(
+          ,
+          Type = struct,
+          Name = __B,
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = __B_VT*,
+            Name = __vptr
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = true,
+            Type = __B_VT,
+            Name = __vtable
+          ),
+          Field(
+            ,
+            AccessModifier = private,
+            IsStatic = false,
+            Type = String,
+            Name = privateDataB
+          ),
+          Field(
+            ,
+            AccessModifier = public,
+            IsStatic = false,
+            Type = String,
+            Name = publicDataA
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = String,
+            Name = protectedDataA
+          ),
+          Field(
+            ,
+            AccessModifier = private,
+            IsStatic = false,
+            Type = String,
+            Name = privateDataA
+          ),
+          Constructor(
+            ,
+            AccessModifier = public,
+            Name = __B,
+            ParameterList(
+
+            )
+          ),
+          Method(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            ReturnType = Class,
+            Name = __class,
+            ParameterList(
+
+            )
+          ),
+          Method(
+            ,
+            AccessModifier = public,
+            IsStatic = false,
+            ReturnType = String,
+            Name = getArbitraryData,
+            ParameterList(
+
+            )
+          )
+        ),
+        Struct(
+          ,
+          Type = struct,
+          Name = __B_VT,
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = Class,
+            Name = __isa
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = int32_t (*) (__B),
+            Name = hashCode
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = bool (*) (__B, Object),
+            Name = equals
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = Class (*) (__B),
+            Name = getClass
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = String (*) (__B),
+            Name = toString
+          ),
+          Field(
+            ,
+            AccessModifier = protected,
+            IsStatic = false,
+            Type = String (*) (__B),
+            Name = getArbitraryData
+          ),
+          Constructor(
+            ,
+            AccessModifier = public,
+            Name = __B,
+            ParameterList(
+
+            ),
+            InitializationList(
+              ,
+              InitField(
+                ,
+                Name = __isa,
+                InitFieldWith(
+                  ,
+                  Type = Class,
+                  Name = __B::__class()
+                )
+              ),
+              InitField(
+                ,
+                Name = hashCode,
+                InitFieldWith(
+                  ,
+                  Type = int32_t (*) (__B),
+                  Name = &__Object::hashCode
+                )
+              ),
+              InitField(
+                ,
+                Name = equals,
+                InitFieldWith(
+                  ,
+                  Type = bool (*) (__B, Object),
+                  Name = &__Object::equals
+                )
+              ),
+              InitField(
+                ,
+                Name = getClass,
+                InitFieldWith(
+                  ,
+                  Type = Class (*) (__B),
+                  Name = &__Object::getClass
+                )
+              ),
+              InitField(
+                ,
+                Name = toString,
+                InitFieldWith(
+                  ,
+                  Type = String (*) (__B),
+                  Name = &__Object::toString
+                )
+              ),
+              InitField(
+                ,
+                Name = getArbitraryData,
+                InitFieldWith(
+                  ,
+                  Type = String (*) (__B),
+                  Name = &__B::getArbitraryData
+                )
+              )
+            )
+          )
         )
       )
-
     )
   )
 )
-
-
-
-
-
-

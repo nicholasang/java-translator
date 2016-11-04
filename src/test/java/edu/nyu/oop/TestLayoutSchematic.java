@@ -46,12 +46,12 @@ public class TestLayoutSchematic {
 
         // since field and initializer lists are very similar, just testing initializer list for correctness
 
-        boolean hashcode = false, equals = false, getClass = false, toString = false, mainish = false;
+        boolean hashCode = false, equals = false, getClass = false, toString = false, mainish = false;
         for (LayoutSchematic.Initializer initializer : initializers) {
             LayoutSchematic.Field initTo = initializer.initializeTo;
             switch (initializer.fieldName) {
-            case "hashcode":
-                hashcode = initTo.type.equals("int32_t (*) (__TestClass)") && initTo.name.equals("&__Object::hashcode");
+            case "hashCode":
+                hashCode = initTo.type.equals("int32_t (*) (__TestClass)") && initTo.name.equals("&__Object::hashCode");
                 break;
             case "equals":
                 equals = initTo.type.equals("bool (*) (__TestClass, Object)") && initTo.name.equals("&__Object::equals");
@@ -68,8 +68,8 @@ public class TestLayoutSchematic {
             }
         }
 
-        assert(hashcode && equals && getClass && toString && mainish);
-        logger.info("Vtable struct laoyut correct");
+        assert(hashCode && equals && getClass && toString && mainish);
+        logger.info("Vtable struct layout correct");
     }
 
     @Test

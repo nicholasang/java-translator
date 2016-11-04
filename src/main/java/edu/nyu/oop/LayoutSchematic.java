@@ -63,12 +63,12 @@ public class LayoutSchematic {
 
         Field vptr = new Field();
         vptr.name = "__vptr";
-        vptr.type = "__" + className + "_VT*";
+        vptr.type = className + "_VT*";
         classStruct.fieldList.add(vptr);
 
         Field vtable = new Field();
         vtable.name = "__vtable";
-        vtable.type = "__" + className + "_VT";
+        vtable.type = className + "_VT";
         vtable.isStatic = true;
         classStruct.fieldList.add(vtable);
 
