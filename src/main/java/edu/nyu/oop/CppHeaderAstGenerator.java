@@ -44,7 +44,7 @@ public class CppHeaderAstGenerator {
 
         populateClassWrappers(headerAst);
 
-        XtcTestUtils.prettyPrintAst(headerAst.getRoot());
+        //XtcTestUtils.prettyPrintAst(headerAst.getRoot());
 
         //CppHVisitor outputHeader = new CppHVisitor();
 
@@ -317,7 +317,7 @@ public class CppHeaderAstGenerator {
     }
 
 
-    public static void displayCppHEntryList(CppAst header) {
+    public static void displayCppHEntryListNumbered(CppAst header) {
         ArrayList<Object> backingList = header.getAllEntries();
         for(int i = 0; i < header.getAllEntries().size(); ++i) {
             Object o = backingList.get(i);
@@ -325,6 +325,22 @@ public class CppHeaderAstGenerator {
                 System.out.println(i + " " + ((GNode)(backingList.get(i))).getName());
             } else if(o instanceof MappingNode.DataField) {
                 System.out.println(i + " " + ((MappingNode.DataField)(backingList.get(i))).getVal());
+
+            }
+        }
+    }
+
+    public static void displayCppHEntryListAs2DArray(CppAst header) {
+        ArrayList<Object> backingList = header.getAllEntries();
+        for(int i = 0; i < header.getAllEntries().size(); ++i) {
+            Object o = backingList.get(i);
+            if(o instanceof GNode) {
+                if(((GNode) o).getName().equals("ClassWrapper")) {
+                    System.out.println("},\n{");
+                }
+                System.out.println("\"" + ((GNode)(backingList.get(i))).getName() + "\",");
+            } else if(o instanceof MappingNode.DataField) {
+                System.out.println("\"" + ((MappingNode.DataField)(backingList.get(i))).getVal() + "\",");
 
             }
         }
