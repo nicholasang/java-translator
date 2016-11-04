@@ -61,7 +61,6 @@ public class CppHeaderAstGenerator {
 
             GNode cW = MappingNode.createMappingNode("ClassWrapper");
             MappingNode.addNode(linkPoint, cW);
-            MappingNode.addDataField(cW, "Name", cR.getName());
 
             linkPoint = cW;
             //create, link, and populate struct
@@ -73,9 +72,10 @@ public class CppHeaderAstGenerator {
     }
 
     public static void populateClassStruct(GNode linkPoint, LayoutSchematic lS, ClassRef cR) {
-        GNode struct = MappingNode.createMappingNode("struct");
+        GNode struct = MappingNode.createMappingNode("Struct");
         MappingNode.addNode(linkPoint, struct);
         linkPoint = struct;
+        MappingNode.addDataField(struct, "Type", "struct");
         MappingNode.addDataField(struct, "Name", cR.getName());
 
         LayoutSchematic.ClassStruct cStruct = lS.classStruct;
@@ -84,7 +84,7 @@ public class CppHeaderAstGenerator {
             GNode fieldNode = MappingNode.createMappingNode("Field");
             MappingNode.addNode(linkPoint, fieldNode);
 
-            MappingNode.addDataField(fieldNode, "AccessModifier", f.accessModifier);
+            MappingNode.addDataField(fieldNode, "AccessModifier", (f.accessModifier == null) ? "protected" : f.accessModifier);
             MappingNode.addDataField(fieldNode, "IsStatic", Boolean.toString(f.isStatic));
             MappingNode.addDataField(fieldNode, "Type", f.type);
             MappingNode.addDataField(fieldNode, "Name", f.name);
@@ -119,7 +119,7 @@ public class CppHeaderAstGenerator {
             GNode constructorNode = MappingNode.createMappingNode("Method");
             MappingNode.addNode(linkPoint, constructorNode);
 
-            MappingNode.addDataField(constructorNode, "AccessModifier", m.accessModifier);
+            MappingNode.addDataField(constructorNode, "AccessModifier", (m.accessModifier == null) ? "protected" : m.accessModifier);
             MappingNode.addDataField(constructorNode, "IsStatic", Boolean.toString(m.isStatic));
             MappingNode.addDataField(constructorNode, "ReturnType", m.returnType);
             MappingNode.addDataField(constructorNode, "Name", m.name);
@@ -141,9 +141,10 @@ public class CppHeaderAstGenerator {
     }
 
     public static void populateVtableStruct(GNode linkPoint, LayoutSchematic lS, ClassRef cR) {
-        GNode struct = MappingNode.createMappingNode("struct");
+        GNode struct = MappingNode.createMappingNode("Struct");
         MappingNode.addNode(linkPoint, struct);
         linkPoint = struct;
+        MappingNode.addDataField(struct, "Type", "struct");
         MappingNode.addDataField(struct, "Name", cR.getName() + "_VT");
 
         LayoutSchematic.VtableStruct vtStruct = lS.vtableStruct;
@@ -152,7 +153,8 @@ public class CppHeaderAstGenerator {
             GNode fieldNode = MappingNode.createMappingNode("Field");
             MappingNode.addNode(linkPoint, fieldNode);
 
-            MappingNode.addDataField(fieldNode, "AccessModifier", f.accessModifier);
+
+            MappingNode.addDataField(fieldNode, "AccessModifier", (f.accessModifier == null) ? "protected" : f.accessModifier);
             MappingNode.addDataField(fieldNode, "IsStatic", Boolean.toString(f.isStatic));
             MappingNode.addDataField(fieldNode, "Type", f.type);
             MappingNode.addDataField(fieldNode, "Name", f.name);
@@ -161,22 +163,27 @@ public class CppHeaderAstGenerator {
         GNode constructorNode = MappingNode.createMappingNode("Constructor");
         MappingNode.addNode(linkPoint, constructorNode);
 
-        MappingNode.addDataField(constructorNode, "AccessModifier", "public ????????");
+        MappingNode.addDataField(constructorNode, "AccessModifier", "public");
         MappingNode.addDataField(constructorNode, "Name", cR.getName());
 
-        GNode pL = MappingNode.createMappingNode("ParameterList");
-        MappingNode.addNode(constructorNode, pL);
+        GNode paramList = MappingNode.createMappingNode("ParameterList");
+        MappingNode.addNode(constructorNode, paramList);
+
+        GNode initList = MappingNode.createMappingNode("InitializationList");
+        MappingNode.addNode(constructorNode, initList);
+
+
 
         if(vtStruct.initializerList.size() > 0) {
             for(Initializer init : vtStruct.initializerList) {
-                GNode initNode = MappingNode.createMappingNode("Init");
-                MappingNode.addNode(constructorNode, initNode);
+                GNode initNode = MappingNode.createMappingNode("InitField");
+                MappingNode.addNode(initList, initNode);
 
                 MappingNode.addDataField(initNode, "Name", init.fieldName);
 
                 Field f = init.initializeTo;
 
-                GNode fieldNode = MappingNode.createMappingNode("Field");
+                GNode fieldNode = MappingNode.createMappingNode("InitFieldWith");
                 MappingNode.addNode(initNode, fieldNode);
 
 
