@@ -94,8 +94,6 @@ public class Boot extends Tool {
         }
 
         if (runtime.test("parseJava")) {
-            // NOTE: must type in EXACT filename (same case!!) or file is added twice by dependency parser
-
             String workingDir = System.getProperty("user.dir");
 
             Location nLocation = n.getLocation();
@@ -104,8 +102,16 @@ public class Boot extends Tool {
 
             List<GNode> allAsts = GenerateJavaASTs.beginParse((GNode) n);
 
-            CppAst headerCppAst = CppHeaderAstGenerator.generateNew(allAsts);
+            runtime.console().pln();
+            for(Node node : allAsts) {
+                runtime.console().pln(node.getLocation().file);
+            }
+            runtime.console().pln().flush();
 
+            //temporarily disable, use the hardcoded version
+            //List<CppAst> allCPPAsts = CppHeaderAstGenerator.generateNew(allAsts);
+            //HardCodedTestCppHeaderAstGenerator.generateNew(allAsts);
+            CppCommands.convertToCpp(allAsts);
 
         }
 
