@@ -13,6 +13,8 @@ import edu.nyu.oop.util.InitVisitor;
 import edu.nyu.oop.util.MappingNode;
 import edu.nyu.oop.util.NodeUtil;
 import org.junit.AfterClass;
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import xtc.tree.GNode;
 
@@ -24,8 +26,10 @@ import java.io.File;
 
 import org.junit.Test;
 
-public class TestPhases {
-    private static Logger logger = org.slf4j.LoggerFactory.getLogger(TestPhases.class);
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class UnitTestPhases {
+    private static Logger logger = org.slf4j.LoggerFactory.getLogger(UnitTestPhases.class);
 
     private static List<GNode> javaAsts;
     private static final String TESTFILERELATIVEPATH = "src/test/java/inputs/testABCD/TestABCD.java";
@@ -35,7 +39,7 @@ public class TestPhases {
     private static int index;
 
     @Test
-    public void TestPhase1() {
+    public void a0_TestPhase1() {
         Node n = NodeUtil.parseJavaFile(new File(TESTFILERELATIVEPATH));
 
         String workingDir = System.getProperty("user.dir");
@@ -60,7 +64,16 @@ public class TestPhases {
     }
 
     @Test
-    public void TestPhase2HardCodedHeaderTreeSectionA() {
+    public void b0_TestPhase2() {
+        testPhase2HardCodedHeaderTreeSectionA();
+        testPhase2Namespace();
+        testPhase2ClassRefAndClassOrder();
+        testForwardDeclarations();
+        testPhase2ClassWrappers();
+    }
+
+
+    public void testPhase2HardCodedHeaderTreeSectionA() {
 
         headerAst = new CppAst("SomeBigWrapperNode");
 
@@ -72,7 +85,7 @@ public class TestPhases {
         MappingNode.addNode(headerAst.getRoot(), preDirectives);
         MappingNode.addDataFieldMultiVals(preDirectives, "Name", new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")) );
 
-        GNode usingNamespace = MappingNode.createAndLinkDataFieldOneShot(headerAst.getRoot(),"UsingNamespace", "Name", "java::lang");
+        MappingNode.createAndLinkDataFieldOneShot(headerAst.getRoot(),"UsingNamespace", "Name", "java::lang");
 
         backingList = headerAst.getAllEntries();
 
@@ -93,8 +106,7 @@ public class TestPhases {
 
     }
 
-    @Test
-    public void TestPhase2Namespace() {
+    public void testPhase2Namespace() {
 
         for(GNode javaAst : javaAsts) {
             classDecInit.visit(javaAst, headerAst);
@@ -112,8 +124,7 @@ public class TestPhases {
         index += correctNameSpaces.length;
     }
 
-    @Test
-    public void TestPhase2ClassRefAndClassOrder() {
+    public void testPhase2ClassRefAndClassOrder() {
 
         ClassRef.setHierarchy(CppHeaderAstGenerator.determineClassOrder(javaAsts, headerAst));
 
@@ -171,8 +182,7 @@ public class TestPhases {
         }
     }
 
-    @Test
-    public void TestForwardDeclarations() {
+    public void testForwardDeclarations() {
         CppHeaderAstGenerator.setForwardDeclarations(headerAst);
 
         String[] correctForwardDeclarations = {
@@ -220,6 +230,147 @@ public class TestPhases {
         backingListCompareTo(correctForwardDeclarations);
 
         index += correctForwardDeclarations.length;
+    }
+
+    public void testPhase2ClassWrappers() {
+
+        FillLayoutSchematic.fillClasses(headerAst);
+
+        CppHeaderAstGenerator.populateClassWrappers(headerAst);
+
+        String[][] correctClassWrappers = {
+            {
+                "ClassWrapper",
+                "Struct",
+                "struct",
+                "__D",
+                "Field",
+                "protected",
+                "false",
+                "__D_VT*",
+                "__vptr",
+                "Field",
+                "protected",
+                "true",
+                "__D_VT",
+                "__vtable",
+                "Constructor",
+                "public",
+                "__D",
+                "ParameterList",
+                "Method",
+                "protected",
+                "false",
+                "Class",
+                "__class",
+                "ParameterList",
+                "Method",
+                "protected",
+                "false",
+                "void",
+                "allByMyself",
+                "ParameterList",
+                "Struct",
+                "struct",
+                "__D_VT",
+                "Field",
+                "protected",
+                "false",
+                "Class",
+                "__isa",
+                "Field",
+                "protected",
+                "false",
+                "int32_t (*) (__D)",
+                "hashCode",
+                "Field",
+                "protected",
+                "false",
+                "bool (*) (__D, Object)",
+                "equals",
+                "Field",
+                "protected",
+                "false",
+                "Class (*) (__D)",
+                "getClass",
+                "Field",
+                "protected",
+                "false",
+                "String (*) (__D)",
+                "toString",
+                "Field",
+                "protected",
+                "false",
+                "void (*) (__D)",
+                "allByMyself",
+                "Constructor",
+                "public",
+                "__D",
+                "ParameterList",
+                "InitializationList",
+                "InitField",
+                "__isa",
+                "InitFieldWith",
+                "Class",
+                "__D::__class()",
+                "InitField",
+                "hashCode",
+                "InitFieldWith",
+                "int32_t (*) (__D)",
+                "&__Object::hashCode",
+                "InitField",
+                "equals",
+                "InitFieldWith",
+                "bool (*) (__D, Object)",
+                "&__Object::equals",
+                "InitField",
+                "getClass",
+                "InitFieldWith",
+                "Class (*) (__D)",
+                "&__Object::getClass",
+                "InitField",
+                "toString",
+                "InitFieldWith",
+                "String (*) (__D)",
+                "&__Object::toString",
+                "InitField",
+                "allByMyself",
+                "InitFieldWith",
+                "void (*) (__D)",
+                "&__D::allByMyself"
+
+
+
+
+
+
+
+
+            },
+            {
+                "ClassWrapper",
+
+            },
+            {
+                "ClassWrapper",
+
+            },
+            {
+                "ClassWrapper",
+
+            }
+        };
+
+
+
+        for(String[] correctClassWrapper : correctClassWrappers) {
+            backingListCompareTo(correctClassWrapper);
+
+            index += correctClassWrapper.length;
+
+            //remove later
+            break;
+        }
 
     }
 
@@ -230,7 +381,7 @@ public class TestPhases {
 
     private static void backingListCompareTo(String[] correct) {
         for(int i = 0; i < correct.length; ++i) {
-            Object o = backingList.get(i + index);
+            Object o = UnitTestPhases.backingList.get(i + index);
             if(o instanceof GNode) {
                 org.junit.Assert.assertEquals(correct[i], ((GNode)o).getName());
             } else if(o instanceof MappingNode.DataField) {
@@ -240,12 +391,12 @@ public class TestPhases {
     }
 
     private static void displayBackingListDebug() {
-        for(int i = 0; i < backingList.size(); ++i) {
-            Object o = backingList.get(i);
+        for(int i = 0; i < UnitTestPhases.backingList.size(); ++i) {
+            Object o = UnitTestPhases.backingList.get(i);
             if(o instanceof GNode) {
-                logger.debug(Integer.toString(i) + " " +  ((GNode)(backingList.get(i))).getName());
+                logger.debug(Integer.toString(i) + " " +  ((GNode)(UnitTestPhases.backingList.get(i))).getName());
             } else if(o instanceof MappingNode.DataField) {
-                logger.debug(Integer.toString(i) + " " + ((MappingNode.DataField)(backingList.get(i))).getVal());
+                logger.debug(Integer.toString(i) + " " + ((MappingNode.DataField)(UnitTestPhases.backingList.get(i))).getVal());
 
             }
         }
