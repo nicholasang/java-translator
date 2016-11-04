@@ -35,6 +35,7 @@ public class CppHeaderAstGenerator {
             classDecInit.visit(javaAst, headerAst);
         }
 
+
         ClassRef.setHierarchy(determineClassOrder(javaAsts, headerAst));
 
         setForwardDeclarations(headerAst);
@@ -44,6 +45,7 @@ public class CppHeaderAstGenerator {
         populateClassWrappers(headerAst);
 
         XtcTestUtils.prettyPrintAst(headerAst.getRoot());
+
         //CppHVisitor outputHeader = new CppHVisitor();
 
         //outputHeader.visit(headerAst);
