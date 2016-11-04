@@ -55,9 +55,6 @@ public abstract class MappingNode {
 
         construct.add(new InvisiblePrintObject(dataMap));
 
-
-        //addToEntryRepositoryMap(construct.getName(), construct);
-
         return construct;
     }
 
@@ -130,7 +127,6 @@ public abstract class MappingNode {
         return success;
     }
 
-    // TODO: IS A COMMA-DELIMITED STRING GOOD ENOUGH, OR SHOULD I MODIFY SO A LIST OF STRINGS IS CONTAINED, WOULD REQUIRE MORE WORK, BUT DOABLE
     public static Object addDataFieldConcatenatedList(GNode node, String fieldNameKey, ArrayList<String> values) {
 
         if(node == null)return null;
