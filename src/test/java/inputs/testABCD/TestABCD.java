@@ -33,8 +33,8 @@ class A {
         return this.publicDataA;
     }
 
-    public static String[] Love() {
-        return new String[] {"is", "all", "you", "need"};
+    public static String Love() {
+        return "is all you need";
     }
 
 
