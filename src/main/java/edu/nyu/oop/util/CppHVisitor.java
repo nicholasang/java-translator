@@ -91,10 +91,10 @@ public class CppHVisitor extends xtc.tree.Visitor {
         this.writeOut.write("};\n");
     }
 
-    // TODO: STATIC IS NOT WORKING
-    // TODO: in the v-table struct, should it be (*)(equals) or (*equals)... is there a difference?
-    // TODO: function pointers in the v-table are in incorrect format
     // fields
+    // TODO: STATIC IS NOT WORKING
+    // TODO: in the v-table struct, should it be "bool (*) (__A, Object) equals" or "bool (*equals)(__A, Object)"... is there a difference?
+    // TODO: function pointers in the v-table are in incorrect format
     public void visitField(GNode n) throws IOException {
         if (MappingNode.getInstanceOf(n, "IsStatic", 0).equals("true")) {
             this.writeOut.write("static " + MappingNode.getInstanceOf(n, "Type", 0) + " " +
@@ -116,10 +116,10 @@ public class CppHVisitor extends xtc.tree.Visitor {
         this.writeOut.write(");\n\n");
     }
 
-    // TODO: STATIC IS NOT WORKING
-    // TODO: isn't hashCode, equals, etc supposed to be in struct __A/B/C/D as well?
-    // TODO: methods in class struct do not have class type as parameter
     // methods
+    // TODO: STATIC IS NOT WORKING
+    // TODO: isn't hashCode, equals, etc supposed to be in the class struct as well?
+    // TODO: methods in class struct do not have class type as parameter
     public void visitMethod(GNode n) throws IOException {
         if (MappingNode.getInstanceOf(n, "IsStatic", 0).equals("true")) {
             this.writeOut.write("static " + MappingNode.getInstanceOf(n, "ReturnType", 0) + " " +
@@ -136,7 +136,7 @@ public class CppHVisitor extends xtc.tree.Visitor {
     // Parameters
     // TODO: NEEDS COMMAS BETWEEN PARAMETERS
     // TODO: REMOVE WHITESPACE AT END
-    // TODO: struct __A has an extra A constructor
+    // TODO: struct __A has an extra A constructor unless its the default parameterless constructor?
     public void visitParameter(GNode n) throws IOException {
         ArrayList<DataField> parameters = MappingNode.getAllLocalDataFields(n);
         for(DataField parameter : parameters) {
@@ -147,13 +147,15 @@ public class CppHVisitor extends xtc.tree.Visitor {
         visit(n);
     }
 
-    // init Field
-    // TODO: LAST ONE SHOULDN'T HAVE COMMA
+    // InitField with InitFieldWith
+    // TODO: LAST ONE SHOULDN'T HAVE COMMA. should end with {}
     // TODO: not sure how to get InitFieldWith to work
     public void visitInitField(GNode n) throws IOException {
+        this.writeOut.write("\n");
         this.writeOut.write(MappingNode.getInstanceOf(n, "Name", 0) + "(");
         this.writeOut.write(MappingNode.getInstanceOf(n, "Type", 0) + " " +
-                MappingNode.getInstanceOf(n, "Name", 0) + "),\n");
+                MappingNode.getInstanceOf(n, "Name", 0) + "),");
+        visit(n);
     }
 
 

@@ -42,13 +42,13 @@ Class (*) (__D) getClass;
 String (*) (__D) toString;
 void (*) (__D) allByMyself;
 
-__D(__isa(null __isa),
+__D(
+__isa(null __isa),
 hashCode(null hashCode),
 equals(null equals),
 getClass(null getClass),
 toString(null toString),
-allByMyself(null allByMyself),
-);
+allByMyself(null allByMyself),);
 
 };
 
@@ -78,13 +78,13 @@ Class (*) (__A) getClass;
 String (*) (__A) toString;
 String (*) (__A) getArbitraryData;
 
-__A(__isa(null __isa),
+__A(
+__isa(null __isa),
 hashCode(null hashCode),
 equals(null equals),
 getClass(null getClass),
 toString(null toString),
-getArbitraryData(null getArbitraryData),
-);
+getArbitraryData(null getArbitraryData),);
 
 };
 
@@ -110,14 +110,14 @@ String (*) (__C) toString;
 String (*) (__C) getArbitraryData;
 int32_t (*) (__C, int32_t, int32_t) add;
 
-__C(__isa(null __isa),
+__C(
+__isa(null __isa),
 hashCode(null hashCode),
 equals(null equals),
 getClass(null getClass),
 toString(null toString),
 getArbitraryData(null getArbitraryData),
-add(null add),
-);
+add(null add),);
 
 };
 
@@ -143,12 +143,13 @@ Class (*) (__B) getClass;
 String (*) (__B) toString;
 String (*) (__B) getArbitraryData;
 
-__B(__isa(null __isa),
+__B(
+__isa(null __isa),
 hashCode(null hashCode),
 equals(null equals),
 getClass(null getClass),
 toString(null toString),
-getArbitraryData(null getArbitraryData),
-);
+getArbitraryData(null getArbitraryData),);
 
 };
+		
