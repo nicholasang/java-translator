@@ -93,7 +93,7 @@ public class CppHVisitor extends xtc.tree.Visitor {
 
     // TODO: STATIC IS NOT WORKING
     // TODO: in the v-table struct, should it be (*)(equals) or (*equals)... is there a difference?
-    // TODO: function pointers are incorrect in the v-table are in incorrect format
+    // TODO: function pointers in the v-table are in incorrect format
     // fields
     public void visitField(GNode n) throws IOException {
         if (MappingNode.getInstanceOf(n, "IsStatic", 0).equals("true")) {
