@@ -455,6 +455,9 @@ public abstract class MappingNode {
         public static void togglePrintValOnly() {
             DataField.printValOnly = !DataField.printValOnly;
         }
+        public static boolean onlyPrintsVal() {
+            return DataField.printValOnly;
+        }
 
         @Override
         public String toString() {
