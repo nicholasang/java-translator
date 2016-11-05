@@ -76,11 +76,13 @@ public class CppHVisitor extends xtc.tree.Visitor {
             this.writeOut.close();
 
             DataField.togglePrintValOnly();
+            this.headerAst = null;
 
         } catch(IOException ex) {
             if(DataField.onlyPrintsVal()) {
                 DataField.togglePrintValOnly();
             }
+            this.headerAst = null;
             System.err.println(ex.getMessage() + "\n" + Arrays.toString(ex.getStackTrace()));
         }
     }
@@ -218,7 +220,7 @@ public class CppHVisitor extends xtc.tree.Visitor {
         visit(n);
     }
 
-    // visits initialization list, initfield, and initfieldwith
+    // visits initialization list, uses information from initfield and initfieldwith
     public void visitInitializationList(GNode n) throws IOException {
         ArrayList<GNode> initFields = MappingNode.getAllLocalConstructs(n);
         StringBuilder sb = new StringBuilder(":\n");
