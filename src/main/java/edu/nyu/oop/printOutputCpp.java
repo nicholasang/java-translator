@@ -23,13 +23,20 @@ public class printOutputCpp extends xtc.tree.Visitor{
     public void visit(Node n){
         for (Object o: n){
             if (o instanceof Node){ dispatch((Node) o);}
+            else if (o instanceof String){
+                try{
+                    pen.write(o.toString() + " ");
+                }catch(Exception e){
+                    System.out.print(e);
+                }
+            }
         }
     }
 
     /*
      * Print string contents from indices start to end
      */
-    public void printContents(int start, int end, Node n){
+/*    public void printContents(int start, int end, Node n){
         try {
             for (int i = 0; i < end; i++) {
                 if (n.get(i) instanceof String) {
@@ -65,7 +72,7 @@ public class printOutputCpp extends xtc.tree.Visitor{
         }
         visit(n);
     }
-*/
+//
     public void visitPackageDeclaration(GNode n){
         printThisBefore = "namespace ";
         printThisAfter = "{ ";
@@ -98,7 +105,7 @@ public class printOutputCpp extends xtc.tree.Visitor{
         printContents(0, n.size(), n);
         visit(n);
     }
-
+*/
     /*public void visitType(GNode n){
         if(n.size() >= 2 && n.get(1).toString().contains("Dimensions")){
             printAtEnd = "";
@@ -121,4 +128,75 @@ public class printOutputCpp extends xtc.tree.Visitor{
         }
         visit(n);
     }
+
+    public void visitVoidType(GNode n){
+        penPrint("void ");
+        visit(n);
+    }
+
+    public void visitDeclarators(GNode n){
+        visit(n);
+        penPrint("; ");
+    }
+
+    public void visitExpressionStatement(GNode n){
+        visit(n);
+        penPrint("; ");
+    }
+
+    public void visitClassBody(GNode n){
+        visit(n);
+        penPrint("}; ");
+    }
+
+    public void visitArguments(GNode n){
+        if(n.size() == 0){
+            penPrint("()");
+        }
+        else{
+
+            visit(n);
+
+        }
+
+
+    }
+
+    public void visitReturnStatement(GNode n){
+        penPrint(" return ");
+        visit(n);
+        penPrint("; ");
+    }
+
+    public void visitFormalParameters(GNode n){
+        penPrint("(");
+        visit(n);
+        penPrint(") ");
+    }
+
+    public void visitBlock(GNode n){
+        penPrint(" {");
+        visit(n);
+        penPrint("} ");
+    }
+
+  /*  public void visitCallExpression(GNode n){
+        visit(n);
+        penPrint("; ");
+    }
+*/
+    //to avoid needing try/catch blocks everywhere
+    public void penPrint(String words){
+        try{
+            pen.write(words);
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+
+    }
 }
+
+
+// put ; when exiting: Declarators, ExpressionStatement
+// put } when exiting: Class bodies?,

@@ -38,6 +38,22 @@ public class MakeCppAst extends Visitor{
         visit(n);
     }
 
+    public void visitPackageDeclaration(GNode n){
+        for (int i = 0; i < ((Node)n.get(1)).size(); i++){
+            if (((Node)n.get(1)).get(i) instanceof String){
+                ((Node)n.get(1)).set(i,"namespace " + ((Node)n.get(1)).get(i).toString() + " { ");
+            }
+        }
+
+        visit(n);
+    }
+
+    public void visitNewClassExpression(GNode n){
+        n.set(0, "new ");
+
+        visit(n);
+    }
+
     public void visitClassDeclaration(GNode n){
         //TESTING
         /*for (int i = 0; i < n.size(); i++){
@@ -50,21 +66,54 @@ public class MakeCppAst extends Visitor{
         visit(n);
     }
 
+    //a method/ something that needs args
     //dealing with System.out.println
-    public void visitCallExpression(GNode n){
+ /*   public void visitCallExpression(GNode n){
         //n.get(2) = println / print
         if(n.size() > 2 && n.get(2) instanceof String){
             String arg = n.get(2).toString();
             if(arg.equals("print") || arg.equals("println")){
                 String sb = findPrintItems("", (GNode)n.get(3));
                 if (arg.equals("println")){
-                    n.set(2, "cout << " + sb + "<< endl;");
+                    n.set(2, "cout << " + sb + "<< endl");
                 }
                 else{
-                    n.set(2, "cout << " + sb + ";");
+                    n.set(2, "cout << " + sb);
                 }
             }
+        }
+        visit(n);
+    }
+*/  public void visitCallExpression(GNode n){
+        //0 = calling item (if there is one) that may be nested
+        //1 = ???
+        //2 = name of function
+        //3 = arguments
 
+        if(((GNode)n.get(0)).get(0) instanceof String){
+            String caller = ((GNode)n.get(0)).get(0).toString();
+
+            if(caller != null){
+                ((GNode)n.get(0)).set(0, caller + ".");
+            }
+        }
+        if((n.get(3) instanceof Node) && ((GNode)n.get(3)).size() == 0){
+            n.set(2, n.get(2).toString() + "()");
+            n.set(3, null);
+        }
+
+        //if n.get(2) = println / print
+        if(n.size() > 2 && n.get(2) instanceof String){
+            String arg = n.get(2).toString();
+            if(arg.equals("print") || arg.equals("println")){
+                String sb = findPrintItems("", (GNode)n.get(3));
+                if (arg.equals("println")){
+                    n.set(2, "cout << " + sb + "<< endl");
+                }
+                else{
+                    n.set(2, "cout << " + sb);
+                }
+            }
 
         }
         visit(n);
@@ -155,24 +204,65 @@ public class MakeCppAst extends Visitor{
         visit(n);
     }
 
+    public void visitArguments(GNode n){
+        if (n.size() > 0){
+            if (((GNode)n.get(0)) instanceof Node){
+                visit(n);
+            }
+            if(((GNode)n.get(0)).size() == 1){
+                ((GNode)n.get(0)).set(0, "(" + ((GNode)n.get(0)).get(0).toString() + ", ");
+
+            }
+            for (int i = 1; i < n.size()-1; i++){
+                if (n.get(i) instanceof String){
+                    if(((GNode)n.get(i)).size() == 1){
+                        ((GNode)n.get(i)).set(0, ((GNode)n.get(i)).get(i).toString() + ", ");
+                    }
+                }
+            }
+           // System.out.println("last arg: " + ((GNode)n.get(n.size()-1)).get(0).toString());
+            if(((GNode)n.get(n.size()-1)).size() == 1){
+                ((GNode)n.get(n.size()-1)).set(0, ((GNode)n.get(n.size()-1)).get(0).toString() + ")");
+            }
+        }
+        //if empty
+    }
+
+//////////////////////utility functions//////////////////////
+
     //for print functions, puts together the items to print
+
     public String findPrintItems(String line, GNode n){
+
         for (Object o : n){
+
+
             if (o instanceof String){
                 if(o.toString().equals("+") && line.endsWith("\" ")){
-                    System.out.println("found a plus");
-                    line = line + "<< ";
+                    line = line + " << ";
                 }
                 else if (o.toString().startsWith("\"") && line.endsWith("+ ")){
-                        line = line.substring(0, line.length() - 2) + "<< " + o.toString() + " ";
+                        line = line.substring(0, line.length() - 2) + " << " + o.toString() + " ";
+                }
+                else if (o.toString().equals("+")){
+                    line = line + " + ";
                 }
                 else{
-                    line = line + o.toString() + " ";
+                    line = line + o.toString();
                 }
                 n.set(n.indexOf(o), null);
-                System.out.println("line: " + line);
             }
-            else if (o instanceof Node) {
+            if (o instanceof Node) {
+                System.out.println(o.toString());
+                /*if (NodeUtil.dfs((GNode)o, "Arguments") == o){
+                    System.out.println("Found args: " + o.toString());
+                }
+                /*if(!((GNode)o.hasVariable())){
+                    int index = n.indexOf(o);
+                    (GNode)o = GNode.ensureVariable((GNode)o);
+                    method.set(index, (GNode)o);
+                }*/
+                dispatch((Node)o); //this gets called twice?
                 line = findPrintItems(line, (GNode) o);
             }
         }
@@ -192,4 +282,7 @@ public class MakeCppAst extends Visitor{
         }
         return line;
     }
+
+
+
 }
