@@ -44,11 +44,11 @@ public class CppHeaderAstGenerator {
 
         populateClassWrappers(headerAst);
 
-        //XtcTestUtils.prettyPrintAst(headerAst.getRoot());
-
-        //CppHVisitor outputHeader = new CppHVisitor();
-
-        //outputHeader.visit(headerAst);
+//        XtcTestUtils.prettyPrintAst(headerAst.getRoot());
+//
+//        CppHVisitor outputHeader = new CppHVisitor();
+//
+//        outputHeader.visit(headerAst);
 
         return headerAst;
     }

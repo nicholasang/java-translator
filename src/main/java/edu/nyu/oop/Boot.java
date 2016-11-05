@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
+import edu.nyu.oop.util.CppHVisitor;
 import edu.nyu.oop.util.JavaFiveImportParser;
 import edu.nyu.oop.util.NodeUtil;
 import edu.nyu.oop.util.XtcProps;
@@ -108,6 +109,9 @@ public class Boot extends Tool {
             //phase 2
             CppAst headerCppAst = CppHeaderAstGenerator.generateNew(allAsts);
 
+            //phase 3
+            CppHVisitor outputHeader = new CppHVisitor();
+            outputHeader.visit(headerCppAst);
 
         }
 
