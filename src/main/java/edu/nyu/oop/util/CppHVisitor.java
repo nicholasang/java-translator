@@ -62,6 +62,13 @@ public class CppHVisitor extends xtc.tree.Visitor {
 
             visit(headerAst.getRoot());
 
+            StringBuilder sb = new StringBuilder("\n");
+            for(int i = MappingNode.getAllOfType("Namespace").size(); i > 0; --i) {
+                sb.append("}\n");
+            }
+
+            this.writeOut.write(sb.toString());
+
             this.writeOut.flush();
             this.writeOut.close();
 
