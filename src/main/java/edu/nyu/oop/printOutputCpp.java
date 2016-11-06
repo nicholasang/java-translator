@@ -10,16 +10,17 @@ import java.io.IOException;
  */
 public class printOutputCpp extends xtc.tree.Visitor {
 
-
+    GNode mainClass;
     FileWriter pen = null;
     String printThisAfter = " ";
     String printThisBefore = "";
     String printAtEnd = "";
     String[] printLater = null;
 
-    public printOutputCpp(FileWriter outFileWrite, String[] printLater) {
+    public printOutputCpp(FileWriter outFileWrite, String[] printLater, GNode mainClass) {
         this.printLater = printLater;
         pen = outFileWrite;
+        this.mainClass = mainClass;
     }
 
     public void visit(Node n) {
@@ -148,8 +149,10 @@ public class printOutputCpp extends xtc.tree.Visitor {
     }
 
     public void visitClassBody(GNode n) {
-        visit(n);
-        penPrint("}; ");
+        if (! n.equals(mainClass)) {
+            visit(n);
+            penPrint("}; ");
+        }
     }
 
     public void visitArguments(GNode n) {

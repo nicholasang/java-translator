@@ -1,7 +1,7 @@
 ```
-C++ implementation of Java's Object, String, Class and template-based arrays.  
+C++ implementation of Java's Object, String, Class and template-based arrays.
 
-Object-Oriented Programming @ NYU  
+Object-Oriented Programming @ NYU
 Copyright (C) 2012 Robert Grimm
 Modifications Copyright (C) 2013 Thomas Wies
 Modifications Copyright (C) 2015 Randy Shepherd

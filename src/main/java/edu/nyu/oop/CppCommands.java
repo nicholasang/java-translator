@@ -18,22 +18,22 @@ public class CppCommands {
             visitor.visit(javaRoots.get(i));
         }
 
-        printCpp(javaRoots);
+        printCpp(javaRoots, visitor.mainClassNode);
         printMain(visitor.mainClassNode, visitor.packageNode);
 
         return javaRoots;
     }
 
-    public static void printCpp(List<GNode> javaRoots) {
-        XtcTestUtils.prettyPrintAst(javaRoots.get(0));
+    public static void printCpp(List<GNode> javaRoots, GNode mainClass) {
+//        XtcTestUtils.prettyPrintAst(javaRoots.get(0));
         String[] printAtEnd = new String[1];
         printAtEnd[0] = "";
         try {
             FileWriter output = new FileWriter("output/output.cpp");
 
-            output.write("#include <io.stream> #pragma once ");
+            output.write("#include <io.stream>\n#pragma once\n");
 
-            printOutputCpp visitor = new printOutputCpp(output, printAtEnd);
+            printOutputCpp visitor = new printOutputCpp(output, printAtEnd, mainClass);
 
             for (int i = 0; i < javaRoots.size(); i++) {
                 visitor.visit(javaRoots.get(i));
@@ -48,7 +48,7 @@ public class CppCommands {
     }
 
     public static void printMain(GNode mainClassDeclaration, GNode packageDeclaration) {
-        XtcTestUtils.prettyPrintAst(mainClassDeclaration);
+//        XtcTestUtils.prettyPrintAst(mainClassDeclaration);
         try {
             FileWriter output = new FileWriter("output/main.cpp");
 
