@@ -10,6 +10,11 @@ import java.lang.StringBuffer;
  * Created by alex on 10/26/16.
  */
 public class MakeCppAst extends Visitor {
+
+    public boolean mainMethodDeclarationFound = false;
+    public GNode mainClassNode;
+    public GNode packageNode;
+
     public void visit(Node n) {
         for (Object o: n) {
             if (o instanceof Node) dispatch((Node) o);
@@ -37,9 +42,13 @@ public class MakeCppAst extends Visitor {
             case "public":
                 n.set(0, null);
                 break;
+//        case "final":
+//            n.set(0, "const");
+//            break;
         }
         visit(n);
     }
+
 
     public void visitPackageDeclaration(GNode n) {
         for (int i = 0; i < ((Node)n.get(1)).size(); i++) {
@@ -47,6 +56,8 @@ public class MakeCppAst extends Visitor {
                 ((Node)n.get(1)).set(i,"namespace " + ((Node)n.get(1)).get(i).toString() + " { \n");
             }
         }
+
+        packageNode = n;
 
         visit(n);
     }
@@ -62,6 +73,10 @@ public class MakeCppAst extends Visitor {
         //n.get(1) = name of class
 
         visit(n);
+
+        if (mainClassNode == null && mainMethodDeclarationFound) {
+            mainClassNode = n;
+        }
     }
 
 
@@ -124,7 +139,6 @@ public class MakeCppAst extends Visitor {
             case "System":
                 n.set(0, null);
                 break;
-
             }
 
         }
@@ -236,7 +250,17 @@ public class MakeCppAst extends Visitor {
             }
         }
         //if empty
+        }
+
+    public void visitMethodDeclaration(GNode n) {
+        if (n.size() >= 4) {
+            if (n.getString(3).equals("main")) {
+                mainMethodDeclarationFound = true;
+            }
+        }
+        // ^ integrate this with whatever other code Alex writes for method declarations
     }
+
 
 //////////////////////utility functions//////////////////////
 
