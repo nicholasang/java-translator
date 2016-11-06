@@ -20,10 +20,13 @@ public class PrintMainCpp {
 
     public PrintMainCpp(FileWriter outFileWrite) {
         pen = outFileWrite;
-        printVisitor = new printOutputCpp(pen);
     }
 
     public void print(Node mainClassDeclaration, Node packageDeclaration) {
+        String[] printLaterArray = new String[1];
+        printLaterArray[0] = "";
+        printVisitor = new printOutputCpp(pen, printLaterArray, (GNode) mainClassDeclaration);
+
         List<Node> fields = NodeUtil.dfsAll(mainClassDeclaration, "FieldDeclaration");
 
         String namespace = "";
@@ -31,7 +34,9 @@ public class PrintMainCpp {
             Node packageQualifiedID = packageDeclaration.getNode(1);
 
             for (int i = 0; i < packageQualifiedID.size(); i++) {
-                namespace += packageQualifiedID.getString(i) + "::";
+                String namespaceString = packageQualifiedID.getString(i);
+                namespaceString = namespaceString.substring("namespace ".length(), namespaceString.length() - " { ".length());
+                namespace += namespaceString + "::";
             }
 
             namespace = namespace.substring(0, ((namespace.length() < 2) ? 0 : namespace.length() - 2));
@@ -57,7 +62,7 @@ public class PrintMainCpp {
         printVisitor.visit(mainBlock);
 
         try {
-            pen.write("}");
+            pen.write("return 0; }");
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -65,7 +70,12 @@ public class PrintMainCpp {
 
     private void printStaticFields(List<Node> fields) {
         for (Node field : fields) {
-            printVisitor.visit(field);
+            for (int i = 0; i < field.getNode(0).size(); i++) {
+                Node modifier = field.getNode(0).getNode(i);
+                if ("static".equals(modifier.getString(0))) {
+                    printVisitor.visit(field);
+                }
+            }
         }
     }
 

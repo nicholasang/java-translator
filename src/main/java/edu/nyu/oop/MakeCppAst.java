@@ -126,6 +126,7 @@ public class MakeCppAst extends Visitor {
                 } else {
                     n.set(2, "std::cout << " + sb);
                 }
+                return;
             }
 
         }
@@ -135,7 +136,7 @@ public class MakeCppAst extends Visitor {
     public void visitPrimaryIdentifier(GNode n) {
         if (n.get(0) instanceof String) {
             switch (n.get(0).toString()) {
-                //and whatever else becomes null cascade here
+            //and whatever else becomes null cascade here
             case "System":
                 n.set(0, null);
                 break;
@@ -164,8 +165,8 @@ public class MakeCppAst extends Visitor {
     public void visitSelectionExpression(GNode n) {
         if (n.size() > 1 && n.get(1) instanceof String) {
             switch (n.get(1).toString()) {
-                //and whatever else becomes null cascade here
-                //sets primaryIdentifier with "system" and "out" to null
+            //and whatever else becomes null cascade here
+            //sets primaryIdentifier with "system" and "out" to null
             case "out":
                 n.set(1, null);
                 n.set(0, null);
@@ -234,8 +235,7 @@ public class MakeCppAst extends Visitor {
                 visit(n);
             }
             if(((GNode)n.get(0)).size() == 1) {
-                ((GNode)n.get(0)).set(0, "(" + ((GNode)n.get(0)).get(0).toString() + ", ");
-
+                ((GNode) n.get(0)).set(0, "(" + ((GNode) n.get(0)).get(0).toString() + ", ");
             }
             for (int i = 1; i < n.size()-1; i++) {
                 if (n.get(i) instanceof String) {
@@ -250,7 +250,7 @@ public class MakeCppAst extends Visitor {
             }
         }
         //if empty
-        }
+    }
 
     public void visitMethodDeclaration(GNode n) {
         if (n.size() >= 4) {
@@ -258,7 +258,8 @@ public class MakeCppAst extends Visitor {
                 mainMethodDeclarationFound = true;
             }
         }
-        // ^ integrate this with whatever other code Alex writes for method declarations
+
+        visit(n);
     }
 
 
@@ -284,7 +285,7 @@ public class MakeCppAst extends Visitor {
                 n.set(n.indexOf(o), null);
             }
             if (o instanceof Node) {
-                System.out.println(o.toString());
+//                System.out.println(o.toString());
                 /*if (NodeUtil.dfs((GNode)o, "Arguments") == o){
                     System.out.println("Found args: " + o.toString());
                 }

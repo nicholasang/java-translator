@@ -11,7 +11,7 @@ import edu.nyu.oop.util.NodeUtil;
  */
 public class printOutputCpp extends xtc.tree.Visitor {
 
-
+    GNode mainClass;
     FileWriter pen = null;
     String printThisAfter = " ";
     String printThisBefore = "";
@@ -21,9 +21,10 @@ public class printOutputCpp extends xtc.tree.Visitor {
     String ClassName = "";
     String returnType = null;
 
-    public printOutputCpp(FileWriter outFileWrite, String[] printLater) {
+    public printOutputCpp(FileWriter outFileWrite, String[] printLater, GNode mainClass) {
         this.printLater = printLater;
         pen = outFileWrite;
+        this.mainClass = mainClass;
     }
 
     public void visit(Node n) {
@@ -154,8 +155,10 @@ public class printOutputCpp extends xtc.tree.Visitor {
     }
 
     public void visitClassBody(GNode n) {
-        visit(n);
-        penPrint("}; \n");
+        if (! n.equals(mainClass)) {
+            visit(n);
+            penPrint("}; ");
+        }
     }
 
     public void visitArguments(GNode n) {
