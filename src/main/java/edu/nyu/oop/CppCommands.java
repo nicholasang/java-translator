@@ -12,9 +12,9 @@ import java.io.FileWriter;
  * Created by alex on 10/27/16.
  */
 public class CppCommands {
-    public static List<GNode> convertToCpp(List<GNode> javaRoots){
-    MakeCppAst visitor = new MakeCppAst();
-        for (int i = 0; i < javaRoots.size(); i++){
+    public static List<GNode> convertToCpp(List<GNode> javaRoots) {
+        MakeCppAst visitor = new MakeCppAst();
+        for (int i = 0; i < javaRoots.size(); i++) {
             visitor.visit(javaRoots.get(i));
         }
 
@@ -24,18 +24,24 @@ public class CppCommands {
         return javaRoots;
     }
 
-    public static void printCpp(List<GNode> javaRoots){
+    public static void printCpp(List<GNode> javaRoots) {
         XtcTestUtils.prettyPrintAst(javaRoots.get(0));
-        try{
+        String[] printAtEnd = new String[1];
+        printAtEnd[0] = "";
+        try {
             FileWriter output = new FileWriter("output/output.cpp");
 
-            printOutputCpp visitor = new printOutputCpp(output);
-            for (int i = 0; i < javaRoots.size(); i++){
+            output.write("#include <io.stream> #pragma once ");
+
+            printOutputCpp visitor = new printOutputCpp(output, printAtEnd);
+            for (int i = 0; i < javaRoots.size(); i++) {
                 visitor.visit(javaRoots.get(i));
+
             }
+            output.write(printAtEnd[0]);
             output.flush();
             output.close();
-        }catch(IOException e) {
+        } catch(IOException e) {
             System.out.println(e);
         }
 
