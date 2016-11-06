@@ -87,14 +87,14 @@ SomeBigWrapperNode(
           Name = __D,
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = __D_VT*,
             Name = __vptr
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = true,
             Type = __D_VT,
             Name = __vtable
@@ -109,7 +109,7 @@ SomeBigWrapperNode(
           ),
           Method(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             ReturnType = Class,
             Name = __class,
@@ -119,7 +119,7 @@ SomeBigWrapperNode(
           ),
           Method(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             ReturnType = void,
             Name = allByMyself,
@@ -134,50 +134,55 @@ SomeBigWrapperNode(
           Name = __D_VT,
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = Class,
             Name = __isa
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = int32_t (*) (__D),
-            Name = hashCode
+            Name = hashCode,
+            FullName = int32_t (*hashCode) (__D)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = bool (*) (__D, Object),
-            Name = equals
+            Name = equals,
+            FullName = bool (*equals) (__D, Object)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = Class (*) (__D),
-            Name = getClass
+            Name = getClass,
+            FullName = Class (*getClass) (__D)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = String (*) (__D),
-            Name = toString
+            Name = toString,
+            FullName = String (*toString) (__D)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = void (*) (__D),
-            Name = allByMyself
+            Name = allByMyself,
+            FullName = void (*allByMyself) (__D)
           ),
           Constructor(
             ,
             AccessModifier = public,
-            Name = __D,
+            Name = __D_VT,
             ParameterList(
 
             ),
@@ -249,14 +254,14 @@ SomeBigWrapperNode(
           Name = __A,
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = __A_VT*,
             Name = __vptr
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = true,
             Type = __A_VT,
             Name = __vtable
@@ -284,7 +289,7 @@ SomeBigWrapperNode(
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = true,
             Type = String,
             Name = staticDataA
@@ -312,7 +317,7 @@ SomeBigWrapperNode(
           ),
           Method(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             ReturnType = Class,
             Name = __class,
@@ -347,50 +352,55 @@ SomeBigWrapperNode(
           Name = __A_VT,
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = Class,
             Name = __isa
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = int32_t (*) (__A),
-            Name = hashCode
+            Name = hashCode,
+            FullName = int32_t (*hashCode) (__A)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = bool (*) (__A, Object),
-            Name = equals
+            Name = equals,
+            FullName = bool (*equals) (__A, Object)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = Class (*) (__A),
-            Name = getClass
+            Name = getClass,
+            FullName = Class (*getClass) (__A)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = String (*) (__A),
-            Name = toString
+            Name = toString,
+            FullName = String (*toString) (__A)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = String (*) (__A),
-            Name = getArbitraryData
+            Name = getArbitraryData,
+            FullName = String (*getArbitraryData) (__A)
           ),
           Constructor(
             ,
             AccessModifier = public,
-            Name = __A,
+            Name = __A_VT,
             ParameterList(
 
             ),
@@ -462,14 +472,14 @@ SomeBigWrapperNode(
           Name = __C,
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = __C_VT*,
             Name = __vptr
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = true,
             Type = __C_VT,
             Name = __vtable
@@ -505,7 +515,7 @@ SomeBigWrapperNode(
           ),
           Method(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             ReturnType = Class,
             Name = __class,
@@ -538,57 +548,63 @@ SomeBigWrapperNode(
           Name = __C_VT,
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = Class,
             Name = __isa
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = int32_t (*) (__C),
-            Name = hashCode
+            Name = hashCode,
+            FullName = int32_t (*hashCode) (__C)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = bool (*) (__C, Object),
-            Name = equals
+            Name = equals,
+            FullName = bool (*equals) (__C, Object)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = Class (*) (__C),
-            Name = getClass
+            Name = getClass,
+            FullName = Class (*getClass) (__C)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = String (*) (__C),
-            Name = toString
+            Name = toString,
+            FullName = String (*toString) (__C)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = String (*) (__C),
-            Name = getArbitraryData
+            Name = getArbitraryData,
+            FullName = String (*getArbitraryData) (__C)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = int32_t (*) (__C, int32_t, int32_t),
-            Name = add
+            Name = add,
+            FullName = int32_t (*add) (__C, int32_t, int32_t)
           ),
           Constructor(
             ,
             AccessModifier = public,
-            Name = __C,
+            Name = __C_VT,
             ParameterList(
 
             ),
@@ -669,14 +685,14 @@ SomeBigWrapperNode(
           Name = __B,
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = __B_VT*,
             Name = __vptr
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = true,
             Type = __B_VT,
             Name = __vtable
@@ -719,7 +735,7 @@ SomeBigWrapperNode(
           ),
           Method(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             ReturnType = Class,
             Name = __class,
@@ -744,50 +760,55 @@ SomeBigWrapperNode(
           Name = __B_VT,
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = Class,
             Name = __isa
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = int32_t (*) (__B),
-            Name = hashCode
+            Name = hashCode,
+            FullName = int32_t (*hashCode) (__B)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = bool (*) (__B, Object),
-            Name = equals
+            Name = equals,
+            FullName = bool (*equals) (__B, Object)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = Class (*) (__B),
-            Name = getClass
+            Name = getClass,
+            FullName = Class (*getClass) (__B)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = String (*) (__B),
-            Name = toString
+            Name = toString,
+            FullName = String (*toString) (__B)
           ),
           Field(
             ,
-            AccessModifier = protected,
+            AccessModifier = public,
             IsStatic = false,
             Type = String (*) (__B),
-            Name = getArbitraryData
+            Name = getArbitraryData,
+            FullName = String (*getArbitraryData) (__B)
           ),
           Constructor(
             ,
             AccessModifier = public,
-            Name = __B,
+            Name = __B_VT,
             ParameterList(
 
             ),
@@ -854,3 +875,4 @@ SomeBigWrapperNode(
     )
   )
 )
+

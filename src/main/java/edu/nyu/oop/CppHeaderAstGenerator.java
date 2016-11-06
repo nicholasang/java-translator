@@ -44,12 +44,6 @@ public class CppHeaderAstGenerator {
 
         populateClassWrappers(headerAst);
 
-        //XtcTestUtils.prettyPrintAst(headerAst.getRoot());
-
-        //CppHVisitor outputHeader = new CppHVisitor();
-
-        //outputHeader.visit(headerAst);
-
         return headerAst;
     }
 
@@ -86,7 +80,7 @@ public class CppHeaderAstGenerator {
             GNode fieldNode = MappingNode.createMappingNode("Field");
             MappingNode.addNode(linkPoint, fieldNode);
 
-            MappingNode.addDataField(fieldNode, "AccessModifier", (f.accessModifier == null) ? "protected" : f.accessModifier);
+            MappingNode.addDataField(fieldNode, "AccessModifier", (f.accessModifier == null) ? "public" : f.accessModifier);
             MappingNode.addDataField(fieldNode, "IsStatic", Boolean.toString(f.isStatic));
             MappingNode.addDataField(fieldNode, "Type", f.type);
             MappingNode.addDataField(fieldNode, "Name", f.name);
@@ -121,7 +115,7 @@ public class CppHeaderAstGenerator {
             GNode constructorNode = MappingNode.createMappingNode("Method");
             MappingNode.addNode(linkPoint, constructorNode);
 
-            MappingNode.addDataField(constructorNode, "AccessModifier", (m.accessModifier == null) ? "protected" : m.accessModifier);
+            MappingNode.addDataField(constructorNode, "AccessModifier", (m.accessModifier == null) ? "public" : m.accessModifier);
             MappingNode.addDataField(constructorNode, "IsStatic", Boolean.toString(m.isStatic));
             MappingNode.addDataField(constructorNode, "ReturnType", m.returnType);
             MappingNode.addDataField(constructorNode, "Name", m.name);
@@ -156,17 +150,22 @@ public class CppHeaderAstGenerator {
             MappingNode.addNode(linkPoint, fieldNode);
 
 
-            MappingNode.addDataField(fieldNode, "AccessModifier", (f.accessModifier == null) ? "protected" : f.accessModifier);
+            MappingNode.addDataField(fieldNode, "AccessModifier", (f.accessModifier == null) ? "public" : f.accessModifier);
             MappingNode.addDataField(fieldNode, "IsStatic", Boolean.toString(f.isStatic));
             MappingNode.addDataField(fieldNode, "Type", f.type);
             MappingNode.addDataField(fieldNode, "Name", f.name);
+
+            int i;
+            if((i = f.type.indexOf("(*)")) >= 0) {
+                MappingNode.addDataField(fieldNode, "FullName", f.type.substring(0, i+2) + f.name + f.type.substring(i+2));
+            }
         }
 
         GNode constructorNode = MappingNode.createMappingNode("Constructor");
         MappingNode.addNode(linkPoint, constructorNode);
 
         MappingNode.addDataField(constructorNode, "AccessModifier", "public");
-        MappingNode.addDataField(constructorNode, "Name", cR.getName());
+        MappingNode.addDataField(constructorNode, "Name", cR.getName() + "_VT");
 
         GNode paramList = MappingNode.createMappingNode("ParameterList");
         MappingNode.addNode(constructorNode, paramList);

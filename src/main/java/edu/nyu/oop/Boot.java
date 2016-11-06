@@ -1,5 +1,7 @@
 package edu.nyu.oop;
 
+import edu.nyu.oop.util.CppHVisitor;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -16,6 +18,7 @@ import xtc.tree.Node;
 import xtc.util.Tool;
 import xtc.lang.JavaPrinter;
 import xtc.parser.ParseException;
+
 
 /**
  * This is the entry point to your program. It configures the user interface, defining
@@ -108,6 +111,8 @@ public class Boot extends Tool {
             //phase 2
             CppAst headerCppAst = CppHeaderAstGenerator.generateNew(allAsts);
 
+            //phase 3
+            new CppHVisitor().visit(headerCppAst);
 
         }
 
