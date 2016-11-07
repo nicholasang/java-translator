@@ -7,8 +7,7 @@ namespace inputs {
  namespace test001 { 
  __A::__A():__vptr(&__vtable){
 A () 
- {__String doStuff =  "nothing" ; 
-} 
+ {} 
 }
 
 __A_VT __A::__vtable;
