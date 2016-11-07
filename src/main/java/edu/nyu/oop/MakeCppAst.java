@@ -35,13 +35,14 @@ public class MakeCppAst extends Visitor {
 
     public void visitModifier(GNode n) {
         switch((String) n.get(0)) {
-            case "final":
-                n.set(0, "const");
-                break;
-            case "static": ;
-            case "public":
-                n.set(0, null);
-                break;
+        case "final":
+            n.set(0, "const");
+            break;
+        case "static":
+            ;
+        case "public":
+            n.set(0, null);
+            break;
 //        case "final":
 //            n.set(0, "const");
 //            break;
