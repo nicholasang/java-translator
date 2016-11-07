@@ -21,6 +21,8 @@ Output will be placed in the output.h, output.c, and main.cpp files within the o
 ## To run translated C++ files:
 ```cpp ```
 
+Note: this only currently works for the first 6 test files - others do not have main.cpp and output.cpp translated correctly.
+
 ## To format translated C++ files:
 ```formatc ```
 
