@@ -9,15 +9,23 @@
 
 Input files must be correct Java!
 
-## To execute translator (sbt):
+All commands given below are from within sbt.
+
+## To execute translator:
 ```runxtc -translateJava file/path/to/test/file.java```
 
-NOTE: file path and file name must *exactly* match the actual path/name (i.e. correctly capitalized)
+**NOTE: file path and file name must *exactly* match the actual path/name (i.e. correctly capitalized)**
 
 Output will be placed in the output.h, output.c, and main.cpp files within the output directory.
 
-## To run translated C++ files (sbt):
+## To run translated C++ files:
 ```cpp ```
+
+Note: this only currently works for the first 6 test files - others do not have main.cpp and output.cpp translated correctly.
+
+## To format translated C++ files:
+```formatc ```
+
 
 
 Project Map
