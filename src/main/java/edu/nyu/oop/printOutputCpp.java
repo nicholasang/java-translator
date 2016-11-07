@@ -199,15 +199,13 @@ public class printOutputCpp extends xtc.tree.Visitor {
             }
             returnType = search.get(0).toString();
         }
-        if(returnType != null){
-            if (returnType.startsWith("__")){
+        if(returnType != null) {
+            if (returnType.startsWith("__")) {
                 penPrint("\n" + returnType.substring(2) + " ");
-            }
-            else{
+            } else {
                 penPrint("\n" + returnType + " ");
             }
-        }
-        else{
+        } else {
             penPrint("\n");
         }
         penPrint("__" + ClassName + "::" +  n.get(3).toString() + "(");
@@ -263,16 +261,16 @@ public class printOutputCpp extends xtc.tree.Visitor {
         penPrint("__" + ClassName + "::__" + ClassName + "():__vptr(&__vtable){\n");
         Node constructor = NodeUtil.dfs(n, "ConstructorDeclaration");
 
-        if (constructor != null){
-            if(((GNode)constructor.get(5)).size() != 0){
+        if (constructor != null) {
+            if(((GNode)constructor.get(5)).size() != 0) {
                 dispatch(constructor);
             }
         }
         penPrint("}\n\n__" + ClassName + "_VT __" + ClassName + "::__vtable;\n");
         penPrint("\nClass __" + ClassName + "::__class() {\n" +
-                "static Class k = \n"
-                + "new __Class(__rt::literal(\"class " + pack + ClassName + "\"), __Object::__class());\n"
-                + "return k;}\n\n");
+                 "static Class k = \n"
+                 + "new __Class(__rt::literal(\"class " + pack + ClassName + "\"), __Object::__class());\n"
+                 + "return k;}\n\n");
 
         //erase stuff so it doesn't print twice
         for (int i = 0; i < 5; i++) {
