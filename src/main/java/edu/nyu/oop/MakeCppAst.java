@@ -240,7 +240,9 @@ public class MakeCppAst extends Visitor {
                 visit(n);
             }
             if(((GNode)n.get(0)).size() == 1) {
-                ((GNode) n.get(0)).set(0, "(" + ((GNode) n.get(0)).get(0).toString() + ", ");
+                if(((GNode) n.get(0)).get(0) != null){
+                    ((GNode) n.get(0)).set(0, "(" + ((GNode) n.get(0)).get(0).toString() + ", ");
+                }
             }
             for (int i = 1; i < n.size()-1; i++) {
                 if (n.get(i) instanceof String) {
@@ -251,7 +253,9 @@ public class MakeCppAst extends Visitor {
             }
             // System.out.println("last arg: " + ((GNode)n.get(n.size()-1)).get(0).toString());
             if(((GNode)n.get(n.size()-1)).size() == 1) {
-                ((GNode)n.get(n.size()-1)).set(0, ((GNode)n.get(n.size()-1)).get(0).toString() + ")");
+                if(((GNode)n.get(n.size()-1)).get(0) != null){
+                    ((GNode)n.get(n.size()-1)).set(0, ((GNode)n.get(n.size()-1)).get(0).toString() + ")");
+                }
             }
         }
         //if empty
