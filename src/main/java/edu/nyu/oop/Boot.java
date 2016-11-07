@@ -48,7 +48,7 @@ public class Boot extends Tool {
         bool("printJavaAst", "printJavaAst", false, "Print Java Ast.").
         bool("printJavaCode", "printJavaCode", false, "Print Java code.").
         bool("printJavaImportCode", "printJavaImportCode", false, "Print Java code for imports and package source.").
-        bool("parseJava", "parseJava", false, "Parse source file dependencies.");
+        bool("translateJava", "translateJava", false, "Translate Java to C++.");
     }
 
     @Override
@@ -56,7 +56,6 @@ public class Boot extends Tool {
         super.prepare();
         // Perform consistency checks on command line arguments.
         // (i.e. are there some commands that cannot be run together?)
-        logger.debug("This is a debugging statement."); // Example logging statement, you may delete
     }
 
     @Override
@@ -96,7 +95,7 @@ public class Boot extends Tool {
             runtime.console().flush();
         }
 
-        if (runtime.test("parseJava")) {
+        if (runtime.test("translateJava")) {
             // NOTE: must type in EXACT filename (same case!!) or file is added twice by dependency parser
 
             String workingDir = System.getProperty("user.dir");

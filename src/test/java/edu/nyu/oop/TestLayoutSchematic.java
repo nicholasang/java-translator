@@ -51,24 +51,24 @@ public class TestLayoutSchematic {
             LayoutSchematic.Field initTo = initializer.initializeTo;
             switch (initializer.fieldName) {
             case "hashCode":
-                hashCode = initTo.type.equals("int32_t (*) (__TestClass)") && initTo.name.equals("&__Object::hashCode");
+                hashCode = initTo.type.equals("int32_t (*) (TestClass)") && initTo.name.equals("&__Object::hashCode");
                 break;
             case "equals":
-                equals = initTo.type.equals("bool (*) (__TestClass, Object)") && initTo.name.equals("&__Object::equals");
+                equals = initTo.type.equals("bool (*) (TestClass, Object)") && initTo.name.equals("&__Object::equals");
                 break;
             case "getClass":
-                getClass = initTo.type.equals("Class (*) (__TestClass)") && initTo.name.equals("&__Object::getClass");
+                getClass = initTo.type.equals("Class (*) (TestClass)") && initTo.name.equals("&__Object::getClass");
                 break;
             case "toString":
-                toString = initTo.type.equals("String (*) (__TestClass)") && initTo.name.equals("&__TestClass::toString");
+                toString = initTo.type.equals("String (*) (TestClass)") && initTo.name.equals("&__TestClass::toString");
                 break;
             case "mainish":
-                mainish = initTo.type.equals("__rt::Array<bool>* (*) (__TestClass, __rt::Array<String>*)") && initTo.name.equals("&__TestClass::mainish");
+                mainish = initTo.type.equals("__rt::Array<bool>* (*) (TestClass, __rt::Array<String>*)") && initTo.name.equals("&__TestClass::mainish");
                 break;
             }
         }
 
-        assert(hashCode && equals && getClass && toString && mainish);
+        assertTrue(hashCode && equals && getClass && toString && mainish);
         logger.info("Vtable struct layout correct");
     }
 
@@ -82,17 +82,18 @@ public class TestLayoutSchematic {
         for (LayoutSchematic.Constructor constructor : constructors) {
             if (constructor.parameterList.size() == 0 && constructor.accessModifier.equals("public")) {
                 defaultFound = true;
-            } else if (constructor.parameterList.size() == 1) {
+            } else if (constructor.parameterList.size() >= 1) {
                 LayoutSchematic.Parameter param = constructor.parameterList.get(0);
-                if (constructor.accessModifier.equals("private") && param.name.equals("num") && param.type.equals("int_16t")) {
+
+                if (constructor.accessModifier.equals("private") && param.name.equals("num") && param.type.equals("int8_t")) {
                     privateFound = true;
-                } else if (constructor.accessModifier.equals("public") && param.name.equals("num") && param.type.equals("int_32t")) {
+                } else if (constructor.accessModifier.equals("public") && param.name.equals("num") && param.type.equals("int32_t")) {
                     publicFound = true;
                 }
             }
         }
 
-        assert(privateFound && publicFound && defaultFound);
+        assertTrue(privateFound && publicFound && defaultFound);
         logger.info("All constructors correct");
     }
 
@@ -107,14 +108,14 @@ public class TestLayoutSchematic {
             switch (method.name) {
             case "privateMethod":
                 privateFound = method.accessModifier.equals("private");
-                privateFound = privateFound && method.parameterTypes.size() == 2 && method.parameterTypes.get(0).equals("String") && method.parameterTypes.get(1).equals("int_32t");
+                privateFound = privateFound && method.parameterTypes.size() == 3 && method.parameterTypes.get(1).equals("String") && method.parameterTypes.get(2).equals("int32_t");
                 break;
             case "mainish":
-                mainishFound = method.parameterTypes.size() == 1 && method.parameterTypes.get(0).equals("__rt::Array<String>");
+                mainishFound = method.parameterTypes.size() == 2 && method.parameterTypes.get(1).equals("__rt::Array<String>*");
                 mainishFound = mainishFound && method.returnType.equals("__rt::Array<bool>*");
                 break;
             case "toString":
-                toStringFound = method.returnType.equals("String") && method.accessModifier.equals("public") && method.parameterTypes.size() == 0;
+                toStringFound = method.returnType.equals("String") && method.accessModifier.equals("public") && method.parameterTypes.size() == 1;
                 break;
             case "staticMethod":
                 staticFound = method.isStatic && method.returnType.equals("void");
@@ -122,7 +123,7 @@ public class TestLayoutSchematic {
             }
         }
 
-        assert(privateFound && mainishFound && toStringFound && staticFound);
+        assertTrue(privateFound && mainishFound && toStringFound && staticFound);
         logger.info("All methods correct");
     }
 
@@ -137,10 +138,10 @@ public class TestLayoutSchematic {
         for (LayoutSchematic.Field field : fields) {
             switch (field.name) {
             case "publicField": // tests access modifier and type (java -> c++) conversion
-                publicFound = field.type.equals("int_32t") && field.accessModifier.equals("public");
+                publicFound = field.type.equals("int32_t") && field.accessModifier.equals("public");
                 break;
             case "defaultField": // test lack of access modifier and type conversion
-                defaultFound = field.type.equals("int_8t") && (field.accessModifier == null);
+                defaultFound = field.type.equals("int8_t") && (field.accessModifier == null);
                 break;
             case "staticField": // test static-ness
                 staticFound = field.isStatic;
@@ -152,12 +153,12 @@ public class TestLayoutSchematic {
                 declaredFound = field.type.equals("int32_t");
                 break;
             case "arrayField": // test array type
-                arrayFound = field.type.equals("Array<int32_t>*");
+                arrayFound = field.type.equals("__rt::Array<int32_t>*");
                 break;
             }
         }
 
-        assert(publicFound && defaultFound && staticFound && multipleFound && declaredFound && arrayFound);
+        assertTrue(publicFound && defaultFound && staticFound && multipleFound && declaredFound && arrayFound);
         logger.info("All fields correct");
     }
 
