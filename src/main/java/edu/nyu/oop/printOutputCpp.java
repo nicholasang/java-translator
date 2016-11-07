@@ -11,7 +11,7 @@ import edu.nyu.oop.util.NodeUtil;
  */
 public class printOutputCpp extends xtc.tree.Visitor {
 
-
+    GNode mainClass;
     FileWriter pen = null;
     String printThisAfter = " ";
     String printThisBefore = "";
@@ -21,13 +21,14 @@ public class printOutputCpp extends xtc.tree.Visitor {
     String ClassName = "";
     String returnType = null;
 
-    public printOutputCpp(FileWriter outFileWrite, String[] printLater) {
+    public printOutputCpp(FileWriter outFileWrite, String[] printLater, GNode mainClass) {
         this.printLater = printLater;
         pen = outFileWrite;
+        this.mainClass = mainClass;
     }
 
     public void visit(Node n) {
-        if (n != null){
+        if (n != null) {
             for (Object o: n) {
                 if (o instanceof Node) {
                     dispatch((Node) o);
@@ -122,6 +123,7 @@ public class printOutputCpp extends xtc.tree.Visitor {
         else{
             printAtEnd = " ";
         }
+
         printContents(0, n.size(), n);
         visit(n);
     }*/
@@ -154,7 +156,7 @@ public class printOutputCpp extends xtc.tree.Visitor {
 
     public void visitClassBody(GNode n) {
         visit(n);
-        penPrint("}; \n");
+        penPrint("}; ");
     }
 
     public void visitArguments(GNode n) {
@@ -188,23 +190,24 @@ public class printOutputCpp extends xtc.tree.Visitor {
         penPrint("} \n");
     }
 
-    public void visitMethodDeclaration(GNode n){
+    public void visitMethodDeclaration(GNode n) {
         //String returnType = "";//((GNode)((GNode)n.get(2)).get(0)).get(0).toString();
         GNode search = (GNode)n.get(2);
-        if(search.size() > 0){
-            while (search.get(0) instanceof Node){
+        if(search.size() > 0) {
+            while (search.get(0) instanceof Node) {
                 search = (GNode)search.get(0);
             }
             returnType = search.get(0).toString();
         }
 
         penPrint("__" + ClassName + "::" +  n.get(3).toString() + "(");
-        if (((GNode)n.get(4)).size() == 0){
+        if (((GNode)n.get(4)).size() == 0) {
             penPrint(ClassName + "__this");
+        } else {
+            dispatch((GNode)n.get(4));
         }
-        else{ dispatch((GNode)n.get(4));}
         penPrint("){\n");
-        for (int i = 5; i < n.size(); i++){
+        for (int i = 5; i < n.size(); i++) {
             visit((GNode)n.get(i));
         }
 
@@ -214,18 +217,20 @@ public class printOutputCpp extends xtc.tree.Visitor {
         for(int i = 0; i < n.size(); i++) {
             printLater[0] = "}" + printLater[0];
         }
-        for (Object o : ((GNode)n.get(1))){
-            if (o instanceof String){
+        for (Object o : ((GNode)n.get(1))) {
+            if (o instanceof String) {
                 pack += o.toString().substring(10, o.toString().length() - 4) + ".";
             }
         }
         visit(n);
     }
 
-    public void visitClassDeclaration(GNode n){
-        initializeClass(n);
-        visit(n);
-        ClassName = "";
+    public void visitClassDeclaration(GNode n) {
+        if (! n.equals(mainClass)) {
+            initializeClass(n);
+            visit(n);
+            ClassName = "";
+        }
     }
 
     /*  public void visitCallExpression(GNode n){
@@ -242,30 +247,31 @@ public class printOutputCpp extends xtc.tree.Visitor {
         }
     }
 
-    public void initializeClass(GNode n){
+    public void initializeClass(GNode n) {
         ClassName = n.get(1).toString();
         //ClassName = ClassName.substring(6, ClassName.length() - 3);
         penPrint("__" + ClassName + "::__" + ClassName + "():__vptr(&__vtable){\n");
         Node constructor = NodeUtil.dfs(n, "ConstructorDeclaration");
-        if (constructor != null){
+        if (constructor != null) {
             dispatch(constructor);
         }
         penPrint("}\n\n__" + ClassName + "_VT __" + ClassName + "::__vtable;\n");
         penPrint("\nClass __" + ClassName + "::__class() {\n" +
-                "static Class k = \n"
-                + "new __Class(__rt::literal(\"class " + pack + ClassName + "\"), __Object::__class());\n"
-                + "return k;}\n\n");
+                 "static Class k = \n"
+                 + "new __Class(__rt::literal(\"class " + pack + ClassName + "\"), __Object::__class());\n"
+                 + "return k;}\n\n");
         penPrint("__" + ClassName + "_VT __" + ClassName + "::__vtable;");
 
         //erase stuff so it doesn't print twice
-        for (int i = 0; i < 5; i++){
+        for (int i = 0; i < 5; i++) {
             n.set(i, null);
         }
 
-        if (((GNode)n.get(5)).get(0) == constructor){
+        if (((GNode)n.get(5)).get(0) == constructor) {
             ((GNode)n.get(5)).set(0, null);
         }
     }
+
 
 }
 
