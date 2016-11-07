@@ -22,7 +22,7 @@ public class FillLayoutSchematic {
     }
 
     public static void fillClass(ClassRef classRef) {
-        populateClassStruct(classRef.getLayoutSchematic().classStruct, classRef.getJClassDeclaration());
+        populateClassStruct(classRef.getLayoutSchematic().classStruct, classRef.getJClassDeclaration(), classRef.getName());
 
         if (classRef.getParentClassRef() != null) {
             getInheritedFields(classRef.getLayoutSchematic().classStruct, classRef.getParentClassRef().getLayoutSchematic().classStruct);
@@ -160,9 +160,15 @@ public class FillLayoutSchematic {
 
             methodPointer.name = method.name;
 
-            String type = method.returnType + " (*) (" + className;
+            String type = method.returnType + " (*) (";
+            boolean isFirstParam = true;
             for (String parameterType : method.parameterTypes) {
-                type += ", " + parameterType;
+                if (isFirstParam) {
+                    isFirstParam = false;
+                    type += parameterType;
+                } else {
+                    type += ", " + parameterType;
+                }
             }
             type += ")";
             methodPointer.type = type;
@@ -252,7 +258,7 @@ public class FillLayoutSchematic {
             firstCommaOrClosingParen = field.type.lastIndexOf(')');
         }
 
-        field.type = field.type.substring(0, lastOpeningParen + 1) + className + field.type.substring(firstCommaOrClosingParen);
+        field.type = field.type.substring(0, lastOpeningParen + 1) + className.substring(2) + field.type.substring(firstCommaOrClosingParen);
     }
 
     private static void getInheritedFields(LayoutSchematic.ClassStruct childClassStruct, LayoutSchematic.ClassStruct parentClassStruct) {
@@ -272,14 +278,14 @@ public class FillLayoutSchematic {
         }
     }
 
-    private static void populateClassStruct(LayoutSchematic.ClassStruct classStruct, GNode classNode) {
+    private static void populateClassStruct(LayoutSchematic.ClassStruct classStruct, GNode classNode, String className) {
         List<Node> methodNodes = NodeUtil.dfsAll(classNode, "MethodDeclaration");
         List<Node> fieldNodes = NodeUtil.dfsAll(classNode, "FieldDeclaration");
         List<Node> constructorNodes = NodeUtil.dfsAll(classNode, "ConstructorDeclaration");
 
 
         for (Node methodNode : methodNodes) {
-            classStruct.methodList.add(createMethod((GNode) methodNode));
+            classStruct.methodList.add(createMethod((GNode) methodNode, className));
         }
 
         for (Node fieldNode : fieldNodes) {
@@ -299,7 +305,7 @@ public class FillLayoutSchematic {
         }
     }
 
-    private static LayoutSchematic.Method createMethod(GNode methodNode) {
+    private static LayoutSchematic.Method createMethod(GNode methodNode, String className) {
         LayoutSchematic.Method method = new LayoutSchematic.Method();
 
         GNode modifiers = (GNode) methodNode.getNode(0);
@@ -321,6 +327,7 @@ public class FillLayoutSchematic {
         method.name = methodNode.getString(3);
 
         GNode parameters = (GNode) methodNode.getNode(4);
+        method.parameterTypes.add(className.substring(2));
         for (int i = 0; i < parameters.size(); i++) {
             Node parameter = parameters.getNode(i);
             method.parameterTypes.add(getType((GNode) parameter.getNode(1)));
