@@ -1,8 +1,6 @@
 package edu.nyu.oop;
 
-import edu.nyu.oop.util.NodeUtil;
 import xtc.tree.GNode;
-import xtc.tree.Node;
 
 import java.util.List;
 import java.io.IOException;
@@ -34,7 +32,7 @@ public class CppCommands {
 
             output.write("#include \"output.h\"\n#include \"java_lang.h\"\nusing namespace std;\n#include <iostream>\nusing namespace java::lang;\n"); //#include <io.stream> \n#pragma once \n
 
-            printOutputCpp visitor = new printOutputCpp(output, printAtEnd, mainClass);
+            PrintOutputCpp visitor = new PrintOutputCpp(output, printAtEnd, mainClass);
 
             for (int i = 0; i < javaRoots.size(); i++) {
                 visitor.visit(javaRoots.get(i));

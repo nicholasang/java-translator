@@ -12,7 +12,7 @@ import java.io.FileWriter;
 
 public class PrintMainCpp {
 
-    printOutputCpp printVisitor;
+    PrintOutputCpp printVisitor;
     FileWriter pen = null;
     String printThisAfter = " ";
     String printThisBefore = "";
@@ -25,7 +25,7 @@ public class PrintMainCpp {
     public void print(Node mainClassDeclaration, Node packageDeclaration) {
         String[] printLaterArray = new String[1];
         printLaterArray[0] = "";
-        printVisitor = new printOutputCpp(pen, printLaterArray, (GNode) mainClassDeclaration);
+        printVisitor = new PrintOutputCpp(pen, printLaterArray, (GNode) mainClassDeclaration);
         printVisitor.inMain = true;
 
         List<Node> fields = NodeUtil.dfsAll(mainClassDeclaration, "FieldDeclaration");

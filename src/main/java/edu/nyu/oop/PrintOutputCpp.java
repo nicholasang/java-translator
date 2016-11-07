@@ -11,7 +11,7 @@ import edu.nyu.oop.util.NodeUtil;
 /**
  * Created by alex on 10/27/16.
  */
-public class printOutputCpp extends xtc.tree.Visitor {
+public class PrintOutputCpp extends xtc.tree.Visitor {
 
     boolean inConstructor;
     String superClassName = "";
@@ -29,7 +29,7 @@ public class printOutputCpp extends xtc.tree.Visitor {
     ArrayList<String> variablesInScope = new ArrayList<String>();
     public boolean inMain = false;
 
-    public printOutputCpp(FileWriter outFileWrite, String[] printLater, GNode mainClass) {
+    public PrintOutputCpp(FileWriter outFileWrite, String[] printLater, GNode mainClass) {
         this.printLater = printLater;
         pen = outFileWrite;
         this.mainClass = mainClass;
