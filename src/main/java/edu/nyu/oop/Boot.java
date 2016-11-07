@@ -1,5 +1,7 @@
 package edu.nyu.oop;
 
+import edu.nyu.oop.util.CppHVisitor;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -16,6 +18,7 @@ import xtc.tree.Node;
 import xtc.util.Tool;
 import xtc.lang.JavaPrinter;
 import xtc.parser.ParseException;
+
 
 /**
  * This is the entry point to your program. It configures the user interface, defining
@@ -45,7 +48,7 @@ public class Boot extends Tool {
         bool("printJavaAst", "printJavaAst", false, "Print Java Ast.").
         bool("printJavaCode", "printJavaCode", false, "Print Java code.").
         bool("printJavaImportCode", "printJavaImportCode", false, "Print Java code for imports and package source.").
-        bool("parseJava", "parseJava", false, "Parse source file dependencies.");
+        bool("translateJava", "translateJava", false, "Translate Java to C++.");
     }
 
     @Override
@@ -53,7 +56,6 @@ public class Boot extends Tool {
         super.prepare();
         // Perform consistency checks on command line arguments.
         // (i.e. are there some commands that cannot be run together?)
-        logger.debug("This is a debugging statement."); // Example logging statement, you may delete
     }
 
     @Override
@@ -93,24 +95,25 @@ public class Boot extends Tool {
             runtime.console().flush();
         }
 
-        if (runtime.test("parseJava")) {
+        if (runtime.test("translateJava")) {
+            // NOTE: must type in EXACT filename (same case!!) or file is added twice by dependency parser
+
             String workingDir = System.getProperty("user.dir");
 
             Location nLocation = n.getLocation();
             Location longLocation = new Location(workingDir + "/" + nLocation.file, nLocation.line, nLocation.column);
             n.setLocation(longLocation);
 
+            //phase 1
             List<GNode> allAsts = GenerateJavaASTs.beginParse((GNode) n);
 
-//            runtime.console().pln();
-//            for(Node node : allAsts) {
-//                runtime.console().pln(node.getLocation().file);
-//            }
-//            runtime.console().pln().flush();
+            //phase 2
+            CppAst headerCppAst = CppHeaderAstGenerator.generateNew(allAsts);
 
-            //temporarily disable, use the hardcoded version
-            //List<CppAst> allCPPAsts = CppHeaderAstGenerator.generateNew(allAsts);
-            //HardCodedTestCppHeaderAstGenerator.generateNew(allAsts);
+            //phase 3
+            new CppHVisitor().visit(headerCppAst);
+
+            //phase 4 + 5
             CppCommands.convertToCpp(allAsts);
 
         }

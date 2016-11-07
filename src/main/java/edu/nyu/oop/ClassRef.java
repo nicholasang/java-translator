@@ -4,14 +4,16 @@ import edu.nyu.oop.util.ClassHierarchyTree;
 import xtc.tree.GNode;
 import java.util.*;
 
-//instead of using several hash-maps, encapulate relationships between classes in
-//different ASTs, parts of different ASTs, and other classes in a ClassRef object
+/*
+ * Phase Two
+ * encapsulates relationships between classes in different ASTs, parts of different ASTs,
+ * and other classes in a ClassRef object
+ */
 public class ClassRef {
     private String name;
     private GNode jAst;
     private GNode jClassDeclaration;
 
-    //TODO : I will probably use a CppAst object to represent the .cpp Ast as well (instead of just a GNode reference)
     private GNode cppAst;
     private GNode cppAstLinkPoint;
     private CppAst cppHAst;
@@ -34,6 +36,7 @@ public class ClassRef {
         this.name = name;
     }
 
+    // getters and setters
     public String getName() {
         return this.name;
     }

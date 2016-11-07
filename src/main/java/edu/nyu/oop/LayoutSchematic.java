@@ -2,12 +2,16 @@ package edu.nyu.oop;
 
 import java.util.ArrayList;
 
-/**
- * Created by kplajer on 10/26/16.
+/*
+ * Phase 2
+ * Creates the layout schematic for each method, field, and constructor
+ * in the class struct as well as the V-table struct in the C++ header file.
+ * Each subclass mimics the use of a struct in C++
  */
 public class LayoutSchematic {
-    // static v-table field, v-table pointer, __class() method, in v-table: __isa
-
+    /*
+     * Java struct equivalents to represent components of the header file
+     */
     public static class Method {
         public String name;
         public ArrayList<String> parameterTypes = new ArrayList<String>();
@@ -33,6 +37,9 @@ public class LayoutSchematic {
         public ArrayList<Parameter> parameterList = new ArrayList<Parameter>();
     }
 
+    /*
+     * Represents the class struct with methods, fields, and constructors
+     */
     public static class ClassStruct {
         public ArrayList<Method> methodList = new ArrayList<Method>();
         public ArrayList<Field> fieldList = new ArrayList<Field>();
@@ -44,6 +51,9 @@ public class LayoutSchematic {
         public Field initializeTo;
     }
 
+    /*
+     * Represents the V-table struct with fields and initialized methods
+     */
     public static class VtableStruct {
         public ArrayList<Field> fieldList = new ArrayList<Field>();
         public ArrayList<Initializer> initializerList = new ArrayList<Initializer>();
@@ -52,7 +62,7 @@ public class LayoutSchematic {
     public ClassStruct classStruct;
     public VtableStruct vtableStruct;
 
-
+    // constructor
     public LayoutSchematic(String className) {
         classStruct = new ClassStruct();
 
@@ -63,12 +73,12 @@ public class LayoutSchematic {
 
         Field vptr = new Field();
         vptr.name = "__vptr";
-        vptr.type = "__" + className + "_VT*";
+        vptr.type = className + "_VT*";
         classStruct.fieldList.add(vptr);
 
         Field vtable = new Field();
         vtable.name = "__vtable";
-        vtable.type = "__" + className + "_VT";
+        vtable.type = className + "_VT";
         vtable.isStatic = true;
         classStruct.fieldList.add(vtable);
 

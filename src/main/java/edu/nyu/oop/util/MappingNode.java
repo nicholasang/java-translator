@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 //4-Tran
+
+/*
+ * Maps nodes for easy accessing from the AST
+ */
 public abstract class MappingNode {
     private MappingNode() {}
 
@@ -54,9 +58,6 @@ public abstract class MappingNode {
         dataMap.put("%ALL", all);
 
         construct.add(new InvisiblePrintObject(dataMap));
-
-
-        //addToEntryRepositoryMap(construct.getName(), construct);
 
         return construct;
     }
@@ -130,7 +131,6 @@ public abstract class MappingNode {
         return success;
     }
 
-    // TODO: IS A COMMA-DELIMITED STRING GOOD ENOUGH, OR SHOULD I MODIFY SO A LIST OF STRINGS IS CONTAINED, WOULD REQUIRE MORE WORK, BUT DOABLE
     public static Object addDataFieldConcatenatedList(GNode node, String fieldNameKey, ArrayList<String> values) {
 
         if(node == null)return null;
@@ -458,6 +458,9 @@ public abstract class MappingNode {
 
         public static void togglePrintValOnly() {
             DataField.printValOnly = !DataField.printValOnly;
+        }
+        public static boolean onlyPrintsVal() {
+            return DataField.printValOnly;
         }
 
         @Override
