@@ -228,7 +228,9 @@ public class MakeCppAst extends Visitor {
         }
 
         else {
-            n.set(0, n.get(0).toString() + " = ");
+            if(n.get(2) != null){
+                n.set(0, n.get(0).toString() + " = ");
+            }
         }
 
         visit(n);
