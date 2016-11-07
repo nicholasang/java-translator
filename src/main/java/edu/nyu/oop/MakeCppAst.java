@@ -30,10 +30,13 @@ public class MakeCppAst extends Visitor {
 
     public void visitModifier(GNode n) {
         switch((String) n.get(0)) {
-        case "final":
-            n.set(0, "const");
-            break;
-
+            case "final":
+                n.set(0, "const");
+                break;
+            case "static": ;
+            case "public":
+                n.set(0, null);
+                break;
         }
         visit(n);
     }
@@ -41,7 +44,7 @@ public class MakeCppAst extends Visitor {
     public void visitPackageDeclaration(GNode n) {
         for (int i = 0; i < ((Node)n.get(1)).size(); i++) {
             if (((Node)n.get(1)).get(i) instanceof String) {
-                ((Node)n.get(1)).set(i,"namespace " + ((Node)n.get(1)).get(i).toString() + " { ");
+                ((Node)n.get(1)).set(i,"namespace " + ((Node)n.get(1)).get(i).toString() + " { \n");
             }
         }
 
@@ -55,16 +58,12 @@ public class MakeCppAst extends Visitor {
     }
 
     public void visitClassDeclaration(GNode n) {
-        //TESTING
-        /*for (int i = 0; i < n.size(); i++){
-            if (n.get(i) instanceof String){
-                System.out.println(i + ": " + n.get(i));
-            }
-        }*/
-        n.set(1, "class " + n.get(1) + "{");
+        n.set(0,null);
         //n.get(1) = name of class
+
         visit(n);
     }
+
 
     //a method/ something that needs args
     //dealing with System.out.println
@@ -94,7 +93,7 @@ public class MakeCppAst extends Visitor {
             String caller = ((GNode)n.get(0)).get(0).toString();
 
             if(caller != null) {
-                ((GNode)n.get(0)).set(0, caller + ".");
+                ((GNode)n.get(0)).set(0, caller + "->");
             }
         }
         if((n.get(3) instanceof Node) && ((GNode)n.get(3)).size() == 0) {
@@ -141,7 +140,9 @@ public class MakeCppAst extends Visitor {
             case "Object":
                 n.set(0, "__Object");
                 break;
+
             }
+
         }
         visit(n);
     }

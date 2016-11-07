@@ -31,7 +31,7 @@ public class CppCommands {
         try {
             FileWriter output = new FileWriter("output/output.cpp");
 
-            output.write("#include <io.stream> #pragma once ");
+            output.write("#include \"output.h\"\n#include \"java_lang.h\"\nusing namespace std;\n#include <iostream>\nusing namespace java::lang;\n"); //#include <io.stream> \n#pragma once \n
 
             printOutputCpp visitor = new printOutputCpp(output, printAtEnd);
             for (int i = 0; i < javaRoots.size(); i++) {
