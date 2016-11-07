@@ -212,7 +212,7 @@ public class printOutputCpp extends xtc.tree.Visitor {
         }
         penPrint("__" + ClassName + "::" +  n.get(3).toString() + "(");
         if (((GNode)n.get(4)).size() == 0) {
-            penPrint(ClassName + "__this");
+            penPrint(ClassName + " __this");
         } else {
             dispatch((GNode)n.get(4));
         }
