@@ -113,6 +113,9 @@ public class Boot extends Tool {
             //phase 3
             new CppHVisitor().visit(headerCppAst);
 
+            //phase 4 + 5
+            CppCommands.convertToCpp(allAsts);
+
         }
 
 
