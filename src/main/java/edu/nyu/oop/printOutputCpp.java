@@ -172,10 +172,10 @@ public class printOutputCpp extends xtc.tree.Visitor {
     }
 
     public void visitReturnStatement(GNode n) {
-        penPrint(" return " + returnType + " ");
+        penPrint(" return new " + returnType + " (");
         returnType = null;
         visit(n);
-        penPrint("; \n");
+        penPrint("); \n");
     }
 
     public void visitFormalParameters(GNode n) {
@@ -199,7 +199,17 @@ public class printOutputCpp extends xtc.tree.Visitor {
             }
             returnType = search.get(0).toString();
         }
-
+        if(returnType != null){
+            if (returnType.startsWith("__")){
+                penPrint("\n" + returnType.substring(2) + " ");
+            }
+            else{
+                penPrint("\n" + returnType + " ");
+            }
+        }
+        else{
+            penPrint("\n");
+        }
         penPrint("__" + ClassName + "::" +  n.get(3).toString() + "(");
         if (((GNode)n.get(4)).size() == 0) {
             penPrint(ClassName + "__this");
@@ -252,15 +262,17 @@ public class printOutputCpp extends xtc.tree.Visitor {
         //ClassName = ClassName.substring(6, ClassName.length() - 3);
         penPrint("__" + ClassName + "::__" + ClassName + "():__vptr(&__vtable){\n");
         Node constructor = NodeUtil.dfs(n, "ConstructorDeclaration");
-        if (constructor != null) {
-            dispatch(constructor);
+
+        if (constructor != null){
+            if(((GNode)constructor.get(5)).size() != 0){
+                dispatch(constructor);
+            }
         }
         penPrint("}\n\n__" + ClassName + "_VT __" + ClassName + "::__vtable;\n");
         penPrint("\nClass __" + ClassName + "::__class() {\n" +
-                 "static Class k = \n"
-                 + "new __Class(__rt::literal(\"class " + pack + ClassName + "\"), __Object::__class());\n"
-                 + "return k;}\n\n");
-        penPrint("__" + ClassName + "_VT __" + ClassName + "::__vtable;");
+                "static Class k = \n"
+                + "new __Class(__rt::literal(\"class " + pack + ClassName + "\"), __Object::__class());\n"
+                + "return k;}\n\n");
 
         //erase stuff so it doesn't print twice
         for (int i = 0; i < 5; i++) {
