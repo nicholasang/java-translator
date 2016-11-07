@@ -79,7 +79,7 @@ public class printOutputCpp extends xtc.tree.Visitor {
 
     public void visitClassBody(GNode n) {
         visit(n);
-        penPrint("}; ");
+        penPrint(" ");
     }
 
     public void visitArguments(GNode n) {
@@ -102,9 +102,9 @@ public class printOutputCpp extends xtc.tree.Visitor {
     }
 
     public int visitFormalParameters(GNode n) {
-        penPrint("(");
+        penPrint("");
         visit(n);
-        penPrint(") ");
+        penPrint(" ");
         return n.size();
     }
 
@@ -114,9 +114,9 @@ public class printOutputCpp extends xtc.tree.Visitor {
     }
 
     public void visitBlock(GNode n) {
-        penPrint(" {");
+        penPrint(" {\n");
         visit(n);
-        penPrint("} \n");
+        penPrint("\n}\n");
     }
 
     public void visitMethodDeclaration(GNode n) {
@@ -135,17 +135,20 @@ public class printOutputCpp extends xtc.tree.Visitor {
                 penPrint("\n" + returnType + " ");
             }
         } else {
-            penPrint("\n");
+            penPrint("void ");
         }
         penPrint("__" + ClassName + "::" +  n.get(3).toString() + "(");
         if (((GNode)n.get(4)).size() == 0) {
             penPrint(ClassName + " __this");
         } else {
+            penPrint(ClassName + " __this, ");
             dispatch((GNode)n.get(4));
         }
-        penPrint("){\n");
+        penPrint(")\n");
         for (int i = 5; i < n.size(); i++) {
-            visit((GNode)n.get(i));
+            if (n.get(i) instanceof Node) {
+                dispatch(n.getNode(i));
+            }
         }
 
         variablesInScope.clear();
@@ -209,13 +212,15 @@ public class printOutputCpp extends xtc.tree.Visitor {
         inConstructor = true;
         penPrint("__" + ClassName + "::__" + ClassName);
         if (n.get(3) instanceof Node) {
-            Object returnVal = dispatch(n.getNode(3));
-            if (returnVal instanceof Integer) {
-                int numParams = (Integer) returnVal;
+            penPrint("(");
+            Object num = dispatch(n.getNode(3));
+            if (num instanceof Integer) {
+                int numParams = (Integer) num;
                 if (numParams == 0) {
                     haveNoArgConstructor = true;
                 }
             }
+            penPrint(")");
         }
 
         penPrint(":__vptr(&__vtable) \n");

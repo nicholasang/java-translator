@@ -313,15 +313,19 @@ public class FillLayoutSchematic {
      */
     private static void populateClassStruct(LayoutSchematic.ClassStruct classStruct, GNode classNode, String className) {
         List<Node> methodNodes = NodeUtil.dfsAll(classNode, "MethodDeclaration");
+        List<Node> methodFields = new ArrayList<Node>();
         List<Node> fieldNodes = NodeUtil.dfsAll(classNode, "FieldDeclaration");
         List<Node> constructorNodes = NodeUtil.dfsAll(classNode, "ConstructorDeclaration");
 
-
         for (Node methodNode : methodNodes) {
             classStruct.methodList.add(createMethod((GNode) methodNode, className));
+            methodFields.addAll(NodeUtil.dfsAll(methodNode, "FieldDeclaration"));
         }
 
         for (Node fieldNode : fieldNodes) {
+            if (methodFields.contains(fieldNode)) {
+                continue;
+            }
             classStruct.fieldList.addAll(createField((GNode) fieldNode));
         }
 

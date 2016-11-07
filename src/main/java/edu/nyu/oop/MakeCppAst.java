@@ -99,9 +99,16 @@ public class MakeCppAst extends Visitor {
                 ((GNode)n.get(0)).set(0, caller + "->__vptr->");
             }
         }
-        if((n.get(3) instanceof Node) && ((GNode)n.get(3)).size() == 0) {
-            n.set(2, n.get(2).toString() + "(" + caller + ")");
-            n.set(3, null);
+        if((n.get(3) instanceof Node)) {
+            if (((GNode)n.get(3)).size() == 0) {
+                n.set(2, n.get(2).toString() + "(" + caller + ")");
+                n.set(3, null);
+            } else if (! n.getString(2).equals("print") && ! n.getString(2).equals("println")) {
+                n.set(2, n.get(2).toString() + "(" + caller + ", ");
+                Node args = n.getNode(3);
+                Node lastArg = args.getNode(args.size()-1);
+                lastArg.set(0, lastArg.getString(0) + ")");
+            }
         }
 
         //if n.get(2) = println / print
