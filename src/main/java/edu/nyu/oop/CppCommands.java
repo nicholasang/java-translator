@@ -13,6 +13,7 @@ import java.io.FileWriter;
 public class CppCommands {
 
     public static List<GNode> convertToCpp(List<GNode> javaRoots) {
+//        XtcTestUtils.prettyPrintAst(javaRoots.get(0));
         MakeCppAst visitor = new MakeCppAst();
         for (int i = 0; i < javaRoots.size(); i++) {
             visitor.visit(javaRoots.get(i));

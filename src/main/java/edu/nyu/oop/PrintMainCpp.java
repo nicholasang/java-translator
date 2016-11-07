@@ -26,6 +26,7 @@ public class PrintMainCpp {
         String[] printLaterArray = new String[1];
         printLaterArray[0] = "";
         printVisitor = new printOutputCpp(pen, printLaterArray, (GNode) mainClassDeclaration);
+        printVisitor.inMain = true;
 
         List<Node> fields = NodeUtil.dfsAll(mainClassDeclaration, "FieldDeclaration");
 

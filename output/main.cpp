@@ -3,10 +3,13 @@
 #include "java_lang.h"
 using namespace std;
 using namespace java::lang;
-using namespace inputs ::test001 ;
+using namespace inputs ::test005 ;
 int main(int argc, char* argv[])
 {
-    A a =  new  __A ();
-    std::cout << a->__vptr->toString(a)->data<< endl ;
+    B b =  (B) new  __B ();
+    A a1 =  (A) new  __A ();
+    A a2 =  (A) b ;
+    std::cout << a1->__vptr->toString(a1)->data<< endl ;
+    std::cout << a2->__vptr->toString(a2)->data<< endl ;
     return 0;
 }

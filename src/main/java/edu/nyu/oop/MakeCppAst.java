@@ -43,6 +43,8 @@ public class MakeCppAst extends Visitor {
         case "public":
             n.set(0, null);
             break;
+        default:
+            n.set(0, null);
         }
         visit(n);
     }
@@ -82,26 +84,7 @@ public class MakeCppAst extends Visitor {
         }
     }
 
-
-    //a method/ something that needs args
-    //dealing with System.out.println
-    /*   public void visitCallExpression(GNode n){
-           //n.get(2) = println / print
-           if(n.size() > 2 && n.get(2) instanceof String){
-               String arg = n.get(2).toString();
-               if(arg.equals("print") || arg.equals("println")){
-                   String sb = findPrintItems("", (GNode)n.get(3));
-                   if (arg.equals("println")){
-                       n.set(2, "cout << " + sb + "<< endl");
-                   }
-                   else{
-                       n.set(2, "cout << " + sb);
-                   }
-               }
-           }
-           visit(n);
-       }
-    */  public void visitCallExpression(GNode n) {
+    public void visitCallExpression(GNode n) {
         //0 = calling item (if there is one) that may be nested
         //1 = ???
         //2 = name of function
@@ -156,15 +139,15 @@ public class MakeCppAst extends Visitor {
 
     public void visitQualifiedIdentifier(GNode n) {
         if(n.get(0) instanceof String) {
-            switch(n.get(0).toString()) {
-            case "String":
-                n.set(0, "__String");
-                break;
-            case "Object":
-                n.set(0, "__Object");
-                break;
-
-            }
+//            switch(n.get(0).toString()) {
+//            case "String":
+//                n.set(0, "__String");
+//                break;
+//            case "Object":
+//                n.set(0, "__Object");
+//                break;
+//
+//            }
 
         }
         visit(n);
@@ -215,6 +198,15 @@ public class MakeCppAst extends Visitor {
         }
     }
 
+    public void visitFieldDeclaration(GNode n) {
+        String type = n.getNode(1).getNode(0).getString(0);
+
+        Node declarator = NodeUtil.dfs(n, "Declarator");
+        declarator.set(1, "(" + type + ")");
+
+        visit(n);
+    }
+
     public void visitDeclarator(GNode n) {
         String ln = "";
         if (NodeUtil.dfs(n, "ArrayInitializer") != null) {
@@ -231,7 +223,7 @@ public class MakeCppAst extends Visitor {
         }
 
         else {
-            if(n.get(2) != null){
+            if(n.get(2) != null) {
                 n.set(0, n.get(0).toString() + " = ");
             }
         }
@@ -246,13 +238,13 @@ public class MakeCppAst extends Visitor {
             }
             if(((GNode)n.get(0)).size() == 1) {
                 if(((GNode) n.get(0)).get(0) != null) {
-                    ((GNode) n.get(0)).set(0, "(" + ((GNode) n.get(0)).get(0).toString() + ", ");
+                    ((GNode) n.get(0)).set(0, "(" + ((GNode) n.get(0)).get(0).toString());
                 }
             }
             for (int i = 1; i < n.size()-1; i++) {
                 if (n.get(i) instanceof String) {
                     if(((GNode)n.get(i)).size() == 1) {
-                        ((GNode)n.get(i)).set(0, ((GNode)n.get(i)).get(i).toString() + ", ");
+                        ((GNode)n.get(i)).set(0, ", " + ((GNode)n.get(i)).get(i).toString());
                     }
                 }
             }
@@ -273,6 +265,14 @@ public class MakeCppAst extends Visitor {
             }
         }
 
+        visit(n);
+    }
+
+    public void visitStringLiteral(GNode n) {
+        if (n.get(0) != null) {
+            String str = n.getString(0);
+            n.set(0, "(new __String(" + str + "))");
+        }
         visit(n);
     }
 
@@ -325,7 +325,7 @@ public class MakeCppAst extends Visitor {
                 line = findArrayItems(line, (GNode) o);
             }
         }
-        return line;
+        return line.substring(0, line.length()-2);
     }
 
 

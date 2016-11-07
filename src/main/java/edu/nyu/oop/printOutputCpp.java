@@ -5,12 +5,17 @@ import xtc.tree.GNode;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+
 import edu.nyu.oop.util.NodeUtil;
 /**
  * Created by alex on 10/27/16.
  */
 public class printOutputCpp extends xtc.tree.Visitor {
 
+    boolean inConstructor;
+    String superClassName = "";
+    boolean haveNoArgConstructor = false;
     GNode mainClass;
     FileWriter pen = null;
     String printThisAfter = " ";
@@ -20,6 +25,9 @@ public class printOutputCpp extends xtc.tree.Visitor {
     String pack = "";
     String ClassName = "";
     String returnType = null;
+
+    ArrayList<String> variablesInScope = new ArrayList<String>();
+    public boolean inMain = false;
 
     public printOutputCpp(FileWriter outFileWrite, String[] printLater, GNode mainClass) {
         this.printLater = printLater;
@@ -42,91 +50,6 @@ public class printOutputCpp extends xtc.tree.Visitor {
             }
         }
     }
-
-    /*
-     * Print string contents from indices start to end
-     */
-    /*    public void printContents(int start, int end, Node n){
-            try {
-                for (int i = 0; i < end; i++) {
-                    if (n.get(i) instanceof String) {
-                        String word = n.get(i).toString();
-                        if (i + 1 < end) {
-                            pen.write(printThisBefore + word + printThisAfter);
-
-                        } else {
-                            pen.write(printThisBefore + word + printAtEnd);
-                            printAtEnd = "";
-                        }
-                    }
-                }
-                printThisBefore = "";
-                printThisAfter = " ";
-            }catch(Exception e){
-                System.out.println(e);
-            }
-        }
-
-        public void visitDimensions(GNode n){
-            printThisAfter = "";
-            printAtEnd = "] ";
-            printContents(0, n.size(), n);
-            visit(n);
-        }
-
-    /*    public void visit(GNode n){
-            try{
-                pen.write("_");
-            }catch(IOException e) {
-                System.out.println(e);
-            }
-            visit(n);
-        }
-    //
-        public void visitPackageDeclaration(GNode n){
-            printThisBefore = "namespace ";
-            printThisAfter = "{ ";
-            printAtEnd = "{ ";
-
-            visit(n);
-        }
-
-        public void visitClassDeclaration(GNode n){
-            System.out.println("Class dec visited");
-            printThisAfter = " class ";
-            visit(n);
-
-        }
-
-        public void visitModifier(GNode n){
-            printAtEnd = " ";
-            printContents(0, n.size(), n);
-            visit(n);
-        }
-
-        public void visitQualifiedIdentifier(GNode n){
-            printAtEnd = " ";
-            printContents(0, n.size(), n);
-            visit(n);
-        }
-
-        public void visitPrimitiveType(GNode n){
-            printAtEnd = " ";
-            printContents(0, n.size(), n);
-            visit(n);
-        }
-    */
-    /*public void visitType(GNode n){
-        if(n.size() >= 2 && n.get(1).toString().contains("Dimensions")){
-            printAtEnd = "";
-        }
-        else{
-            printAtEnd = " ";
-        }
-
-        printContents(0, n.size(), n);
-        visit(n);
-    }*/
 
     ////////////////new stuff//////////////////////////////
 
@@ -172,16 +95,22 @@ public class printOutputCpp extends xtc.tree.Visitor {
     }
 
     public void visitReturnStatement(GNode n) {
-        penPrint(" return new " + returnType + " (");
+        penPrint(" return ");
         returnType = null;
         visit(n);
-        penPrint("); \n");
+        penPrint(";\n");
     }
 
-    public void visitFormalParameters(GNode n) {
+    public int visitFormalParameters(GNode n) {
         penPrint("(");
         visit(n);
-        penPrint(") \n");
+        penPrint(") ");
+        return n.size();
+    }
+
+    public void visitFormalParameter(GNode n) {
+        variablesInScope.add(n.getString(3));
+        visit(n);
     }
 
     public void visitBlock(GNode n) {
@@ -219,6 +148,7 @@ public class printOutputCpp extends xtc.tree.Visitor {
             visit((GNode)n.get(i));
         }
 
+        variablesInScope.clear();
     }
 
     public void visitPackageDeclaration(GNode n) {
@@ -237,7 +167,7 @@ public class printOutputCpp extends xtc.tree.Visitor {
         if (! n.equals(mainClass)) {
             initializeClass(n);
             visit(n);
-            ClassName = "";
+            finishUpClass(n);
         }
     }
 
@@ -255,18 +185,69 @@ public class printOutputCpp extends xtc.tree.Visitor {
         }
     }
 
-    public void initializeClass(GNode n) {
-        ClassName = n.get(1).toString();
-        //ClassName = ClassName.substring(6, ClassName.length() - 3);
-        penPrint("__" + ClassName + "::__" + ClassName + "():__vptr(&__vtable){\n");
-        Node constructor = NodeUtil.dfs(n, "ConstructorDeclaration");
+    public void visitThisExpression(GNode n) {
+        if (inConstructor) {
+            penPrint("this->");
+        } else {
+            penPrint("__this->");
+        }
+        visit(n);
+    }
 
-        if (constructor != null) {
-            if(((GNode)constructor.get(5)).size() != 0) {
-                dispatch(constructor);
+    public void visitPrimaryIdentifier(GNode n) {
+        if (! variablesInScope.contains(n.getString(0)) && ! inMain) {
+            if (inConstructor) {
+                penPrint("this->");
+            } else {
+                penPrint("__this->");
             }
         }
-        penPrint("}\n\n__" + ClassName + "_VT __" + ClassName + "::__vtable;\n");
+        visit(n);
+    }
+
+    public void visitConstructorDeclaration(GNode n) {
+        inConstructor = true;
+        penPrint("__" + ClassName + "::__" + ClassName);
+        if (n.get(3) instanceof Node) {
+            Object returnVal = dispatch(n.getNode(3));
+            if (returnVal instanceof Integer) {
+                int numParams = (Integer) returnVal;
+                if (numParams == 0) {
+                    haveNoArgConstructor = true;
+                }
+            }
+        }
+
+        penPrint(":__vptr(&__vtable) \n");
+
+        if (n.get(5) instanceof Node) {
+            dispatch(n.getNode(5));
+        }
+
+        inConstructor = false;
+        variablesInScope.clear();
+    }
+
+    public void finishUpClass(GNode n) {
+        if (! haveNoArgConstructor) {
+            penPrint("__" + ClassName + "::__" + ClassName + "() :__vptr(&__vtable) {\n");
+            penPrint("}");
+        }
+
+        haveNoArgConstructor = false;
+        superClassName = "";
+        ClassName = "";
+    }
+
+    public void initializeClass(GNode n) {
+
+        ClassName = n.get(1).toString();
+
+        if (n.get(3) instanceof Node) {
+            superClassName = n.getNode(3).getNode(0).getNode(0).getString(0);
+        }
+
+        penPrint("\n\n__" + ClassName + "_VT __" + ClassName + "::__vtable;\n");
         penPrint("\nClass __" + ClassName + "::__class() {\n" +
                  "static Class k = \n"
                  + "new __Class(__rt::literal(\"class " + pack + ClassName + "\"), __Object::__class());\n"
@@ -277,9 +258,6 @@ public class printOutputCpp extends xtc.tree.Visitor {
             n.set(i, null);
         }
 
-        if (((GNode)n.get(5)).get(0) == constructor) {
-            ((GNode)n.get(5)).set(0, null);
-        }
     }
 
 
