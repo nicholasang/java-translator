@@ -10,8 +10,12 @@ import java.util.HashSet;
 
 import static edu.nyu.oop.util.MappingNode.*;
 
-
 //4-tran
+
+/*
+ * Phase Two
+ * creates a visitor to visit the Java package declaration and create a C++ namespace
+ */
 public class InitVisitor extends xtc.tree.Visitor {
     CppAst cpph;
     GNode jAstRoot;

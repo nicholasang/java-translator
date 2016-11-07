@@ -12,11 +12,15 @@ import xtc.tree.Node;
 
 import java.util.*;
 
-
+/*
+ * Phase Two
+ * Generates the C++ Header AST from the Java AST
+ */
 public class CppHeaderAstGenerator {
     //prevent direct instantiation
     private CppHeaderAstGenerator() {}
 
+    // creates a new AST and maps all the nodes
     public static CppAst generateNew(List<GNode> javaAsts) { //decided to create the tree inside this class
 
         CppAst headerAst = new CppAst("SomeBigWrapperNode");
@@ -47,6 +51,7 @@ public class CppHeaderAstGenerator {
         return headerAst;
     }
 
+    // populates nodes within class wrappers (class struct and vtable struct)
     public static void populateClassWrappers(CppAst headerAst) {
 
         List<ClassRef> classes = headerAst.getClassRefs();
@@ -67,6 +72,7 @@ public class CppHeaderAstGenerator {
 
     }
 
+    // populates the class struct
     public static void populateClassStruct(GNode linkPoint, LayoutSchematic lS, ClassRef cR) {
         GNode struct = MappingNode.createMappingNode("Struct");
         MappingNode.addNode(linkPoint, struct);
@@ -75,7 +81,7 @@ public class CppHeaderAstGenerator {
         MappingNode.addDataField(struct, "Name", cR.getName());
 
         LayoutSchematic.ClassStruct cStruct = lS.classStruct;
-
+        // fields
         for(Field f : cStruct.fieldList) {
             GNode fieldNode = MappingNode.createMappingNode("Field");
             MappingNode.addNode(linkPoint, fieldNode);
@@ -86,7 +92,7 @@ public class CppHeaderAstGenerator {
             MappingNode.addDataField(fieldNode, "Name", f.name);
         }
 
-
+        // constructors
         for(Constructor c : cStruct.constructorList) {
             GNode constructorNode = MappingNode.createMappingNode("Constructor");
             MappingNode.addNode(linkPoint, constructorNode);
@@ -97,6 +103,7 @@ public class CppHeaderAstGenerator {
             GNode pL = MappingNode.createMappingNode("ParameterList");
             MappingNode.addNode(constructorNode, pL);
 
+            // parameters
             if(c.parameterList.size() > 0) {
                 for (Parameter p : c.parameterList) {
                     GNode paramNode = MappingNode.createMappingNode("Parameter");
@@ -104,13 +111,12 @@ public class CppHeaderAstGenerator {
 
                     MappingNode.addDataField(paramNode, "Type", p.type);
                     MappingNode.addDataField(paramNode, "Name", p.name);
-
                 }
             }
 
         }
 
-
+        // methods
         for(Method m : cStruct.methodList) {
             GNode constructorNode = MappingNode.createMappingNode("Method");
             MappingNode.addNode(linkPoint, constructorNode);
@@ -124,6 +130,7 @@ public class CppHeaderAstGenerator {
             GNode pL = MappingNode.createMappingNode("ParameterList");
             MappingNode.addNode(constructorNode, pL);
 
+            // populates parameter types
             if(m.parameterTypes.size() > 0) {
                 for(String paramType : m.parameterTypes) {
                     GNode paramNode = MappingNode.createMappingNode("Parameter");
@@ -136,6 +143,7 @@ public class CppHeaderAstGenerator {
         }
     }
 
+    // populates the vtable structs
     public static void populateVtableStruct(GNode linkPoint, LayoutSchematic lS, ClassRef cR) {
         GNode struct = MappingNode.createMappingNode("Struct");
         MappingNode.addNode(linkPoint, struct);
@@ -145,10 +153,10 @@ public class CppHeaderAstGenerator {
 
         LayoutSchematic.VtableStruct vtStruct = lS.vtableStruct;
 
+        // fields
         for(Field f : vtStruct.fieldList) {
             GNode fieldNode = MappingNode.createMappingNode("Field");
             MappingNode.addNode(linkPoint, fieldNode);
-
 
             MappingNode.addDataField(fieldNode, "AccessModifier", (f.accessModifier == null) ? "public" : f.accessModifier);
             MappingNode.addDataField(fieldNode, "IsStatic", Boolean.toString(f.isStatic));
@@ -161,20 +169,24 @@ public class CppHeaderAstGenerator {
             }
         }
 
+        // constructors
         GNode constructorNode = MappingNode.createMappingNode("Constructor");
         MappingNode.addNode(linkPoint, constructorNode);
 
+        // data fields
         MappingNode.addDataField(constructorNode, "AccessModifier", "public");
         MappingNode.addDataField(constructorNode, "Name", cR.getName() + "_VT");
 
+        // parameter list
         GNode paramList = MappingNode.createMappingNode("ParameterList");
         MappingNode.addNode(constructorNode, paramList);
 
+        // initialization list
         GNode initList = MappingNode.createMappingNode("InitializationList");
         MappingNode.addNode(constructorNode, initList);
 
 
-
+        // initfield and initfield with within initialization list
         if(vtStruct.initializerList.size() > 0) {
             for(Initializer init : vtStruct.initializerList) {
                 GNode initNode = MappingNode.createMappingNode("InitField");
@@ -187,7 +199,6 @@ public class CppHeaderAstGenerator {
                 GNode fieldNode = MappingNode.createMappingNode("InitFieldWith");
                 MappingNode.addNode(initNode, fieldNode);
 
-
                 MappingNode.addDataField(fieldNode, "Type", f.type);
                 MappingNode.addDataField(fieldNode, "Name", f.name);
 
@@ -196,7 +207,9 @@ public class CppHeaderAstGenerator {
 
     }
 
-
+    /*
+     * Creates a class hierarchy to determine the order of the classes within the AST
+     */
     public static ClassHierarchyTree determineClassOrder(List<GNode> javaAsts, CppAst headerAst) {
 
         List<ClassRef> cRefs = new ArrayList<ClassRef>();
@@ -232,7 +245,6 @@ public class CppHeaderAstGenerator {
                         }
                     }
                 }
-
                 if(curCR != mainClassRef) {
 
                     hierarchy.putNameToRef(curCR.getName(), curCR);
@@ -243,14 +255,10 @@ public class CppHeaderAstGenerator {
                         String extension = (String) layer.get(0);
                         hierarchy.putChildToParent(curCR.getName(), "__" + extension);
                     }
-
                     cRefs.add(curCR);
                 }
-
             }
-
         }
-
 
         for(ClassRef cR : cRefs) {
             String superClassName = hierarchy.getChildToParent(cR.getName());
@@ -260,7 +268,6 @@ public class CppHeaderAstGenerator {
             cR.setParentClassRef(hierarchy.getNameToRef(superClassName));
         }
 
-
         headerAst.setMainClassRef(mainClassRef);
 
         for(ClassRef cR : cRefs) {
@@ -269,10 +276,12 @@ public class CppHeaderAstGenerator {
                 topologicalSorting(cR, hierarchy, headerAst);
             }
         }
-
         return hierarchy;
     }
 
+    /*
+     * Does topological sorting by adding each ClassRef object to the array
+     */
     public static void topologicalSorting(ClassRef start, ClassHierarchyTree hierarchy, CppAst headerAst) {
         ArrayDeque<ClassRef> Q = new ArrayDeque<ClassRef>();
         Q.add(start);
@@ -293,6 +302,9 @@ public class CppHeaderAstGenerator {
         }
     }
 
+    /*
+     * sets declarations for the C++ Header AST
+     */
     public static void setForwardDeclarations(CppAst headerAst) {
         for(ClassRef cR : headerAst.getClassRefs()) {
             //forward declaration struct

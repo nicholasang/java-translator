@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 //4-Tran
+
+/*
+ * Maps nodes for easy accessing from the AST
+ */
 public abstract class MappingNode {
     private MappingNode() {}
 

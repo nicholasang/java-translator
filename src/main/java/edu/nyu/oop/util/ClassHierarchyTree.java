@@ -7,6 +7,11 @@ import xtc.tree.GNode;
 import java.util.*;
 
 //4-tran
+
+/*
+ * Phase Two
+ * uses hashmaps to create a class hierarchy
+ */
 public class ClassHierarchyTree {
     HashMap<String, ClassRef> NameToRef;
     HashMap<String, String> childToParentMap;

@@ -25,9 +25,16 @@ import java.util.*;
 
 import java.util.HashMap;
 
+
+/*
+ * Phase 1
+ * Generates all the Java ASTs from the source files to be translated.
+ * Resolves any dependencies (other classes or imports)
+ */
 public class GenerateJavaASTs {
     private GenerateJavaASTs() {}
 
+    // parses the java files and returns Java ASTs
     public static List<GNode> beginParse(GNode n) {
         HashMap<String, Boolean> fileNamesFound = new HashMap<String, Boolean>();
         List<GNode> jAsts = new ArrayList<GNode>();
@@ -58,9 +65,5 @@ public class GenerateJavaASTs {
 
             nodesToCheck.addAll(JavaFiveImportParser.parse(next));
         }
-
     }
-
-
-
 }
