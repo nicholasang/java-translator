@@ -155,10 +155,8 @@ public class printOutputCpp extends xtc.tree.Visitor {
     }
 
     public void visitClassBody(GNode n) {
-        if (! n.equals(mainClass)) {
-            visit(n);
-            penPrint("}; ");
-        }
+        visit(n);
+        penPrint("}; ");
     }
 
     public void visitArguments(GNode n) {
@@ -228,9 +226,11 @@ public class printOutputCpp extends xtc.tree.Visitor {
     }
 
     public void visitClassDeclaration(GNode n) {
-        initializeClass(n);
-        visit(n);
-        ClassName = "";
+        if (! n.equals(mainClass)) {
+            initializeClass(n);
+            visit(n);
+            ClassName = "";
+        }
     }
 
     /*  public void visitCallExpression(GNode n){

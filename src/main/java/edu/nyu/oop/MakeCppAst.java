@@ -109,8 +109,6 @@ public class MakeCppAst extends Visitor {
 
         String caller = "";
 
-        XtcTestUtils.prettyPrintAst(n);
-
         if(((GNode)n.get(0)).get(0) instanceof String) {
             caller = ((GNode)n.get(0)).get(0).toString();
 

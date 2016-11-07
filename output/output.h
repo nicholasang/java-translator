@@ -5,14 +5,17 @@
 
 using namespace java::lang;
 
-namespace inputs {
-namespace test001 {
+namespace inputs
+{
+namespace test001
+{
 struct __A;
 struct __A_VT;
 typedef __A* A;
 
 
-struct __A {
+struct __A
+{
     __A_VT* __vptr;
     static __A_VT __vtable;
 
@@ -22,7 +25,8 @@ struct __A {
     static String toString(A);
 };
 
-struct __A_VT {
+struct __A_VT
+{
     Class __isa;
     int32_t (*hashCode) (A);
     bool (*equals) (A, Object);
