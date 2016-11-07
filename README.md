@@ -20,10 +20,9 @@ Output will be placed in the output.h, output.c, and main.cpp files within the o
 ```cpp ```
 
 
-```
 Project Map
 -----------
-
+```
 ├── README.md
 │
 ├── build.sbt (managed library dependencies and c++ compilation configuration)
