@@ -125,7 +125,10 @@ public class MakeCppAst extends Visitor {
         if(n.size() > 2 && n.get(2) instanceof String) {
             String arg = n.get(2).toString();
             if(arg.equals("print") || arg.equals("println")) {
-                String sb = findPrintItems("", (GNode)n.get(3)) + "->data";
+                String sb = findPrintItems("", (GNode)n.get(3));
+                if (sb.charAt(sb.length()-1) == ')') {
+                    sb += "->data";
+                }
                 if (arg.equals("println")) {
                     n.set(2, "std::cout << " + sb + "<< endl");
                 } else {
@@ -242,7 +245,7 @@ public class MakeCppAst extends Visitor {
                 visit(n);
             }
             if(((GNode)n.get(0)).size() == 1) {
-                if(((GNode) n.get(0)).get(0) != null){
+                if(((GNode) n.get(0)).get(0) != null) {
                     ((GNode) n.get(0)).set(0, "(" + ((GNode) n.get(0)).get(0).toString() + ", ");
                 }
             }
@@ -255,7 +258,7 @@ public class MakeCppAst extends Visitor {
             }
             // System.out.println("last arg: " + ((GNode)n.get(n.size()-1)).get(0).toString());
             if(((GNode)n.get(n.size()-1)).size() == 1) {
-                if(((GNode)n.get(n.size()-1)).get(0) != null){
+                if(((GNode)n.get(n.size()-1)).get(0) != null) {
                     ((GNode)n.get(n.size()-1)).set(0, ((GNode)n.get(n.size()-1)).get(0).toString() + ")");
                 }
             }
