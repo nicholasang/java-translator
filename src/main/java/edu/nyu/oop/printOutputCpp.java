@@ -170,10 +170,10 @@ public class printOutputCpp extends xtc.tree.Visitor {
     }
 
     public void visitReturnStatement(GNode n) {
-        penPrint(" return " + returnType + " ");
+        penPrint(" return new " + returnType + " (");
         returnType = null;
         visit(n);
-        penPrint("; \n");
+        penPrint("); \n");
     }
 
     public void visitFormalParameters(GNode n) {
@@ -197,7 +197,12 @@ public class printOutputCpp extends xtc.tree.Visitor {
             }
             returnType = search.get(0).toString();
         }
-
+        if(returnType != null){
+            penPrint("\n" + returnType + " ");
+        }
+        else{
+            penPrint("\n");
+        }
         penPrint("__" + ClassName + "::" +  n.get(3).toString() + "(");
         if (((GNode)n.get(4)).size() == 0){
             penPrint(ClassName + "__this");
