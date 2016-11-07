@@ -43,9 +43,6 @@ public class MakeCppAst extends Visitor {
         case "public":
             n.set(0, null);
             break;
-//        case "final":
-//            n.set(0, "const");
-//            break;
         }
         visit(n);
     }
@@ -65,6 +62,11 @@ public class MakeCppAst extends Visitor {
 
     public void visitNewClassExpression(GNode n) {
         n.set(0, "new ");
+
+        if (n.size() >= 3) {
+            Node newClassName = n.getNode(2);
+            newClassName.set(0, "__" + newClassName.getString(0));
+        }
 
         visit(n);
     }
@@ -105,15 +107,19 @@ public class MakeCppAst extends Visitor {
         //2 = name of function
         //3 = arguments
 
+        String caller = "";
+
+        XtcTestUtils.prettyPrintAst(n);
+
         if(((GNode)n.get(0)).get(0) instanceof String) {
-            String caller = ((GNode)n.get(0)).get(0).toString();
+            caller = ((GNode)n.get(0)).get(0).toString();
 
             if(caller != null) {
-                ((GNode)n.get(0)).set(0, caller + "->");
+                ((GNode)n.get(0)).set(0, caller + "->__vptr->");
             }
         }
         if((n.get(3) instanceof Node) && ((GNode)n.get(3)).size() == 0) {
-            n.set(2, n.get(2).toString() + "()");
+            n.set(2, n.get(2).toString() + "(" + caller + ")");
             n.set(3, null);
         }
 
@@ -121,13 +127,13 @@ public class MakeCppAst extends Visitor {
         if(n.size() > 2 && n.get(2) instanceof String) {
             String arg = n.get(2).toString();
             if(arg.equals("print") || arg.equals("println")) {
-                String sb = findPrintItems("", (GNode)n.get(3));
+                String sb = findPrintItems("", (GNode)n.get(3)) + "->data";
                 if (arg.equals("println")) {
                     n.set(2, "std::cout << " + sb + "<< endl");
                 } else {
                     n.set(2, "std::cout << " + sb);
                 }
-                return;
+//                return;
             }
 
         }

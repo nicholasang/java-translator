@@ -62,14 +62,6 @@ public class PrintMainCpp {
         printVisitor.visit(mainBlock);
 
         try {
-            pen.write("/*==============*/");
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-
-        printVisitor.visit(mainClassDeclaration);
-
-        try {
             pen.write("return 0; }");
         } catch (Exception e) {
             System.out.println(e);
