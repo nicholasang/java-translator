@@ -1,14 +1,17 @@
-Translator
+# Java to C++ Translator
 ----------
 
 ## Features:
 - translates java into C++ header files for all 21 provided inputs
 - translates java into output.cpp and main.cpp files for 6 inputs (test000 through test005)
+- supports method overriding (not overloading)
+- does not support arrays
 
 Input files must be correct Java!
 
 ## To execute translator (sbt):
 ```runxtc -translateJava file/path/to/test/file.java```
+
 NOTE: file path and file name must *exactly* match the actual path/name (i.e. correctly capitalized)
 
 Output will be placed in the output.h, output.c, and main.cpp files within the output directory.
