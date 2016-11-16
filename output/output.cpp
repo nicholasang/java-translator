@@ -22,7 +22,8 @@ Class __A::__class()
 String __A::toString(A __this)
 {
     return (new __String("A")) ;
-};
+
+}
 __A::__A() :__vptr(&__vtable)
 {
 }
@@ -40,7 +41,8 @@ Class __B::__class()
 String __B::toString(B __this)
 {
     return (new __String("B")) ;
-};
+
+}
 __B::__B() :__vptr(&__vtable)
 {
 }
