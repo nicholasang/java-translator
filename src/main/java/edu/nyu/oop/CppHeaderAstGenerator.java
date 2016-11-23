@@ -74,6 +74,9 @@ public class CppHeaderAstGenerator {
         MappingNode.addDataField(struct, "Type", "struct");
         MappingNode.addDataField(struct, "Name", cR.getName());
 
+        // reference to cpphAST struct location in classref
+        cR.setCppHStructBody(struct);
+
         LayoutSchematic.ClassStruct cStruct = lS.classStruct;
 
         for(Field f : cStruct.fieldList) {
@@ -142,6 +145,9 @@ public class CppHeaderAstGenerator {
         linkPoint = struct;
         MappingNode.addDataField(struct, "Type", "struct");
         MappingNode.addDataField(struct, "Name", cR.getName() + "_VT");
+
+        // reference to cpphAST struct location in classref
+        cR.setCppHVtableBody(struct);
 
         LayoutSchematic.VtableStruct vtStruct = lS.vtableStruct;
 
