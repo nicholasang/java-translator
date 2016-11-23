@@ -12,6 +12,15 @@ import xtc.tree.Node;
 
 import java.util.*;
 
+
+
+
+// Possibly include this macro as a preprocessor directive if we have time
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// one-line instantiation and initialization of
+// any target language class with any number of arguments (any __init function)
+// #define NEW(cls, var, ...) new cls(); cls::__init(var, ##__VA_ARGS__)
+
 /*
  * Phase Two
  * Generates the C++ Header AST from the Java AST
@@ -31,7 +40,12 @@ public class CppHeaderAstGenerator {
 
         GNode preDirectives = MappingNode.createMappingNode("PreprocessorDirectives");
         MappingNode.addNode(headerAst.getRoot(), preDirectives);
-        MappingNode.addDataFieldMultiVals(preDirectives, "Name", new ArrayList<String>(Arrays.asList("#pragma once", "#include \"java_lang.h\"", "#include <stdint.h>", "#include <string>")) );
+        MappingNode.addDataFieldMultiVals(preDirectives, "Name",
+                                          new ArrayList<String>(Arrays.asList(
+                                                  "#pragma once",
+                                                  "#include \"java_lang.h\"",
+                                                  "#include <stdint.h>",
+                                                  "#include <string>" /*, "#define NEW(cls, var, ...) new cls(); cls::__init(var, ##__VA_ARGS__)" */ )) );
 
         MappingNode.createAndLinkDataFieldOneShot(headerAst.getRoot(),"UsingNamespace", "Name", "java::lang");
 
