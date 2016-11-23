@@ -1,22 +1,36 @@
-Translator
+# Java to C++ Translator
 ----------
 
-This README should document its features and any details a user might need to know about your translator.
+## Features:
+- translates java into C++ header files for all 21 provided inputs
+- translates java into output.cpp and main.cpp files for 6 inputs (test000 through test005)
+- supports method overriding (not overloading)
+- does not support arrays
 
-Use Github Markdown https://help.github.com/articles/github-flavored-markdown/
+Input files must be correct Java!
 
-The Speaker is responsible for it being up to date and accurate.
+All commands given below are from within sbt.
 
-Don't forget to update xtc.properties with your team and project name.
+## To execute translator:
+```runxtc -translateJava file/path/to/test/file.java```
 
-Example command to execute translator from Sbt
+**NOTE: file path and file name must *exactly* match the actual path/name (i.e. correctly capitalized)**
 
-```runxtc -printJavaAst src/test/java/inputs/Test000/Test000.java ```
+Output will be placed in the output.h, output.c, and main.cpp files within the output directory.
 
-```
+## To run translated C++ files:
+```cpp ```
+
+Note: this only currently works for the first 6 test files - others do not have main.cpp and output.cpp translated correctly.
+
+## To format translated C++ files:
+```formatc ```
+
+
+
 Project Map
 -----------
-
+```
 ├── README.md
 │
 ├── build.sbt (managed library dependencies and c++ compilation configuration)

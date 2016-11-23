@@ -6,6 +6,10 @@ import static edu.nyu.oop.util.MappingNode.*;
 
 import java.util.*;
 
+/*
+ * Phase Two
+ * Represents the C++ AST
+ */
 public class CppAst {
 
     private GNode root;
@@ -41,10 +45,12 @@ public class CppAst {
         this.classRefs = new ArrayList<ClassRef>();
     }
 
+    // adds a class reference
     public void addClassRefs(ClassRef cR) {
         if(cR != null)this.classRefs.add(cR);
     }
 
+    // adds a lis of class references
     public void addClassRefs(List<ClassRef> cRs) {
         if(cRs == null)return;
 
@@ -54,6 +60,7 @@ public class CppAst {
 
     }
 
+    // getters and setters
     public List<ClassRef> getClassRefs() {
         return this.classRefs;
     }

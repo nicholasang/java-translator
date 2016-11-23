@@ -14,6 +14,10 @@ import static edu.nyu.oop.util.MappingNode.*;
 import java.io.*;
 
 //4-tran
+/*
+ * Phase 3
+ * Uses a visitor for the header AST to print out to output.h
+ */
 public class CppHVisitor extends xtc.tree.Visitor {
     CppAst headerAst;
     private Writer writeOut;
@@ -164,8 +168,6 @@ public class CppHVisitor extends xtc.tree.Visitor {
         }
         visit(n);
     }
-
-
 
     // constructors
     public void visitConstructor(GNode n) throws IOException {

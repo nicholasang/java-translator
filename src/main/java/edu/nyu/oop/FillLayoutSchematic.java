@@ -6,8 +6,9 @@ import edu.nyu.oop.util.NodeUtil;
 import xtc.tree.GNode;
 import xtc.tree.Node;
 
-/**
- * Created by kplajer on 10/28/16.
+/*
+ * Phase Two
+ * populates the layout schematic for the header by using the generated C++ header AST
  */
 public class FillLayoutSchematic {
 
@@ -21,6 +22,10 @@ public class FillLayoutSchematic {
         }
     }
 
+    /*
+     * populates the class struct
+     * populates the v-table struct by using the class struct
+     */
     public static void fillClass(ClassRef classRef) {
         populateClassStruct(classRef.getLayoutSchematic().classStruct, classRef.getJClassDeclaration(), classRef.getName());
 
@@ -35,11 +40,17 @@ public class FillLayoutSchematic {
         populateVtableFromClassStruct(classRef.getLayoutSchematic().vtableStruct, classRef.getLayoutSchematic().classStruct, classRef.getName());
     }
 
+    /*
+     * creates each method in the class struct
+     * initializes everything in the v-table struct including the pointers to the methods
+     */
     static {
         objectLayoutSchematic = new LayoutSchematic("__Object");
 
+        // layout for the class struct
         LayoutSchematic.ClassStruct classStruct = objectLayoutSchematic.classStruct;
 
+        // hashcode
         LayoutSchematic.Method hashCode = new LayoutSchematic.Method();
         hashCode.name = "hashCode";
         hashCode.parameterTypes.add("Object");
@@ -47,6 +58,7 @@ public class FillLayoutSchematic {
         hashCode.accessModifier = "public";
         classStruct.methodList.add(hashCode);
 
+        // equals
         LayoutSchematic.Method equals = new LayoutSchematic.Method();
         equals.name = "equals";
         equals.parameterTypes.add("Object");
@@ -55,6 +67,7 @@ public class FillLayoutSchematic {
         equals.accessModifier = "public";
         classStruct.methodList.add(equals);
 
+        // getClass
         LayoutSchematic.Method getClass = new LayoutSchematic.Method();
         getClass.name = "getClass";
         getClass.parameterTypes.add("Object");
@@ -62,6 +75,7 @@ public class FillLayoutSchematic {
         getClass.accessModifier = "public";
         classStruct.methodList.add(getClass);
 
+        // toString
         LayoutSchematic.Method toString = new LayoutSchematic.Method();
         toString.name = "toString";
         toString.parameterTypes.add("Object");
@@ -71,8 +85,10 @@ public class FillLayoutSchematic {
 
         classStruct.constructorList.add(createDefaultConstructor());
 
+        // layout for the v-table struct
         LayoutSchematic.VtableStruct vtableStruct = objectLayoutSchematic.vtableStruct;
 
+        // v-table function pointers
         LayoutSchematic.Field hashCodePtr = new LayoutSchematic.Field();
         hashCodePtr.name = "hashCode";
         hashCodePtr.type = "int32_t (*) (Object)";
@@ -93,6 +109,7 @@ public class FillLayoutSchematic {
         toStringPtr.type = "String (*) (Object)";
         vtableStruct.fieldList.add(toStringPtr);
 
+        // v-table initialize functions
         LayoutSchematic.Initializer hashCodeInit = new LayoutSchematic.Initializer();
         hashCodeInit.fieldName = "hashCode";
         hashCodePtr = new LayoutSchematic.Field();
@@ -127,6 +144,9 @@ public class FillLayoutSchematic {
 
     }
 
+    /*
+     * uses the class struct to populate the v-table
+     */
     private static void populateVtableFromClassStruct(LayoutSchematic.VtableStruct vtableStruct, LayoutSchematic.ClassStruct classStruct, String className) {
         List<LayoutSchematic.Method> methodList = classStruct.methodList;
 
@@ -181,6 +201,9 @@ public class FillLayoutSchematic {
         }
     }
 
+    /*
+     * returns true if the field exists, else returns false
+     */
     private static boolean fieldExists(String name, List<LayoutSchematic.Field> fields) {
         for (LayoutSchematic.Field field : fields) {
             if (field.name.equals(name)) {
@@ -190,6 +213,9 @@ public class FillLayoutSchematic {
         return false;
     }
 
+    /*
+     * returns the name of the field, else returns null
+     */
     private static LayoutSchematic.Field getFieldWithName(String name, List<LayoutSchematic.Field> fields) {
         for (LayoutSchematic.Field field : fields) {
             if (field.name.equals(name)) {
@@ -199,6 +225,9 @@ public class FillLayoutSchematic {
         return null;
     }
 
+    /*
+     * returns the initializer for the field, else returns null
+     */
     private static LayoutSchematic.Initializer getInitializerFor(String name, List<LayoutSchematic.Initializer> initializers) {
         for (LayoutSchematic.Initializer initializer : initializers) {
             if (initializer.fieldName.equals(name)) {
@@ -209,9 +238,10 @@ public class FillLayoutSchematic {
     }
 
     private static void getInheritedVtable(LayoutSchematic.VtableStruct childVtable, LayoutSchematic.VtableStruct parentVtable, String childClass) {
-        // in Java, private methods are not really inherited (subclass does not "know" about them), but here, in order for other
-        // inherited methods to work (say, inherited methods that call those private methods), the subclass must have these private methods
-
+        /* in Java, private methods are not really inherited (subclass does not "know" about them),
+         * but here, in order for other inherited methods to work (say, inherited methods that call
+         * those private methods), the subclass must have these private methods
+         */
         for (LayoutSchematic.Field field : parentVtable.fieldList) {
             if (field.name.equals("__isa")) {
                 continue;
@@ -278,17 +308,24 @@ public class FillLayoutSchematic {
         }
     }
 
+    /*
+     * populates the class struct using a list of methods, fields, and constructors
+     */
     private static void populateClassStruct(LayoutSchematic.ClassStruct classStruct, GNode classNode, String className) {
         List<Node> methodNodes = NodeUtil.dfsAll(classNode, "MethodDeclaration");
+        List<Node> methodFields = new ArrayList<Node>();
         List<Node> fieldNodes = NodeUtil.dfsAll(classNode, "FieldDeclaration");
         List<Node> constructorNodes = NodeUtil.dfsAll(classNode, "ConstructorDeclaration");
 
-
         for (Node methodNode : methodNodes) {
             classStruct.methodList.add(createMethod((GNode) methodNode, className));
+            methodFields.addAll(NodeUtil.dfsAll(methodNode, "FieldDeclaration"));
         }
 
         for (Node fieldNode : fieldNodes) {
+            if (methodFields.contains(fieldNode)) {
+                continue;
+            }
             classStruct.fieldList.addAll(createField((GNode) fieldNode));
         }
 
@@ -305,6 +342,9 @@ public class FillLayoutSchematic {
         }
     }
 
+    /*
+     * returns the method
+     */
     private static LayoutSchematic.Method createMethod(GNode methodNode, String className) {
         LayoutSchematic.Method method = new LayoutSchematic.Method();
 
@@ -361,7 +401,6 @@ public class FillLayoutSchematic {
                     }
                 }
             }
-
             field.type = getType((GNode) fieldNode.getNode(1));
 
             fields.add(field);
@@ -370,6 +409,9 @@ public class FillLayoutSchematic {
         return fields;
     }
 
+    /*
+     * returns true if the constructor has no arguments, else returns false
+     */
     private static boolean hasNoArguments(GNode constructorNode) {
         GNode parameters = (GNode) constructorNode.getNode(3);
         if (parameters.size() == 0) {
@@ -378,6 +420,9 @@ public class FillLayoutSchematic {
         return false;
     }
 
+    /*
+     * returns the default constructor
+     */
     private static LayoutSchematic.Constructor createDefaultConstructor() {
         LayoutSchematic.Constructor constructor = new LayoutSchematic.Constructor();
         constructor.accessModifier = "public";
@@ -385,7 +430,9 @@ public class FillLayoutSchematic {
         return constructor;
     }
 
-
+    /*
+     * returns the constructor
+     */
     private static LayoutSchematic.Constructor createConstructor(GNode constructorNode) {
         LayoutSchematic.Constructor constructor = new LayoutSchematic.Constructor();
 
@@ -425,6 +472,9 @@ public class FillLayoutSchematic {
         }
     }
 
+    /*
+     * returns the C++ equivalent type of the Java primitive type
+     */
     private static String getCType(String javaType) {
         String cType;
         switch (javaType) {
