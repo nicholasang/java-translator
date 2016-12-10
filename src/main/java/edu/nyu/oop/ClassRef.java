@@ -7,7 +7,7 @@ import java.util.*;
 /*
  * Phase Two
  * encapsulates relationships between classes in different ASTs, parts of different ASTs,
- * and other classes in a ClassRef object
+ * and other classes in a ClassRef object, contains references to GNodes in a respective Java AST and C++ header AST
  */
 public class ClassRef {
     private String name;

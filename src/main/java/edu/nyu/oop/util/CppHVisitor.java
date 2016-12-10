@@ -19,7 +19,7 @@ import java.io.*;
  * Uses a visitor for the header AST to print out to output.h
  */
 public class CppHVisitor extends xtc.tree.Visitor {
-    CppAst headerAst;
+    private CppAst headerAst;
     private Writer writeOut;
     private boolean isVtable;
     private boolean isConstructor;
@@ -79,6 +79,7 @@ public class CppHVisitor extends xtc.tree.Visitor {
             this.writeOut.flush();
             this.writeOut.close();
 
+            // print only the DataField value rather than the <key:value> pair
             DataField.togglePrintValOnly();
             this.headerAst = null;
 

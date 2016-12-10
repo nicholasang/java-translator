@@ -23,21 +23,33 @@ import java.util.*;
 
 /*
  * Phase Two
- * Generates the C++ Header AST from the Java AST
+ *
+ * Used to generate a C++ header AST from a list of Java ASTs
  */
 public class CppHeaderAstGenerator {
     //prevent direct instantiation
     private CppHeaderAstGenerator() {}
 
-    // creates a new AST and maps all the nodes
-    public static CppAst generateNew(List<GNode> javaAsts) { //decided to create the tree inside this class
+    /*
+        -creates a new C++ header AST based on the provided Java ASTs
+        -as part of the process, creates a Class Hierarchy Tree containing mappings for the class relationships,
+        as well as class containers (ClassRef) that represent the classes and
+        hold references to their respective Java AST and C++ header AST GNodes
+    */
+    public static CppAst generateNew(List<GNode> javaAsts) {
 
+        // create a new C++ header AST (the root)
         CppAst headerAst = new CppAst("SomeBigWrapperNode");
 
-        InitVisitor classDecInit = new InitVisitor();
+        // NOTE: for each entry or node added to the C++ header AST,
+        // a reference to that entry is added to both an entry list in the static MappingNode class
+        // as well as a key-value entry map (e.g. all entries of name "Method" are placed in a list (value) to which the key "Method" maps)
+        //
+        // link the entry list and map in MappingNode to the entry list and map in the new CppAst
         MappingNode.setEntryRepository(headerAst.getAllEntries());
         MappingNode.setEntryRepositoryMap(headerAst.getAllEntriesMap());
 
+        // add pre-determined preprocessor directives to the C++ header AST
         GNode preDirectives = MappingNode.createMappingNode("PreprocessorDirectives");
         MappingNode.addNode(headerAst.getRoot(), preDirectives);
         MappingNode.addDataFieldMultiVals(preDirectives, "Name",
@@ -46,22 +58,37 @@ public class CppHeaderAstGenerator {
                                                   "#include \"java_lang.h\"",
                                                   "#include <stdint.h>",
                                                   "#include <string>" /*, "#define NEW(cls, var, ...) new cls(); cls::__init(var, ##__VA_ARGS__)" */ )) );
-
+        // add the required java::lang namespace
         MappingNode.createAndLinkDataFieldOneShot(headerAst.getRoot(),"UsingNamespace", "Name", "java::lang");
 
+        // use an InitVisitor to fetch all unique package names
+        // and (as a side-effect) add all unique namespaces to the C++ header AST
+        InitVisitor classDecInit = new InitVisitor();
         for(GNode javaAst : javaAsts) {
             classDecInit.visit(javaAst, headerAst);
         }
 
-
+        // create ClassRef class representations, a hierarchy tree to represent their relationships,
+        // sort the ClassRefs in a list such that parents come before children
+        // (breadth-first search of the parent to child tree)
+        // the ClassRef list is sorted in the C++ header Ast object, the hierarchy tree is a static field in ClassRef
+        // (the tree represents the relationships between all classes/ClassRefs)
         ClassRef.setHierarchy(determineClassOrder(javaAsts, headerAst));
 
+        ////////////////////////////////////////////////////////////////
+        //  ClassRef.getHierarchy().childToParentMap; TODO: overloading
+        ////////////////////////////////////////////////////////////////
+
+        // add all necessary prototypes and typedefs
         setForwardDeclarations(headerAst);
 
+        // for each ClassRef, populate its LayoutSchematic with all field and method information
         FillLayoutSchematic.fillClasses(headerAst);
 
+        // complete the header AST by populating each class node within the tree with information from each ClassRef's LayoutSchematic
         populateClassWrappers(headerAst);
 
+        // return the completed C++ header AST
         return headerAst;
     }
 
@@ -183,6 +210,7 @@ public class CppHeaderAstGenerator {
             MappingNode.addDataField(fieldNode, "Type", f.type);
             MappingNode.addDataField(fieldNode, "Name", f.name);
 
+            // create correctly formed declaration / names for function pointers
             int i;
             if((i = f.type.indexOf("(*)")) >= 0) {
                 MappingNode.addDataField(fieldNode, "FullName", f.type.substring(0, i+2) + f.name + f.type.substring(i+2));
@@ -228,7 +256,8 @@ public class CppHeaderAstGenerator {
     }
 
     /*
-     * Creates a class hierarchy to determine the order of the classes within the AST
+     * Creates a class hierarchy to represent the relationships between classes,
+     * create ClassRef class representations, and determine the order of the classes within the AST
      */
     public static ClassHierarchyTree determineClassOrder(List<GNode> javaAsts, CppAst headerAst) {
 
@@ -290,6 +319,8 @@ public class CppHeaderAstGenerator {
 
         headerAst.setMainClassRef(mainClassRef);
 
+        // sort the ClassRefs in order of parents to children
+        // (a breadth-first traversal of the parent to child hierarchy)
         for(ClassRef cR : cRefs) {
             ClassRef parent = cR.getParentClassRef();
             if(parent == null) {
@@ -300,7 +331,8 @@ public class CppHeaderAstGenerator {
     }
 
     /*
-     * Does topological sorting by adding each ClassRef object to the array
+     * sorts the Class Hierarchy Tree (subtree) ClassRefs in order of parents to children
+     * (a breadth-first traversal of the parent to child hierarchy)
      */
     public static void topologicalSorting(ClassRef start, ClassHierarchyTree hierarchy, CppAst headerAst) {
         ArrayDeque<ClassRef> Q = new ArrayDeque<ClassRef>();
@@ -323,7 +355,7 @@ public class CppHeaderAstGenerator {
     }
 
     /*
-     * sets declarations for the C++ Header AST
+        sets declarations (forward declarations and typedefs) for the C++ Header AST
      */
     public static void setForwardDeclarations(CppAst headerAst) {
         for(ClassRef cR : headerAst.getClassRefs()) {
@@ -348,6 +380,9 @@ public class CppHeaderAstGenerator {
     }
 
 
+    /*
+        -prints the backing entry list in the CppAst as a numbered one-dimensional list
+     */
     public static void displayCppHEntryListNumbered(CppAst header) {
         ArrayList<Object> backingList = header.getAllEntries();
         for(int i = 0; i < header.getAllEntries().size(); ++i) {
@@ -361,6 +396,11 @@ public class CppHeaderAstGenerator {
         }
     }
 
+    /*
+        -prints the backing entry list in the CppAst as a 2D list
+        -used to view expected node/entry order and output
+        and for the phase 2 unit testing
+     */
     public static void displayCppHEntryListAs2DArray(CppAst header) {
         ArrayList<Object> backingList = header.getAllEntries();
         for(int i = 0; i < header.getAllEntries().size(); ++i) {
