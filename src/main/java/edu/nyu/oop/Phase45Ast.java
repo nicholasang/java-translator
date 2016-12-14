@@ -34,25 +34,44 @@ public class Phase45Ast extends Visitor{
 
     //make class GNode
     public GNode visitClassDeclaration(GNode n){
-        //fill with specifics of node's children
+        GNode Class = GNode.create("Class");
+        for (int i = 0; i < n.size(); i++){
+            Class.add(dispatch((Node)n.get(i)));
+        }
+        return Class;
+ /*       //fill with specifics of node's children
         ArrayList<GNode> methods = new ArrayList<GNode>();
         //TODO actually assign correct indices to spots
         //TODO OR fill with nulls and place after?
         GNode Class = GNode.create("Class", dispatch((Node)n.get(0)), methods);
         //TODO visit on any methods to add to list
         return Class;
-    }
+ */   }
         //class signature
         //arraylist of globals
         //arraylist of constructors
             //if empty, we will print a default
         //arraylist of methods
     //make method GNode
+        public GNode visitMethodDeclaration(GNode n) {
+            GNode Method = GNode.create("Method");
+            for (int i = 0; i < n.size(); i++) {
+                Method.add(dispatch((Node) n.get(i)));
+            }
+            return Method;
+        }
         //method signature
         //arraylist of sequence of commands
         //command item = a line basically
         //commands for: variable declarations,
                     //operations
+        public GNode visitPackageDeclaration(GNode n) {
+            GNode Package = GNode.create("Package");
+            for (int i = 0; i < n.size(); i++) {
+                Package.add(dispatch((Node) n.get(i)));
+            }
+            return Package;
+        }
     //special methods
         //ex: print
         // main
