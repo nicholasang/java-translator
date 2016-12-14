@@ -1,15 +1,12 @@
 package edu.nyu.oop;
 
-import edu.nyu.oop.util.CppHVisitor;
+import edu.nyu.oop.util.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
-import edu.nyu.oop.util.JavaFiveImportParser;
-import edu.nyu.oop.util.NodeUtil;
-import edu.nyu.oop.util.XtcProps;
 import org.slf4j.Logger;
 
 import xtc.tree.Location;
@@ -48,7 +45,8 @@ public class Boot extends Tool {
         bool("printJavaAst", "printJavaAst", false, "Print Java Ast.").
         bool("printJavaCode", "printJavaCode", false, "Print Java code.").
         bool("printJavaImportCode", "printJavaImportCode", false, "Print Java code for imports and package source.").
-        bool("translateJava", "translateJava", false, "Translate Java to C++.");
+        bool("translateJava", "translateJava", false, "Translate Java to C++.").
+        bool("symbolTable", "symbolTable", false, "Generate Symbol Table.");
     }
 
     @Override
@@ -115,6 +113,23 @@ public class Boot extends Tool {
 
             //phase 4 + 5
             CppCommands.convertToCpp(allAsts);
+        }
+
+        if (runtime.test("symbolTable")) {
+            String workingDir = System.getProperty("user.dir");
+
+            Location nLocation = n.getLocation();
+            Location longLocation = new Location(workingDir + "/" + nLocation.file, nLocation.line, nLocation.column);
+            n.setLocation(longLocation);
+
+            //phase 1
+            List<GNode> allAsts = GenerateJavaASTs.beginParse((GNode) n);
+
+            // ^ this is just doing phase 1 stuff
+
+           SymbolTable table = new SymbolTable();
+           SymbolTableBuilder builder = new SymbolTableBuilder(table);
+
         }
 
 
