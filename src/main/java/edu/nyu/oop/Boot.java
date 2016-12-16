@@ -5,7 +5,9 @@ import edu.nyu.oop.util.CppHVisitor;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.HashSet;
 import java.util.List;
+import java.util.ArrayList;
 
 import edu.nyu.oop.util.JavaFiveImportParser;
 import edu.nyu.oop.util.NodeUtil;
@@ -15,9 +17,12 @@ import org.slf4j.Logger;
 import xtc.tree.Location;
 import xtc.tree.GNode;
 import xtc.tree.Node;
+import xtc.util.SymbolTable;
 import xtc.util.Tool;
 import xtc.lang.JavaPrinter;
 import xtc.parser.ParseException;
+
+import edu.nyu.oop.util.temp_logical_bits_and_init;
 
 
 /**
@@ -110,12 +115,17 @@ public class Boot extends Tool {
             //phase 2
             CppAst headerCppAst = CppHeaderAstGenerator.generateNew(allAsts);
 
+            //deletelater:
+            temp_logical_bits_and_init.run(headerCppAst);
+
             //phase 3
-            new CppHVisitor().visit(headerCppAst);
+            // new CppHVisitor().visit(headerCppAst);
 
             //phase 4 + 5
-             CppCommands.convertToCpp(allAsts);
+            // CppCommands.convertToCpp(allAsts);
         }
+
+
 
 
 
