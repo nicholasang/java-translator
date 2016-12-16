@@ -125,10 +125,16 @@ public class Boot extends Tool {
             //phase 1
             List<GNode> allAsts = GenerateJavaASTs.beginParse((GNode) n);
 
+            // TODO: compress all ASTs into 1 AST ?
+
             // ^ this is just doing phase 1 stuff
 
-           SymbolTable table = new SymbolTable();
-           SymbolTableBuilder builder = new SymbolTableBuilder(table);
+            SymbolTable table = new SymbolTable();
+            SymbolTableBuilder builder = new SymbolTableBuilder(table);
+
+            // right now, just parses only the first AST in the List
+            builder.buildTable(allAsts.get(0));
+            builder.printTable();
 
         }
 

@@ -3,10 +3,12 @@ package edu.nyu.oop.util;
 import java.util.*;
 
 import xtc.Constants;
-import xtc.tree.Node;
+import xtc.tree.GNode;
 
 
 public class SymbolTable {
+	private static final boolean DEBUG = false;
+
 	private Scope root;
 	private Scope currentScope;
 	private Map< String, ClassScope > classScopes = new HashMap< String, ClassScope >();
@@ -16,7 +18,10 @@ public class SymbolTable {
 		this.currentScope = root;
 	}
 
-	public void enterNewScope(Node n) {
+	public void enterNewScope(GNode n) {
+		if (DEBUG) {
+			System.out.println("entering " + n.getName());
+		}
 		Scope scope;
 		if (n.hasName("ClassDeclaration")) {
 			scope = new ClassScope(n, currentScope);
@@ -28,6 +33,7 @@ public class SymbolTable {
                 scope = new ConstructorScope(n, (ClassScope) currentScope);
             }
             else {
+
                 scope = new ConstructorScope(n);
             }
         }
@@ -45,7 +51,29 @@ public class SymbolTable {
 			scope = new Scope(n, currentScope);
 		}
 		n.setProperty(Constants.SCOPE, scope);
+		currentScope.addScope(scope);
 		currentScope = scope;
+	}
+
+	public void enterNewMethodScope(GNode n, boolean isPrivate, boolean isStatic, String name, String returnType) {
+		if (DEBUG) {
+			System.out.println("entering " + n.getName());
+		}
+		Scope scope;
+		if (n.hasName("MethodDeclaration")) {
+			// NOTE: this uses the idea that when you enter a method's scope, you are
+			// always currently in that method's class scope
+			if (currentScope instanceof ClassScope) {
+	            scope = new MethodScope(n, (ClassScope) currentScope, isPrivate, isStatic, name, returnType);
+			}
+			else {
+				scope = new MethodScope(n);
+			}
+
+			n.setProperty(Constants.SCOPE, scope);
+			currentScope.addScope(scope);
+			currentScope = scope;
+		}
 	}
 
     public void addSymbolToCurrentScope(String name, String type) {
@@ -58,29 +86,37 @@ public class SymbolTable {
 		currentScope.addSymbol(symbol);
 	}
 
-	public addParameterToCurrentScope(String name, String type, boolean isPrivate, boolean isStatic) {
+	public void addParameterToCurrentScope(String name, String type, boolean isPrivate, boolean isStatic) {
 		if (currentScope instanceof MethodScope) {
 			((MethodScope) currentScope).addParameter(type);
+		}
+		else if (currentScope instanceof ConstructorScope) {
+			((ConstructorScope) currentScope).addParameter(type);
 		}
 		addSymbolToCurrentScope(name, type, isPrivate, isStatic);
 	}
 
-	public addParameterToCurrentScope(String name, String type) {
+	public void addParameterToCurrentScope(String name, String type) {
 		if (currentScope instanceof MethodScope) {
 			((MethodScope) currentScope).addParameter(type);
+		}
+		else if (currentScope instanceof ConstructorScope) {
+			((ConstructorScope) currentScope).addParameter(type);
 		}
 		addSymbolToCurrentScope(name, type);
 	}
 
 	public void exitCurrentScope() {
 		if (root != currentScope) {
+			if (DEBUG) {
+				System.out.println("exiting " + currentScope.associatedNode.getName());
+			}
 			currentScope = currentScope.parent;
 		}
 	}
 
-	public boolean enterScopeForNode(Node n) {
+	public boolean enterScopeForNode(GNode n) {
 		// returns false if node doesn't have an associated scope
-
 		if (n.hasProperty(Constants.SCOPE)) {
 			Object scopeProperty = n.getProperty(Constants.SCOPE);
 			if (scopeProperty instanceof Scope) {
@@ -103,47 +139,65 @@ public class SymbolTable {
 	}
 
 	public String toString() {
-		String string = "root scope";
+		String string = "root";
 		Collection<Scope> scopes = root.getAllScopes();
+		string += "\n" + "  nested scopes:";
 		for (Scope scope : scopes) {
-			string += "\n" + "  " + printScope(scope);
-		}
-		return string;
-	}
-
-	public String printScope(Scope scope) {
-		String string = "scope: " + scope.associatedNode.getName();
-		Collection<Symbol> symbols = scope.getAllSymbols();
-		for (Symbol symbol : symbols) {
-			string += "\n" + symbol.name + " : " + symbol.type;
-		}
-
-		Collection<Scope> scopes = scope.getAllScopes();
-		for (Scope childScope : scopes) {
-			string += "\n" + "  " + printScope(childScope);
+			string += "\n" + scope.toString("   ");
 		}
 		return string;
 	}
 
 	private static class Scope {
-		private Map< Node, Scope > nestedScopes;
+		private Map< GNode, Scope > nestedScopes;
 		private Map< String, Symbol > symbols;
 		Scope parent;
-		Node associatedNode;
+		GNode associatedNode;
 
 		public Scope() {
 			this(null, null);
 		}
 
-		public Scope(Node n) {
+		public Scope(GNode n) {
 			this(n, null);
 		}
 
-		public Scope(Node n, Scope parent) {
+		public Scope(GNode n, Scope parent) {
 			this.associatedNode = n;
 			this.parent = parent;
-			this.nestedScopes = new HashMap<Node, Scope>();
+			this.nestedScopes = new HashMap<GNode, Scope>();
 			this.symbols = new HashMap<String, Symbol>();
+			if (DEBUG && n != null) {
+				System.out.println(n.getName() + " created");
+			}
+			if (parent != null) {
+				if (DEBUG && parent.associatedNode == null) {
+					System.out.println(" parent is: ROOT" );
+				}
+				else if (DEBUG) {
+					System.out.println(" parent is: " + parent.associatedNode.getName());
+				}
+			}
+		}
+
+		public String toString(String indent) {
+			String string = indent + this.associatedNode.getName();
+			Collection<Symbol> symbols = this.getAllSymbols();
+			string += "\n" + "  " + indent + "symbols:";
+			for (Symbol symbol : symbols) {
+				string += "\n" + "   " + indent + symbol.name + " : " + symbol.type;
+			}
+
+			Collection<Scope> scopes = this.getAllScopes();
+			string += "\n" + "  " + indent + "nested scopes:";
+			for (Scope childScope : scopes) {
+				string += "\n" + childScope.toString(indent + "   ");
+			}
+			return string;
+		}
+
+		public String toString() {
+			return toString("");
 		}
 
 		public boolean hasParent() {
@@ -180,15 +234,15 @@ public class SymbolTable {
 			if (this.hasScope(scope.associatedNode)) {
 				return false;
 			}
-			nestedScopes.put(associatedNode, scope);
+			Scope old = nestedScopes.put(scope.associatedNode, scope);
 			return true;
 		}
 
-		public boolean hasScope(Node n) {
+		public boolean hasScope(GNode n) {
 			return nestedScopes.containsKey(n);
 		}
 
-		public Scope getScope(Node n) {
+		public Scope getScope(GNode n) {
 			if (this.hasScope(n)) {
 				return nestedScopes.get(n);
 			}
@@ -221,15 +275,17 @@ public class SymbolTable {
 		public ClassScope() {
 			super();
 			this.methods = new HashMap<String, Set<Scope>>();
+			this.constructors = new ArrayList<ConstructorScope>();
 		}
 
-		public ClassScope(Node n) {
+		public ClassScope(GNode n) {
 			this(n, null);
 		}
 
-		public ClassScope(Node n, Scope parent) {
+		public ClassScope(GNode n, Scope parent) {
 			super(n, parent);
 			this.methods = new HashMap<String, Set<Scope>>();
+			this.constructors = new ArrayList<ConstructorScope>();
 
 			this.name = n.getString(1);
 			classScopes.put(this.name, this);
@@ -240,6 +296,26 @@ public class SymbolTable {
 			else {
 				this.superClass = "Object";
 			}
+		}
+
+		public String toString(String indent) {
+			String string = indent + "Class " + this.name;
+			Collection<Symbol> symbols = this.getAllSymbols();
+			string += "\n" + "  " + indent + "symbols:";
+			for (Symbol symbol : symbols) {
+				string += "\n" + "   " + indent + symbol.name + " : " + symbol.type;
+			}
+
+			Collection<Scope> scopes = this.getAllScopes();
+			string += "\n" + "  " + indent + "nested scopes:";
+			for (Scope childScope : scopes) {
+				string += "\n" + childScope.toString(indent + "   ");
+			}
+			return string;
+		}
+
+		public String toString() {
+			return toString("");
 		}
 
 		public ClassScope getSuperClassScope() {
@@ -298,11 +374,11 @@ public class SymbolTable {
         boolean isPrivate;
         boolean isStatic;
 
-		public MethodScope(Node n) {
+		public MethodScope(GNode n) {
 			this(n, null);
 		}
 
-		public MethodScope(Node n, ClassScope parent) {
+		public MethodScope(GNode n, ClassScope parent) {
 			super(n, parent);
 			this.classScope = parent;
 			this.parameterTypes = new ArrayList<String>();
@@ -310,15 +386,40 @@ public class SymbolTable {
             classScope.addMethod(name, this);
 		}
 
-		public MethodScope(Node n, ClassScope parent, boolean isPrivate, boolean isStatic, String name) {
+		public MethodScope(GNode n, ClassScope parent, boolean isPrivate, boolean isStatic, String name, String returnType) {
 			super(n, parent);
 			this.classScope = parent;
 			this.name = name;
 			this.parameterTypes = new ArrayList<String>();
 			this.isPrivate = isPrivate;
 			this.isStatic = isStatic;
+			this.returnType = returnType;
 
             classScope.addMethod(name, this);
+		}
+
+		public String toString(String indent) {
+			String string = indent + "Method " + this.name + " (";
+			for (String type : parameterTypes) {
+				string += type + ", ";
+			}
+            string += ") -> " + returnType;
+			Collection<Symbol> symbols = this.getAllSymbols();
+			string += "\n" + "  " + indent + "symbols:";
+			for (Symbol symbol : symbols) {
+				string += "\n" + "   " + indent + symbol.name + " : " + symbol.type;
+			}
+
+			Collection<Scope> scopes = this.getAllScopes();
+			string += "\n" + "  " + indent + "nested scopes:";
+			for (Scope childScope : scopes) {
+				string += "\n" + childScope.toString(indent + "   ");
+			}
+			return string;
+		}
+
+		public String toString() {
+			return toString("");
 		}
 
 		public void addParameter(String type) {
@@ -338,20 +439,44 @@ public class SymbolTable {
         ClassScope classScope;
         List< String > parameterTypes; // in order
 
-        public ConstructorScope(Node n) {
+        public ConstructorScope(GNode n) {
             this(n, null);
         }
 
-        public ConstructorScope(Node n, ClassScope parent) {
+        public ConstructorScope(GNode n, ClassScope parent) {
             super(n, parent);
             this.classScope = parent;
             this.parameterTypes = new ArrayList<String>();
-
-            // TODO: set up parameters
-            // return type doesn't matter, modifiers don't matter because we assume correctness
-
             classScope.addConstructor(this);
         }
+
+		public String toString(String indent) {
+			String string = indent + "Constructor (";
+   			for (String type : parameterTypes) {
+				string += type + ", ";
+			}
+            string += ")";
+			Collection<Symbol> symbols = this.getAllSymbols();
+			string += "\n" + "  " + indent + "symbols:";
+			for (Symbol symbol : symbols) {
+				string += "\n" + "   " + indent + symbol.name + " : " + symbol.type;
+			}
+
+			Collection<Scope> scopes = this.getAllScopes();
+			string += "\n" + "  " + indent + "nested scopes:";
+			for (Scope childScope : scopes) {
+				string += "\n" + childScope.toString(indent + "   ");
+			}
+			return string;
+		}
+
+		public String toString() {
+			return toString("");
+		}
+
+		public void addParameter(String type) {
+			parameterTypes.add(type);
+		}
 
     }
 
@@ -365,6 +490,8 @@ public class SymbolTable {
 		public Symbol(String name, String type) {
 			this.name = name;
 			this.type = type;
+			this.isPrivate = false;
+            this.isStatic = false;
 		}
 
         public Symbol(String name, String type, boolean isPrivate, boolean isStatic) {
