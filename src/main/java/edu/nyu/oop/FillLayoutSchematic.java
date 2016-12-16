@@ -368,16 +368,15 @@ public class FillLayoutSchematic {
 
         // add default constructor and __init()
         classStruct.constructorList.add(createDefaultConstructor());
-        classStruct.methodList.add(createDefaultInitMethod());
+        classStruct.methodList.add(createDefaultInitMethod(className));
 
         for (Node constructorNode : constructorNodes) {
             if (!hasNoArguments((GNode) constructorNode)) {
-                classStruct.methodList.add(createInitMethod((GNode) constructorNode));
+                classStruct.methodList.add(createInitMethod(className, (GNode) constructorNode));
             }
         }
 
     }
-
 
     /*
      * returns the method
@@ -416,7 +415,7 @@ public class FillLayoutSchematic {
     /*
         creates and returns an __init method
      */
-    private static LayoutSchematic.Method createInitMethod(GNode methodNode) {
+    private static LayoutSchematic.Method createInitMethod(String className, GNode methodNode) {
         LayoutSchematic.Method init = new LayoutSchematic.Method();
         init.accessModifier = "private";
         init.returnType     = "void";
@@ -424,6 +423,7 @@ public class FillLayoutSchematic {
 
         GNode parameters = (GNode) methodNode.getNode(3);
 
+        init.parameterTypes.add(className.substring(2));
         for (int i = 0, numParams = parameters.size(); i < numParams; i++) {
             Node parameterNode = parameters.getNode(i);
             init.parameterTypes.add(/* paramType */ getType((GNode) parameterNode.getNode(1)));
@@ -435,11 +435,13 @@ public class FillLayoutSchematic {
     /*
     * returns the default __init
     */
-    private static LayoutSchematic.Method createDefaultInitMethod() {
+    private static LayoutSchematic.Method createDefaultInitMethod(String className) {
         LayoutSchematic.Method init = new LayoutSchematic.Method();
         init.accessModifier = "private";
         init.returnType     = "void";
         init.name           = "__init";
+
+        init.parameterTypes.add(className.substring(2));
 
         return init;
     }
@@ -546,24 +548,24 @@ public class FillLayoutSchematic {
     private static String getCType(String javaType) {
         String cType;
         switch (javaType) {
-        case "long":
-            cType = "int64_t";
-            break;
-        case "int":
-            cType = "int32_t";
-            break;
-        case "short":
-            cType = "int16_t";
-            break;
-        case "byte":
-            cType = "int8_t";
-            break;
-        case "boolean":
-            cType = "bool";
-            break;
-        default:
-            cType = javaType;
-            break;
+            case "long":
+                cType = "int64_t";
+                break;
+            case "int":
+                cType = "int32_t";
+                break;
+            case "short":
+                cType = "int16_t";
+                break;
+            case "byte":
+                cType = "int8_t";
+                break;
+            case "boolean":
+                cType = "bool";
+                break;
+            default:
+                cType = javaType;
+                break;
         }
 
         return cType;
