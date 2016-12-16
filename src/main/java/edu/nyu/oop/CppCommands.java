@@ -3,6 +3,7 @@ package edu.nyu.oop;
 import xtc.tree.GNode;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.io.IOException;
 import java.io.FileWriter;
 /**
@@ -12,19 +13,33 @@ public class CppCommands {
 
     public static List<GNode> convertToCpp(List<GNode> javaRoots) {
 //        XtcTestUtils.prettyPrintAst(javaRoots.get(0));
-        MakeCppAst visitor = new MakeCppAst();
+        List<GNode> CppRoots = new ArrayList<GNode>();
+        //MakeCppAst visitor = new MakeCppAst();
+        GNode mainClassNode = null;
+        GNode packageNode = null;
         for (int i = 0; i < javaRoots.size(); i++) {
-            visitor.visit(javaRoots.get(i));
+            Phase45Ast visitor = new Phase45Ast(javaRoots.get(i));
+            CppRoots.add(visitor.Root);
+            if (visitor.packageNode != null){
+                packageNode = visitor.packageNode;
+            }
+            if (visitor.mainClassNode != null){
+                mainClassNode = visitor.mainClassNode;
+            }
+            //visitor.visit(javaRoots.get(i));
         }
+        XtcTestUtils.prettyPrintAst(CppRoots.get(0));
+//        printCpp(javaRoots, mainClassNode);
+ //       printMain(mainClassNode, packageNode);
 
-        printCpp(javaRoots, visitor.mainClassNode);
-        printMain(visitor.mainClassNode, visitor.packageNode);
+        //printCpp(javaRoots, visitor.mainClassNode);
+        //printMain(visitor.mainClassNode, visitor.packageNode);
 
         return javaRoots;
     }
 
     public static void printCpp(List<GNode> javaRoots, GNode mainClass) {
-//        XtcTestUtils.prettyPrintAst(javaRoots.get(0));
+ //       XtcTestUtils.prettyPrintAst(javaRoots.get(0));
         String[] printAtEnd = new String[1];
         printAtEnd[0] = "";
         try {
@@ -47,7 +62,7 @@ public class CppCommands {
     }
 
     public static void printMain(GNode mainClassDeclaration, GNode packageDeclaration) {
-//        XtcTestUtils.prettyPrintAst(mainClassDeclaration);
+ //       XtcTestUtils.prettyPrintAst(mainClassDeclaration);
         try {
             FileWriter output = new FileWriter("output/main.cpp");
 
