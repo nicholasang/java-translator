@@ -145,8 +145,6 @@ then
             run_test $i
             echo "---------------------------------------------"
         done
-        
-        echo -e "exit\n" > ./pipe
     else
         invalid_arg_exit
     fi
