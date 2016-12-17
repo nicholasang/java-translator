@@ -133,8 +133,8 @@ public class Boot extends Tool {
             SymbolTableBuilder builder = new SymbolTableBuilder(table);
 
             // right now, just parses only the first AST in the List
-            builder.buildTable(allAsts.get(0));
-            builder.printTable();
+            table = builder.buildTable(allAsts.get(0));
+            System.out.println(table);
 
         }
 

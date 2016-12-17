@@ -127,6 +127,7 @@ public class SymbolTable {
 		return false;
 	}
 
+	// if false, need to use "this->"
 	public boolean symbolExistsBelowClassScope(String name) {
 		Scope scope = currentScope;
 		while (scope != null && ! (scope instanceof ClassScope)) {
@@ -136,6 +137,17 @@ public class SymbolTable {
 			scope = scope.parent;
 		}
 		return false;
+	}
+
+	public String typeOfSymbol(String name) {
+		Scope scope = currentScope;
+		while (scope != null) {
+			if (scope.hasSymbol(name)) {
+				return scope.getSymbolType(name);
+			}
+			scope = scope.parent;
+		}
+		return null;
 	}
 
 	public String toString() {
