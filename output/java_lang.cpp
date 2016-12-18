@@ -192,22 +192,23 @@ Class __Class::getComponentType(Class __this)
 }
 
 // java.lang.Class.isInstance(Object)
-bool __Class::isInstance(Class __this, Object o)
-{
-    Class k = o->__vptr->getClass(o);
+ bool __Class::isInstance(Class __this, Object o) {
+      Class k = o->__vptr->getClass(o);
 
-    do
-    {
-        if (__this->__vptr->equals(__this, (Object)k)) return true;
+      do {
+        if (__this->__vptr->equals(__this, (Object) k)) return true;
 
-        // FIXME: handle covariance of arrays
+        if(__this->__vptr->isArray(__this) && k->__vptr->isArray(k)) {
+            Class c1 = __this->__vptr->getComponentType(__this);
+            Class c2 = k->__vptr->getComponentType(k);
+            if (c1->__vptr->equals(c1, (Object) c2)) return true;
+        }
 
         k = k->__vptr->getSuperclass(k);
-    }
-    while ((Class)__rt::null() != k);
+      } while ((Class)__rt::null() != k);
 
-    return false;
-}
+      return false;
+    }
 
 // Internal accessor for java.lang.Class' class.
 Class __Class::__class()
