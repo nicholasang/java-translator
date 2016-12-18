@@ -2,7 +2,7 @@
 - In terminal, run cmpInit.sh and cmpRun.sh to batch-translate and compare Java output with translated C++ output
 - errors and inconsistencies printed to the "record.txt" in the "test" directory as <test_number><error_type>
 ## More-detailed instructions:
-- start at the 4-Tran project directory, run cpInit.sh first and wait for sbt to initialize
+- start at the 4-Tran project directory, run cmpInit.sh first and wait for sbt to initialize
 - enter at least two arguments
   - (the test number xyz and 't') or
   - (which test to run last and 'bt')(e.g. 5 bt to test tests 000,001,002,003,004,005 in a row)
