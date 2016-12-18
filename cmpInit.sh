@@ -1,4 +1,3 @@
-
 function create_pipe {
     if [ ! -p "$1" ]
     then

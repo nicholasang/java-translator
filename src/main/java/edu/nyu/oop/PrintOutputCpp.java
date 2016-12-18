@@ -29,21 +29,35 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
     ArrayList<String> variablesInScope = new ArrayList<String>();
     public boolean inMain = false;
 
-    public PrintOutputCpp(FileWriter outFileWrite, String[] printLater, GNode mainClass) {
+    public PrintOutputCpp(FileWriter outFileWrite, String[] printLater, GNode mainClass, boolean inMain) {
         this.printLater = printLater;
         pen = outFileWrite;
         this.mainClass = mainClass;
+        this.inMain = inMain;
+    }
+
+    public void start() {
+        if (!this.inMain) {
+            try {
+                this.pen.write("#include \"output.h\"\n#include \"java_lang.h\"\nusing namespace std;\n#include <iostream>\nusing namespace java::lang;\n");
+
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     public void visit(Node n) {
+
+
         if (n != null) {
-            for (Object o: n) {
+            for (Object o : n) {
                 if (o instanceof Node) {
                     dispatch((Node) o);
                 } else if (o instanceof String) {
                     try {
                         pen.write(o.toString() + " ");
-                    } catch(Exception e) {
+                    } catch (Exception e) {
                         System.out.print(e);
                     }
                 }
@@ -51,7 +65,9 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
         }
     }
 
-    ////////////////new stuff//////////////////////////////
+
+
+////////////////new stuff//////////////////////////////
 
     public void visitNullLiteral(GNode n) {
         try {
@@ -179,7 +195,7 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
           penPrint("; ");
       }
     */
-    //to avoid needing try/catch blocks everywhere
+//to avoid needing try/catch blocks everywhere
     public void penPrint(String words) {
         try {
             pen.write(words);
@@ -263,6 +279,18 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
             n.set(i, null);
         }
 
+    }
+
+    public void finish() {
+        if (this.inMain) return;
+
+        try {
+            this.pen.write(this.printLater[0]);
+            this.pen.flush();
+            this.pen.close();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
 
