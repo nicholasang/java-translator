@@ -134,11 +134,12 @@ public class Boot extends Tool {
             // phase 3 - create and save a command to print the header source code
             sourceOutputter.add(new SourceHeaderOutputCommand(new CppHVisitor(), headerCppAst));
 
-            // phase 4 - build and return the C++ implementation AST,
-            // as well as a command to print the implementation source code
+            // phase 4 - build the C++ implementation AST,
+            // return a list of commands to print the implementation source code
+            // (output.cpp and main.cpp)
             sourceOutputter.addAll(CppCommands.convertToCpp(allAsts));
 
-            // execute all commands to output source C++ code
+            // execute all commands to output C++ source code
             sourceOutputter.executeAll();
 
         }
