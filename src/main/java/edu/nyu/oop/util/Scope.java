@@ -1,65 +1,119 @@
-// import java.util.*;
+package edu.nyu.oop.util;
+
+import java.util.*;
+
+import xtc.Constants;
+import xtc.tree.GNode;
 
 
+public class Scope {
+	private static final boolean DEBUG = false;
 
+	private Map< GNode, Scope > nestedScopes;
+	private Map< String, Symbol > symbols;
+	Scope parent;
+	GNode associatedNode;
 
-// public class Scope {
-// 	String name
-// 	Scope parent;
-// 	Map<String, Scope> nestedScopes;
+	public Scope() {
+		this(null, null);
+	}
 
-// }
+	public Scope(GNode n) {
+		this(n, null);
+	}
 
-// public static class Scope {
-// 		String name;
-// 		Scope parent;
-// 		Map<String, Scope> nestedScopes;
-// 		Map<String, Symbol> symbols;
-// 		Symbol associatedSymbol; // only not null if a method
-// 		Map<String, List<Symbol>> overloadedMethodsStagedForMangling;
+	public Scope(GNode n, Scope parent) {
+		this.associatedNode = n;
+		this.parent = parent;
+		this.nestedScopes = new HashMap<GNode, Scope>();
+		this.symbols = new HashMap<String, Symbol>();
+		if (DEBUG && n != null) {
+			System.out.println(n.getName() + " created");
+		}
+		if (parent != null) {
+			if (DEBUG && parent.associatedNode == null) {
+				System.out.println(" parent is: ROOT" );
+			}
+			else if (DEBUG) {
+				System.out.println(" parent is: " + parent.associatedNode.getName());
+			}
+		}
+	}
 
-// 		public Scope(String name) {
-// 			this(name, null);
-// 		}
+	public String toString(String indent) {
+		String string = indent + this.associatedNode.getName();
+		Collection<Symbol> symbols = this.getAllSymbols();
+		string += "\n" + "  " + indent + "symbols:";
+		for (Symbol symbol : symbols) {
+			string += "\n" + "   " + indent + symbol.name + " : " + symbol.type;
+		}
 
-// 		public Scope(String name, Scope parent) {
-// 			this(name, parent, null);
-// 		}
+		Collection<Scope> scopes = this.getAllScopes();
+		string += "\n" + "  " + indent + "nested scopes:";
+		for (Scope childScope : scopes) {
+			string += "\n" + childScope.toString(indent + "   ");
+		}
+		return string;
+	}
 
-// 		public Scope(String name, Scope parent, Symbol symbol) {
-// 			this.name = name;
-// 			this.parent = parent;
-// 			this.childScopes = new HashMap<String, Scope>();
-// 			this.symbols = new HashMap<String, Scope>();
-// 			this.associatedSymbol = symbol;
-// 			this.overloadedMethodsStagedForMangling = new HashMap<String, List<Symbol>>();
-// 		}
+	public String toString() {
+		return toString("");
+	}
 
-// 		public boolean hasSymbol(String name) {
-// 			return symbols.containsKey(name);
-// 		}
+	public boolean hasParent() {
+		return (parent == null);
+	}
 
-// 		public boolean hasSymbol(Symbol symbol) {
-// 			return symbols.containsValue(symbol);
-// 		}
+	public boolean addSymbol(Symbol symbol) {
+		if (this.hasSymbol(symbol.name)) {
+			return false;
+		}
+		symbols.put(symbol.name, symbol);
+		return true;
+	}
 
-// 		public boolean hasChildScope(String name) {
-// 			return childScopes.containsKey(name);
-// 		}
+	public boolean hasSymbol(String name) {
+		return symbols.containsKey(name);
+	}
 
-// 		public boolean hasChildScope(Scope scope) {
-// 			return childScopes.containsValue(scope);
-// 		}
+	public Symbol getSymbol(String name) {
+		if (this.hasSymbol(name)) {
+			return symbols.get(name);
+		}
+		return null;
+	}
 
-// 		public boolean hasChildScopes() {
-// 			return (childScopes.size() == 0);
-// 		}
+	public String getSymbolType(String name) {
+		if (this.hasSymbol(name)) {
+			return symbols.get(name).type;
+		}
+		return null;
+	}
 
-// 		public void addChildScope(Scope child) {
-// 			childScopes.put(child.name, child);
-// 		}
+	public boolean addScope(Scope scope) {
+		if (this.hasScope(scope.associatedNode)) {
+			return false;
+		}
+		Scope old = nestedScopes.put(scope.associatedNode, scope);
+		return true;
+	}
 
-// 		public boolean addSymbol(Symbol symbol) {
-// 			symbols.put(symbol.name, symbol);
-// 		}
-// 	}
+	public boolean hasScope(GNode n) {
+		return nestedScopes.containsKey(n);
+	}
+
+	public Scope getScope(GNode n) {
+		if (this.hasScope(n)) {
+			return nestedScopes.get(n);
+		}
+		return null;
+	}
+
+	public Collection<Scope> getAllScopes() {
+		return nestedScopes.values();
+	}
+
+	public Collection<Symbol> getAllSymbols() {
+		return symbols.values();
+	}
+}
