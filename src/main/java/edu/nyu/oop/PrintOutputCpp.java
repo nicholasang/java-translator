@@ -239,6 +239,33 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
             penPrint("}");
         }
 
+        // array specializations
+        if (superClassName == "") { // if there is no superclass
+            penPrint("\n\nnamespace __rt\n{"
+                    + "template <>\n"
+                    + "java::lang::Class Array<inputs::javalang::" + ClassName + ">::__class()\n"
+                    + "{\n"
+                    + "static java::lang::Class k =\n"
+                    + "new java::lang::__Class(literal(\"[Linputs.javalang." + ClassName + ";\"),\n"
+                    + "java::lang::__Object::class(),\n"
+                    + "inputs::javalang::__" + ClassName + "::__class());\n"
+                    + "return k;\n"
+                    + "}\n}");
+        }
+        else {
+            penPrint("\n\nnamespace __rt\n{" // prints the name of the superclass
+                    + "template <>\n"
+                    + "java::lang::Class Array<inputs::javalang::" + ClassName + ">::__class()\n"
+                    + "{\n"
+                    + "static java::lang::Class k =\n"
+                    + "new java::lang::__Class(literal(\"[Linputs.javalang." + ClassName + ";\"),\n"
+                    + "java::lang::__Object::class(),\n"
+                    + "inputs::javalang::__" + ClassName + "::__class()),\n"
+                    + "inputs::javalang::__" + superClassName + "::__class());\n"
+                    + "return k;\n"
+                    + "}\n}");
+        }
+
         haveNoArgConstructor = false;
         superClassName = "";
         ClassName = "";

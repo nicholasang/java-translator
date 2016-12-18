@@ -202,7 +202,7 @@ namespace __rt {
   // add Java primitives hardcoded for array specializations
   // Template specialization for arrays of booleans.
   template<>
-    java::lang::Class Array<int32_t>::__class() {
+    java::lang::Class Array<boolean>::__class() {
       static java::lang::Class ik =
         new java::lang::__Class(__rt::literal("boolean"), (java::lang::Class) __rt::null(),
                                 (java::lang::Class) __rt::null(), true);
@@ -216,7 +216,7 @@ namespace __rt {
 
   // Template specialization for arrays of bytes.
   template<>
-    java::lang::Class Array<int32_t>::__class() {
+    java::lang::Class Array<int8_t>::__class() {
       static java::lang::Class ik =
         new java::lang::__Class(__rt::literal("byte"), (java::lang::Class) __rt::null(),
                                 (java::lang::Class) __rt::null(), true);
@@ -230,7 +230,7 @@ namespace __rt {
 
   // Template specialization for arrays of shorts.
   template<>
-    java::lang::Class Array<int32_t>::__class() {
+    java::lang::Class Array<short>::__class() {
       static java::lang::Class ik =
         new java::lang::__Class(__rt::literal("short"), (java::lang::Class) __rt::null(),
                                 (java::lang::Class) __rt::null(), true);
@@ -244,7 +244,7 @@ namespace __rt {
 
   // Template specialization for arrays of longs.
   template<>
-    java::lang::Class Array<int32_t>::__class() {
+    java::lang::Class Array<long>::__class() {
       static java::lang::Class ik =
         new java::lang::__Class(__rt::literal("long"), (java::lang::Class) __rt::null(),
                                 (java::lang::Class) __rt::null(), true);
@@ -258,7 +258,7 @@ namespace __rt {
 
   // Template specialization for arrays of floats.
   template<>
-    java::lang::Class Array<int32_t>::__class() {
+    java::lang::Class Array<float>::__class() {
       static java::lang::Class ik =
         new java::lang::__Class(__rt::literal("float"), (java::lang::Class) __rt::null(),
                                 (java::lang::Class) __rt::null(), true);
@@ -272,7 +272,7 @@ namespace __rt {
 
   // Template specialization for arrays of doubles.
   template<>
-    java::lang::Class Array<int32_t>::__class() {
+    java::lang::Class Array<double>::__class() {
       static java::lang::Class ik =
         new java::lang::__Class(__rt::literal("double"), (java::lang::Class) __rt::null(),
                                 (java::lang::Class) __rt::null(), true);
@@ -286,7 +286,7 @@ namespace __rt {
 
   // Template specialization for arrays of chars.
   template<>
-    java::lang::Class Array<int32_t>::__class() {
+    java::lang::Class Array<char>::__class() {
       static java::lang::Class ik =
         new java::lang::__Class(__rt::literal("char"), (java::lang::Class) __rt::null(),
                                 (java::lang::Class) __rt::null(), true);
