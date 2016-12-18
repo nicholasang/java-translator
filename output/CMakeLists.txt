@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.3)
-project(java_lang_5)
+project(java_lang_4)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(SOURCE_FILES
-    java_lang.cc
+    java_lang.cpp
     java_lang.h
-    main.cc
-    ptr.h)
+    ptr.h
+    main.cpp)
 
-add_executable(java_lang_5 $ {SOURCE_FILES})
+add_executable(java_lang_4 ${SOURCE_FILES})
