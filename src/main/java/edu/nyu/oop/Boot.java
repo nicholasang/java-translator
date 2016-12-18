@@ -1,10 +1,14 @@
 package edu.nyu.oop;
 
+import edu.nyu.oop.util.SourceHeaderOutputCommand;
+import edu.nyu.oop.util.SourceOutputCommand;
+import edu.nyu.oop.util.TranslationWriter;
 import edu.nyu.oop.util.CppHVisitor;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.nyu.oop.util.JavaFiveImportParser;
@@ -45,10 +49,10 @@ public class Boot extends Tool {
         super.init();
         // Declare command line arguments.
         runtime.
-        bool("printJavaAst", "printJavaAst", false, "Print Java Ast.").
-        bool("printJavaCode", "printJavaCode", false, "Print Java code.").
-        bool("printJavaImportCode", "printJavaImportCode", false, "Print Java code for imports and package source.").
-        bool("translateJava", "translateJava", false, "Translate Java to C++.");
+                bool("printJavaAst", "printJavaAst", false, "Print Java Ast.").
+                bool("printJavaCode", "printJavaCode", false, "Print Java code.").
+                bool("printJavaImportCode", "printJavaImportCode", false, "Print Java code for imports and package source.").
+                bool("translateJava", "translateJava", false, "Translate Java to C++.");
     }
 
     @Override
@@ -104,17 +108,29 @@ public class Boot extends Tool {
             Location longLocation = new Location(workingDir + "/" + nLocation.file, nLocation.line, nLocation.column);
             n.setLocation(longLocation);
 
+            List<SourceOutputCommand> cmds = new ArrayList<SourceOutputCommand>();
+
             //phase 1
             List<GNode> allAsts = GenerateJavaASTs.beginParse((GNode) n);
 
             //phase 2
             CppAst headerCppAst = CppHeaderAstGenerator.generateNew(allAsts);
 
-            //phase 3
-            new CppHVisitor().visit(headerCppAst);
+
+
+
+            cmds.add(new SourceHeaderOutputCommand(new CppHVisitor(), headerCppAst));
+
 
             //phase 4 + 5
-             CppCommands.convertToCpp(allAsts);
+            // cmds.addAll(CppCommands.convertToCpp(allAsts));
+
+            TranslationWriter tW = new TranslationWriter();
+
+            for (SourceOutputCommand cmd : cmds) {
+                tW.execute(cmd);
+            }
+
         }
 
 

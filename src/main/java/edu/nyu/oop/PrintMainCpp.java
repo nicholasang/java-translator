@@ -3,6 +3,8 @@ package edu.nyu.oop;
 import edu.nyu.oop.util.NodeUtil;
 import xtc.tree.Node;
 import xtc.tree.GNode;
+
+import java.io.IOException;
 import java.util.*;
 import java.io.FileWriter;
 
@@ -25,8 +27,7 @@ public class PrintMainCpp {
     public void print(Node mainClassDeclaration, Node packageDeclaration) {
         String[] printLaterArray = new String[1];
         printLaterArray[0] = "";
-        printVisitor = new PrintOutputCpp(pen, printLaterArray, (GNode) mainClassDeclaration);
-        printVisitor.inMain = true;
+        printVisitor = new PrintOutputCpp(pen, printLaterArray, (GNode) mainClassDeclaration, true);
 
         List<Node> fields = NodeUtil.dfsAll(mainClassDeclaration, "FieldDeclaration");
 
@@ -48,6 +49,13 @@ public class PrintMainCpp {
         printStaticFields(fields);
 
         printMainMethod(mainClassDeclaration);
+
+        try {
+            this.pen.flush();
+            this.pen.close();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void printMainMethod(Node mainClassDeclaration) {
@@ -83,10 +91,10 @@ public class PrintMainCpp {
     private void printInitialStuff(String namespace) {
         try {
             pen.write("#include <iostream>\n" +
-                      "#include \"output.h\"\n" +
-                      "#include \"java_lang.h\"\n" +
-                      "using namespace std;\n" +
-                      "using namespace java::lang; ");
+                    "#include \"output.h\"\n" +
+                    "#include \"java_lang.h\"\n" +
+                    "using namespace std;\n" +
+                    "using namespace java::lang; ");
             pen.write("using namespace " + namespace + "; ");
         } catch (Exception e) {
             System.out.println(e);
