@@ -40,8 +40,8 @@ public class CppHVisitor extends xtc.tree.Visitor {
             return "public:\n";
         }
         case "private"   : {
-            this.curAccess = "private";
-            return "private:\n";
+            this.curAccess = "public";
+            return "public:\n";
         }
         case "protected" : {
             this.curAccess = "protected";
