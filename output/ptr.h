@@ -1,112 +1,79 @@
 #pragma once
 
-#include <cstring>
-
-#if 0
 #include <iostream>
-#define TRACE(s) \
-  std::cout << __FUNCTION__ << ":" << __LINE__ << ":" << s << std::endl
-#else
-#define TRACE(s)
-#endif
+#include <string>
 
-namespace __rt {
+#define TRACE true
 
-  template<typename T>
-  struct object_policy;
+namespace __rt
+{
 
-  template<typename T>
-  struct array_policy;
+template<typename T>
+class Ptr
+{
+    T* addr;
 
-  template<typename T>
-  struct java_policy;
+    void trace(std::string s) const
+    {
+        if(TRACE)
+            std::cout << __FUNCTION__ << ":" << __LINE__ << ": " << s << std::endl;
+    }
 
-  template<typename T, template <typename> class P = java_policy>
-  class Ptr {
-      T* addr;
-      size_t* counter;
+public:
+    Ptr(T* addr) : addr(addr)
+    {
+        trace("constructor");
+    }
 
-  public:
-      typedef T value_type;
-      typedef P<T> delete_policy;
+    Ptr(const Ptr& other) : addr(other.addr)
+    {
+        trace("copy constructor");
+    }
 
-      Ptr(T* addr = 0) : addr(addr), counter(new size_t(1)) {
-        TRACE(addr);
-      }
+    ~Ptr()
+    {
+        trace("destructor");
+    }
 
-      Ptr(const Ptr& other) : addr(other.addr), counter(other.counter) {
-        TRACE(addr);
-        ++(*counter);
-      }
-
-      ~Ptr() {
-        TRACE(addr);
-        if (0 == --(*counter)) {
-          delete_policy::destroy(addr);;
-          delete counter;
-        }
-      }
-
-      Ptr& operator=(const Ptr& right) {
-        TRACE(addr);
-        if (addr != right.addr) {
-          if (0 == --(*counter)) {
-            delete_policy::destroy(addr);
-            delete counter;
-          }
-          addr = right.addr;
-          counter = right.counter;
-          ++(*counter);
+    Ptr& operator=(const Ptr& right)
+    {
+        trace("assignment operator");
+        if (addr != right.addr)
+        {
+            addr = right.addr;
         }
         return *this;
-      }
+    }
 
-      T& operator*()  const { TRACE(addr); return *addr; }
-      T* operator->() const { TRACE(addr); return addr;  }
-      T* raw()        const { TRACE(addr); return addr;  }
+    T& operator*() const
+    {
+        trace("dereference operator");
+        return *addr;
+    }
 
-      template<typename U, template <typename> class Q>
-      friend class Ptr;
+    T* operator->() const
+    {
+        trace("arrow operator");
+        return addr;
+    }
 
-      template<typename U, template <typename> class Q>
-      Ptr(const Ptr<U,Q>& other) : addr((T*)other.addr), counter(other.counter) {
-        TRACE(addr);
-        ++(*counter);
-      }
+    operator T*() const
+    {
+        trace("cast operator");
+        return addr;
+    }
 
-      template<typename U, template <typename> class Q>
-      bool operator==(const Ptr<U,Q>& other) const {
-        return addr == (T*)other.addr;
-      }
+    Ptr<T> id(Ptr<T> p) const
+    {
+        trace("return");
+        return p;
+    }
 
-      template<typename U, template <typename> class Q>
-      bool operator!=(const Ptr<U,Q>& other) const {
-        return addr != (T*)other.addr;
-      }
+    void* raw() const
+    {
+        return addr;
+    }
 
-  };
-
-  // Deletion policies
-
-  template<typename T>
-  struct object_policy {
-      static void destroy(T* addr) {
-        delete addr;
-      }
-  };
-
-  template<typename T>
-  struct array_policy {
-      static void destroy(T* addr) {
-        delete[] addr;
-      }
-  };
-
-  template<typename T>
-  struct java_policy {
-      static void destroy(T* addr) {
-        if (0 != addr) addr->__vptr->__delete(addr);
-      }
-  };
+};
 
 }
