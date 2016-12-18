@@ -116,17 +116,23 @@ public class Boot extends Tool {
             //phase 2
             CppAst headerCppAst = CppHeaderAstGenerator.generateNew(allAsts);
 
-            cmds.add(new SourceHeaderOutputCommand(new CppHVisitor(), headerCppAst));
+            new CppHVisitor().visit(headerCppAst);
+
+            //TranslationWriter tW = new TranslationWriter();
+
+
+            //cmds.add(new SourceHeaderOutputCommand(new CppHVisitor(), headerCppAst));
+
+            //tW.execute(cmds.get(0));
 
             //phase 4 + 5
-            cmds.addAll(CppCommands.convertToCpp(allAsts));
+            // cmds.addAll(CppCommands.convertToCpp(allAsts));
 
-            TranslationWriter tW = new TranslationWriter();
-
+/*
             for (SourceOutputCommand cmd : cmds) {
                 tW.execute(cmd);
             }
-
+*/
         }
 
 
