@@ -8,6 +8,18 @@ import java.io.FileWriter;
 /**
  * Created by alex on 10/27/16.
  */
+
+
+// ! ! !
+    /*
+        have convert to Cpp return a list of SourceOutputCommands, one for cpp, one for main.
+            please see SourceMainOutputCommand and SourceCppOutputCommand for the "mock-up" of what arguments / code should be to enable the mock-up to be correct
+            idea is to pass a fully initialized PrintMainCpp or PrintOutputCpp to the Command constructor. Try to keep the one-element String array and FileWriter *inside* the
+            printer. I tried to do this and got close, but things broke because PrintMainCpp creates a PrintOutputCpp, so my changes to one affected the other.
+            You know this code better than I do. Is there a way to get the files in CommandDesignWIP working with a revision of your classes?
+            Put printCpp in the print method that does everythng in PrintOutputCpp and the same for printMain in PintMainCpp
+     */
+
 public class CppCommands {
 
     public static List<GNode> convertToCpp(List<GNode> javaRoots) {
