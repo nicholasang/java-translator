@@ -27,6 +27,19 @@ __D::__D() :__vptr(&__vtable)
 {
 }
 
+namespace __rt
+{
+template <>
+java::lang::Class Array<inputs::javalang::D>::__class()
+{
+    static java::lang::Class k =
+        new java::lang::__Class(literal("[Linputs.javalang.D;"),
+                                java::lang::__Object::class(),
+                                inputs::javalang::__D::__class());
+    return k;
+}
+}
+
 __A_VT __A::__vtable;
 
 Class __A::__class()
@@ -60,7 +73,20 @@ String __A::Love(A __this)
     return (new __String("is all you need")) ;
 
 }
-namespace inputs
+
+
+namespace __rt
+{
+template <>
+java::lang::Class Array<inputs::javalang::A>::__class()
+{
+    static java::lang::Class k =
+        new java::lang::__Class(literal("[Linputs.javalang.A;"),
+                                java::lang::__Object::class(),
+                                inputs::javalang::__A::__class());
+    return k;
+}
+} namespace inputs
 {
 namespace testABCD
 {
@@ -83,6 +109,20 @@ int32_t __C::add(C __this, int32_t x int32_t y  )
 }
 __C::__C() :__vptr(&__vtable)
 {
+}
+
+namespace __rt
+{
+template <>
+java::lang::Class Array<inputs::javalang::C>::__class()
+{
+    static java::lang::Class k =
+        new java::lang::__Class(literal("[Linputs.javalang.C;"),
+                                java::lang::__Object::class(),
+                                inputs::javalang::__C::__class()),
+    inputs::javalang::__A::__class());
+    return k;
+}
 } namespace inputs
 {
 namespace testABCD
@@ -107,6 +147,20 @@ String __B::getArbitraryData(B __this)
 }
 __B::__B() :__vptr(&__vtable)
 {
+}
+
+namespace __rt
+{
+template <>
+java::lang::Class Array<inputs::javalang::B>::__class()
+{
+    static java::lang::Class k =
+        new java::lang::__Class(literal("[Linputs.javalang.B;"),
+                                java::lang::__Object::class(),
+                                inputs::javalang::__B::__class()),
+    inputs::javalang::__A::__class());
+    return k;
+}
 }
 }
 }

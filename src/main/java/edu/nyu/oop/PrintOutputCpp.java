@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import edu.nyu.oop.util.NodeUtil;
 /**
@@ -240,7 +241,7 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
         }
 
         // array specializations
-        if (superClassName == "") { // if there is no superclass
+        if (Objects.equals(superClassName, "")) { // if there is no superclass
             penPrint("\n\nnamespace __rt\n{"
                     + "template <>\n"
                     + "java::lang::Class Array<inputs::javalang::" + ClassName + ">::__class()\n"
