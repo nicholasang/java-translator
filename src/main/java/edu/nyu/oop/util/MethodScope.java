@@ -7,13 +7,13 @@ import xtc.tree.GNode;
 
 
 public class MethodScope extends Scope {
-	ClassScope classScope;
-	String name; // not mangled
-	String uniqueName; // mangled
+	public ClassScope classScope;
+	public String name; // not mangled
+	public String uniqueName; // mangled
 	List< String > parameterTypes; // in order
-    String returnType;
-    boolean isPrivate;
-    boolean isStatic;
+    public String returnType;
+    public boolean isPrivate;
+    public boolean isStatic;
 
 	public MethodScope(GNode n) {
 		this(n, null);
@@ -65,6 +65,10 @@ public class MethodScope extends Scope {
 
 	public void addParameter(String type) {
 		parameterTypes.add(type);
+	}
+
+	public List<String> getParameterTypes() {
+		return parameterTypes;
 	}
 
 	public String getMangledName() {

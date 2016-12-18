@@ -7,7 +7,7 @@ import xtc.tree.GNode;
 
 
 public class ConstructorScope extends Scope {
-    ClassScope classScope;
+    public ClassScope classScope;
     List< String > parameterTypes; // in order
 
     public ConstructorScope(GNode n) {

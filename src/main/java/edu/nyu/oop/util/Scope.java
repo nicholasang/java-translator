@@ -11,8 +11,8 @@ public class Scope {
 
 	private Map< GNode, Scope > nestedScopes;
 	private Map< String, Symbol > symbols;
-	Scope parent;
-	GNode associatedNode;
+	public Scope parent;
+	public GNode associatedNode;
 
 	public Scope() {
 		this(null, null);

@@ -7,16 +7,17 @@ import xtc.tree.GNode;
 
 
 public class ClassScope extends Scope {
-	static Map< String, ClassScope > classScopes = new HashMap< String, ClassScope >();
+	public static Map< String, ClassScope > classScopes = new HashMap< String, ClassScope >();
 	static {
 		ClassScope object = new ClassScope();
 		object.name = "Object";
+		object.superClass = null;
 		// TODO: add methods and stuff (?)
 		classScopes.put("Object", object);
 	}
 
-	String superClass;
-	String name;
+	public String superClass;
+	public String name;
 	private Map< String, Set< MethodScope > > methods;
     private List<ConstructorScope> constructors;
 
