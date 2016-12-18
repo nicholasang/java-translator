@@ -548,24 +548,24 @@ public class FillLayoutSchematic {
     private static String getCType(String javaType) {
         String cType;
         switch (javaType) {
-            case "long":
-                cType = "int64_t";
-                break;
-            case "int":
-                cType = "int32_t";
-                break;
-            case "short":
-                cType = "int16_t";
-                break;
-            case "byte":
-                cType = "int8_t";
-                break;
-            case "boolean":
-                cType = "bool";
-                break;
-            default:
-                cType = javaType;
-                break;
+        case "long":
+            cType = "int64_t";
+            break;
+        case "int":
+            cType = "int32_t";
+            break;
+        case "short":
+            cType = "int16_t";
+            break;
+        case "byte":
+            cType = "int8_t";
+            break;
+        case "boolean":
+            cType = "bool";
+            break;
+        default:
+            cType = javaType;
+            break;
         }
 
         return cType;

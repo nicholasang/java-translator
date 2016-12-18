@@ -23,12 +23,13 @@ public class SourceCppOutputCommand implements SourceOutputCommand {
     public void outputSourceExecute() {
         // XtcTestUtils.prettyPrintAst(javaRoots.get(0));
 
+        printer.start();
 
         for (int i = 0; i < this.javaRoots.size(); i++) {
             printer.visit(this.javaRoots.get(i));
 
         }
-        // printer.finish(); // for after-visiting printing
+        printer.finish(); // for after-visiting printing
 
     }
 }

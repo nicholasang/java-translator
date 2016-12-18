@@ -1,10 +1,14 @@
 package edu.nyu.oop;
 
+import edu.nyu.oop.util.CommandDesignWIP.SourceHeaderOutputCommand;
+import edu.nyu.oop.util.CommandDesignWIP.SourceOutputCommand;
+import edu.nyu.oop.util.CommandDesignWIP.TranslationWriter;
 import edu.nyu.oop.util.CppHVisitor;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.nyu.oop.util.JavaFiveImportParser;
@@ -104,17 +108,25 @@ public class Boot extends Tool {
             Location longLocation = new Location(workingDir + "/" + nLocation.file, nLocation.line, nLocation.column);
             n.setLocation(longLocation);
 
+            List<SourceOutputCommand> cmds = new ArrayList<SourceOutputCommand>();
+
             //phase 1
             List<GNode> allAsts = GenerateJavaASTs.beginParse((GNode) n);
 
             //phase 2
             CppAst headerCppAst = CppHeaderAstGenerator.generateNew(allAsts);
 
-            //phase 3
-            new CppHVisitor().visit(headerCppAst);
+            cmds.add(new SourceHeaderOutputCommand(new CppHVisitor(), headerCppAst));
 
             //phase 4 + 5
-             CppCommands.convertToCpp(allAsts);
+            cmds.addAll(CppCommands.convertToCpp(allAsts));
+
+            TranslationWriter tW = new TranslationWriter();
+
+            for (SourceOutputCommand cmd : cmds) {
+                tW.execute(cmd);
+            }
+
         }
 
 
