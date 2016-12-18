@@ -171,6 +171,11 @@ namespace java {
         if (__this->__vptr->equals(__this, (Object)k)) return true;
 
         // FIXME: handle covariance of arrays
+        if(__this->__vptr->isArray(__this) && k->__vptr->isArray(k)) {
+        	Class c1 = __this->__vptr->getComponentType(__this);
+        	Class c2 = k->__vptr->getComponentType(k);
+        	if (c1->__vptr->equals(c1, (Object) c2)) return true;
+        }
 
         k = k->__vptr->getSuperclass(k);
       } while ((Class)__rt::null() != k);
