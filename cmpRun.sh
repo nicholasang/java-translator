@@ -86,9 +86,6 @@ function comp_java_cpp {
 
 #run all functions in order
 function run_test {
-    pre_clean "./src/test/record.txt"
-    touch "./src/test/record.txt"
-    
     output_java $1
     output_cpp
     if [ "$?" -eq 0 ]
@@ -127,6 +124,8 @@ then
         pre_clean "./output/main.cpp"
         pre_clean "./output/output.cpp"
         pre_clean "./output/output.h"
+        pre_clean "./src/test/record.txt"
+        touch "./src/test/record.txt"
         
         translate_and_compile $1
         run_test $1
@@ -138,6 +137,8 @@ then
         pre_clean "./output/main.cpp"
         pre_clean "./output/output.cpp"
         pre_clean "./output/output.h"
+        pre_clean "./src/test/record.txt"
+        touch "./src/test/record.txt"
         
         for i in $(seq -f "%03g" 0 "$1")
         do
