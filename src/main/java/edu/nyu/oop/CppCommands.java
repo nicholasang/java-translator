@@ -14,7 +14,7 @@ public class CppCommands {
     public static List<GNode> convertToCpp(List<GNode> javaRoots) {
 //        XtcTestUtils.prettyPrintAst(javaRoots.get(0));
         List<GNode> CppRoots = new ArrayList<GNode>();
-        //MakeCppAst visitor = new MakeCppAst();
+  //      MakeCppAst visitor = new MakeCppAst();
         GNode mainClassNode = null;
         GNode packageNode = null;
         for (int i = 0; i < javaRoots.size(); i++) {
@@ -26,14 +26,15 @@ public class CppCommands {
             if (visitor.mainClassNode != null){
                 mainClassNode = visitor.mainClassNode;
             }
-            //visitor.visit(javaRoots.get(i));
+ //           visitor.visit(javaRoots.get(i));
         }
         XtcTestUtils.prettyPrintAst(CppRoots.get(0));
-//        printCpp(javaRoots, mainClassNode);
- //       printMain(mainClassNode, packageNode);
+//        XtcTestUtils.prettyPrintAst(javaRoots.get(0));
+        printCpp(CppRoots, mainClassNode);
+//       printMain(mainClassNode, packageNode);
 
-        //printCpp(javaRoots, visitor.mainClassNode);
-        //printMain(visitor.mainClassNode, visitor.packageNode);
+   //     printCpp(javaRoots, visitor.mainClassNode);
+   //    printMain(visitor.mainClassNode, visitor.packageNode);
 
         return javaRoots;
     }
@@ -47,7 +48,7 @@ public class CppCommands {
 
             output.write("#include \"output.h\"\n#include \"java_lang.h\"\nusing namespace std;\n#include <iostream>\nusing namespace java::lang;\n"); //#include <io.stream> \n#pragma once \n
 
-            PrintOutputCpp visitor = new PrintOutputCpp(output, printAtEnd, mainClass);
+            NewPrintCpp visitor = new NewPrintCpp(output, printAtEnd, mainClass);
 
             for (int i = 0; i < javaRoots.size(); i++) {
                 visitor.visit(javaRoots.get(i));

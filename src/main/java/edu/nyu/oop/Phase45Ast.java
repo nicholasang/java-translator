@@ -25,19 +25,19 @@ public class Phase45Ast extends Visitor{
     }
 
     public GNode visit(Node n) {
-        if (n.size() == 1 && n.get(0) instanceof Node){
-            return (GNode)dispatch((Node) n.get(0));
-        }
-        else{
+   //     if (n.size() == 1 && n.get(0) instanceof Node){
+  //          return (GNode)dispatch((Node) n.get(0));
+  //      }
+//        else{
             GNode blank = GNode.create(n.getName());
             PackageNode(blank,n);
             return blank;
-        }
+     //   }
     }
 
     //create GNode.Fixed# for # of variables up to 8
 
-    //make class GNode
+/*    //make class GNode
     public GNode visitClassDeclaration(GNode n){
         GNode Class = GNode.create("ClassDeclaration");
         PackageNode(Class,n);
@@ -70,6 +70,11 @@ public class Phase45Ast extends Visitor{
                     //operations
         public GNode visitPackageDeclaration(GNode n) {
             GNode Namespace = GNode.create("Namespace");
+            for (int i = 0; i < ((Node)n.get(1)).size(); i++) {
+                if (((Node)n.get(1)).get(i) instanceof String) {
+                    ((Node)n.get(1)).set(i,"namespace " + ((Node)n.get(1)).get(i).toString() + " { \n");
+                }
+            }
             PackageNode(Namespace,n);
             packageNode = Namespace;
             return Namespace;
@@ -191,7 +196,7 @@ public class Phase45Ast extends Visitor{
                     sb += "->data";
                 }
                 if (arg.equals("println")) {
-                    n.set(2, "std::cout << " + sb + "<< endl");
+                    n.set(2, "std::cout << " + sb + "<< endl;");
                 } else {
                     n.set(2, "std::cout << " + sb);
                 }
@@ -363,6 +368,9 @@ public class Phase45Ast extends Visitor{
             if(!str.startsWith("(new") && !isArgument){
                 n.set(0, "(new __String(" + str + "))");
             }
+            else if (isArgument && str.startsWith("(new") && !str.endsWith("data")){
+                n.set(0, str + "->data");
+            }
 
         }
         GNode StringLiteral = GNode.create("StringLiteral");
@@ -392,8 +400,8 @@ public class Phase45Ast extends Visitor{
         GNode Modifiers = GNode.create("Modifiers");
         PackageNode(Modifiers,n);
         return Modifiers;
-    }
-
+   }
+*/
  /*   public GNode visit(GNode n) {
         GNode  = GNode.create("");
         PackageNode(,n);
@@ -411,7 +419,7 @@ public class Phase45Ast extends Visitor{
 
 
             if (o instanceof String) {
-                if(o.toString().equals("+") && (line.endsWith("\" ") || line.endsWith("\"))))"))) {
+                if(o.toString().equals("+") && (line.endsWith("\" ") || line.endsWith("\"))"))) {
                     line = line + " << ";
                 } else if (o.toString().startsWith("\"") && line.endsWith("+ ")) {
                     line = line.substring(0, line.length() - 2) + " << " + o.toString() + " ";
@@ -454,13 +462,14 @@ public class Phase45Ast extends Visitor{
 
     private void PackageNode(GNode gn, Node n){
         for (int i = 0; i < n.size(); i++) {
-            if (n.get(i) instanceof Node){
+            if (n.get(i) instanceof Node && n.get(i) != null){
                 Object retNode = dispatch((Node) n.get(i));
-                if (retNode != null){
+                //if (retNode != null){
                     gn.add(retNode);
-                }
+                //}
             }
-            else if (n.get(i) != null){
+            //else if (n.get(i) != null){
+            else{
                 gn.add(n.get(i));
             }
         }

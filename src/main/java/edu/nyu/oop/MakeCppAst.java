@@ -14,6 +14,7 @@ public class MakeCppAst extends Visitor {
     public boolean mainMethodDeclarationFound = false;
     public GNode mainClassNode;
     public GNode packageNode;
+    public boolean isArgument = false;
 
     public void visit(Node n) {
         for (Object o: n) {
@@ -239,6 +240,7 @@ public class MakeCppAst extends Visitor {
     }
 
     public void visitArguments(GNode n) {
+        isArgument = true;
         if (n.size() > 0) {
             if (((GNode)n.get(0)) instanceof Node) {
                 visit(n);
@@ -263,6 +265,8 @@ public class MakeCppAst extends Visitor {
             }
         }
         //if empty
+
+        isArgument = false;
     }
 
     public void visitMethodDeclaration(GNode n) {
@@ -278,7 +282,13 @@ public class MakeCppAst extends Visitor {
     public void visitStringLiteral(GNode n) {
         if (n.get(0) != null) {
             String str = n.getString(0);
-            n.set(0, "(new __String(" + str + "))");
+            if(!str.startsWith("(new") && !isArgument){
+                n.set(0, "(new __String(" + str + "))");
+            }
+            if (isArgument && str.startsWith("(new") && !str.endsWith("data")){
+                n.set(0, str + "->data");
+            }
+
         }
         visit(n);
     }
@@ -294,7 +304,7 @@ public class MakeCppAst extends Visitor {
 
 
             if (o instanceof String) {
-                if(o.toString().equals("+") && line.endsWith("\" ")) {
+                if(o.toString().equals("+") && (line.endsWith("\" ") || line.endsWith("\"))"))) {
                     line = line + " << ";
                 } else if (o.toString().startsWith("\"") && line.endsWith("+ ")) {
                     line = line.substring(0, line.length() - 2) + " << " + o.toString() + " ";

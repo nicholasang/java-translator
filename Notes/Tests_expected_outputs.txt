@@ -1,0 +1,100 @@
+Tests		Expected output				Works?
+000			Hello.						Y
+001			A							Y
+002			A							Y
+003			A							NOPE
+004			A B							NOPE
+005			A B 						Y
+006			A B 						NOPE
+007			A B 						NOPE
+008			A B 						NOPE
+009			inputs.test009.A@53ddbcb1 	NOPE
+010			A B1 B2 C
+011			A B1 B2 C
+012			A B1 B2 still C
+013			inputs.test013.A@30813486
+014			[NullPointerException]
+015			inputs.test015.A@50d55a0f
+016			[ClassCastException]
+017			inputs.test017.A@3214512e
+018			0
+019			3
+020			4
+021			4
+022			[nothing]
+023			[nothing]
+024			0 1 2 3 4 5 6 7 8 9
+025			10 9 8 7 6 5 4 3 2 1
+026			[ArrayStoreException]
+027			0 1 2 3 4 5 6 7 8 9 [ArrayIndexOutOfBoundsException]
+028			class [Linputs.test028.A;
+029			[NegativeArraySizeException]
+030			class [[Linputs.test030.A;
+031			0 0 0 0 0 0 1 2 3 4 0 2 4 6
+			8 0 3 6 9 12 0 4 8 12 16
+032			A.m(int)
+			A.m(A)
+			A.m(double)
+			A.m(Object)
+			A.m(A, Object)
+			A.m(Object, Object)
+033			A.m(int)
+			A.m(A)
+			A.m(double)
+			A.m(Object)
+			A.m(A, Object)
+			A.m(Object, Object)
+034			A.m(byte)
+			A.m(int)
+			A.m(double)
+035			A.m(byte)
+			A.m(double)
+			A.m(double)
+036			A.m(Object, Object)
+			A.m(A, Object)
+			A.m(Object, A)
+037			A.m(Object, Object)
+			A.m(A, Object)
+			A.m(Object, A)
+038			B.m(Object, Object)
+			B.m(B, Object)
+			B.m(Object, B)
+039			A.m(A, Object)
+			B.m(B, Object)
+			B.m(Object, B)
+040			A.m(A, Object)
+			A.m(A, Object)
+			A.m(Object, A)
+041			A.m(A, Object)
+			C.m(C, C)
+			A.m(Object, A)
+042			A.m(A)
+			A.m()
+			B.m(B)
+			B.m()
+			B.m(A)
+			B.m()
+043			B.m(B)
+			C.m()
+044			B.m(B)
+			B.m(A)
+			C.m()
+045			B.m(A)
+			B.m(A)
+			B.m(A)
+			B.m()
+046			A.m(A)
+			A.m(A)
+			B.m(A)
+			B.m()
+047			A.m(A)
+			B.m(B)
+			C.m()
+048			A.m(A)
+			B.m(A)
+			B.m()
+049			[NullPointerException]
+050			A.m(A)
+			B.m(A)
+			B.m(A)
+			A.m()

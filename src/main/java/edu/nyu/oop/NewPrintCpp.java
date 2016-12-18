@@ -2,16 +2,14 @@ package edu.nyu.oop;
 
 import xtc.tree.Node;
 import xtc.tree.GNode;
-import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import edu.nyu.oop.util.NodeUtil;
 /**
  * Created by alex on 10/27/16.
  */
-public class PrintOutputCpp extends xtc.tree.Visitor {
+public class NewPrintCpp extends xtc.tree.Visitor {
 
     boolean inConstructor;
     String superClassName = "";
@@ -29,7 +27,7 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
     ArrayList<String> variablesInScope = new ArrayList<String>();
     public boolean inMain = false;
 
-    public PrintOutputCpp(FileWriter outFileWrite, String[] printLater, GNode mainClass) {
+    public NewPrintCpp(FileWriter outFileWrite, String[] printLater, GNode root) {
         this.printLater = printLater;
         pen = outFileWrite;
         this.mainClass = mainClass;
@@ -49,6 +47,18 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
                 }
             }
         }
+    }
+
+    public void visitPackageDeclaration(GNode n){
+        GNode identifiers = null;
+        if (n.get(1) instanceof GNode){
+             identifiers = (GNode)n.get(1);
+
+        }
+        else{
+            //no namespaces/packages?
+        }
+
     }
 
     ////////////////new stuff//////////////////////////////
@@ -254,9 +264,9 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
 
         penPrint("\n\n__" + ClassName + "_VT __" + ClassName + "::__vtable;\n");
         penPrint("\nClass __" + ClassName + "::__class() {\n" +
-                 "static Class k = \n"
-                 + "new __Class(__rt::literal(\"class " + pack + ClassName + "\"), __Object::__class());\n"
-                 + "return k;}\n\n");
+                "static Class k = \n"
+                + "new __Class(__rt::literal(\"class " + pack + ClassName + "\"), __Object::__class());\n"
+                + "return k;}\n\n");
 
         //erase stuff so it doesn't print twice
         for (int i = 0; i < 5; i++) {
