@@ -2,10 +2,9 @@
 ----------
 
 ## Features:
-- translates java into C++ header files for all 21 provided inputs
+- translates java into C++ header files for all provided inputs
 - translates java into output.cpp and main.cpp files for 6 inputs (test000 through test005)
-- supports method overriding (not overloading)
-- does not support arrays
+- supports method overriding and overloading
 
 Input files must be correct Java!
 
@@ -20,8 +19,6 @@ Output will be placed in the output.h, output.c, and main.cpp files within the o
 
 ## To run translated C++ files:
 ```cpp ```
-
-Note: this only currently works for the first 6 test files - others do not have main.cpp and output.cpp translated correctly.
 
 ## To format translated C++ files:
 ```formatc ```
