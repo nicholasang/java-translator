@@ -241,31 +241,28 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
         }
 
         // array specializations
-        if (Objects.equals(superClassName, "")) { // if there is no superclass
-            penPrint("\n\nnamespace __rt\n{"
-                    + "template <>\n"
-                    + "java::lang::Class Array<inputs::javalang::" + ClassName + ">::__class()\n"
-                    + "{\n"
-                    + "static java::lang::Class k =\n"
-                    + "new java::lang::__Class(literal(\"[Linputs.javalang." + ClassName + ";\"),\n"
-                    + "java::lang::__Object::class(),\n"
-                    + "inputs::javalang::__" + ClassName + "::__class());\n"
-                    + "return k;\n"
-                    + "}\n}");
-        }
-        else {
-            penPrint("\n\nnamespace __rt\n{" // prints the name of the superclass
-                    + "template <>\n"
-                    + "java::lang::Class Array<inputs::javalang::" + ClassName + ">::__class()\n"
-                    + "{\n"
-                    + "static java::lang::Class k =\n"
-                    + "new java::lang::__Class(literal(\"[Linputs.javalang." + ClassName + ";\"),\n"
-                    + "java::lang::__Object::class(),\n"
-                    + "inputs::javalang::__" + ClassName + "::__class()),\n"
-                    + "inputs::javalang::__" + superClassName + "::__class());\n"
-                    + "return k;\n"
-                    + "}\n}");
-        }
+            penPrint("}\n}\n\nnamespace __rt\n{"); // closes the other namespaces
+            if (Objects.equals(superClassName, "")) {
+                penPrint("template<>\n"
+                        + "java::lang::Class Array<inputs::" + pack.substring(7,14) + "::" + ClassName + ">::__class()"
+                        + "{\n"
+                        + "static java::lang::Class k =\n"
+                        + "new java::lang::__Class(literal(\"[Linputs." + pack.substring(7) + ClassName + ";\"),"
+                        + "\njava::lang::__Object::__class(),\n"
+                        + "inputs::" + pack.substring(7,14) + "::__" + ClassName + "::__class());\n" +
+                        "return k;\n}\n}" + "\n\nnamespace inputs {\nnamespace " + pack.substring(7,14) + "{");
+            }
+            else {
+                penPrint("template<>\n"
+                        + "java::lang::Class Array<inputs::" + pack.substring(7, 14) + "::" + ClassName + ">::__class()"
+                        + "{\n"
+                        + "static java::lang::Class k =\n"
+                        + "new java::lang::__Class(literal(\"[Linputs." + pack.substring(7) + ClassName + ";\"),"
+                        + "\ninputs::" + pack.substring(7, 14) + "::__" + superClassName + "::__class(),\n"
+                        + "inputs::" + pack.substring(7, 14) + "::__" + ClassName + "::__class());\n" +
+                        "return k;");
+            }
+
 
         haveNoArgConstructor = false;
         superClassName = "";

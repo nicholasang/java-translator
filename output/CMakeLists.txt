@@ -9,4 +9,4 @@ set(SOURCE_FILES
     ptr.h
     main.cpp)
 
-add_executable(java_lang_4 ${SOURCE_FILES})
+add_executable(java_lang_4 $ {SOURCE_FILES})
