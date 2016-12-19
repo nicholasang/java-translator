@@ -166,6 +166,10 @@ public class SymbolTable {
 		return null;
 	}
 
+	public Scope getCurrentScope() {
+		return currentScope;
+	}
+
 	public String toString() {
 		String string = "root";
 		Collection<Scope> scopes = root.getAllScopes();

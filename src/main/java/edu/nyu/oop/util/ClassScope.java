@@ -20,6 +20,7 @@ public class ClassScope extends Scope {
 	public String name;
 	private Map< String, Set< MethodScope > > methods;
     private List<ConstructorScope> constructors;
+    public boolean isMainMethodClass;
 
 	public ClassScope() {
 		super();
@@ -102,6 +103,9 @@ public class ClassScope extends Scope {
 			Set<MethodScope> set = new HashSet<MethodScope>();
 			set.add(method);
 			methods.put(name, set);
+			if (name.equals("main")) {
+				isMainMethodClass = true;
+			}
 		}
 	}
 

@@ -67,8 +67,8 @@ public class SymbolTableBuilder extends RecursiveVisitor {
 
 	public void visitMethodDeclaration(GNode n) {
 	// - has Block
-		boolean isStatic = false, isPrivate = false;
-		setModifiers((GNode) n.getNode(0), isStatic, isPrivate);
+		boolean isStatic = isStatic((GNode) n.getNode(0));
+		boolean isPrivate = isPrivate((GNode) n.getNode(0));
 
 		String returnType = (String) dispatch(n.getNode(2)); // Type or VoidType
 		String name = n.getString(3);
@@ -150,26 +150,31 @@ public class SymbolTableBuilder extends RecursiveVisitor {
 		}
 	}
 
-	public void setModifiers(GNode modifiers, boolean isStatic, boolean isPrivate) {
+	public boolean isStatic(GNode modifiers) {
 		Modifier modifier = visitModifiers(modifiers);
-		isStatic = false;
-		isPrivate = false;
 		if (modifier == Modifier.STATIC_PRIVATE) {
-			isStatic = true;
-			isPrivate = true;
+			return true;
 		}
 		else if (modifier == Modifier.STATIC) {
-			isStatic = true;
+			return true;
+		}
+		return false;
+	}
+
+	public boolean isPrivate(GNode modifiers) {
+		Modifier modifier = visitModifiers(modifiers);
+		if (modifier == Modifier.STATIC_PRIVATE) {
+			return true;
 		}
 		else if (modifier == Modifier.PRIVATE) {
-			isPrivate = true;
+			return true;
 		}
-
+		return false;
 	}
 
 	public void visitFieldDeclaration(GNode n) {
-		boolean isStatic = false, isPrivate = false;
-		setModifiers((GNode) n.getNode(0), isStatic, isPrivate);
+		boolean isStatic = isStatic((GNode) n.getNode(0));
+		boolean isPrivate = isPrivate((GNode) n.getNode(0));
 
 		String type = visitType((GNode) n.getNode(1)); // can't be VoidType
 		List<String> names = visitDeclarators((GNode) n.getNode(2));

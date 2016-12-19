@@ -49,4 +49,8 @@ public class ConstructorScope extends Scope {
 		parameterTypes.add(type);
 	}
 
+	public List<String> getParameterTypes() {
+		return parameterTypes;
+	}
+
 }

@@ -59,6 +59,8 @@ public class MethodOverloadResolver {
 	}
 
 	public String getArgType(Node arg) {
+		// TODO: handle a CallExpressino as an argument
+
 		String type = "";
 		switch (arg.getName()) {
 			case "NewClassExpression":
@@ -100,6 +102,22 @@ public class MethodOverloadResolver {
 		return type;
 	}
 
+	public MethodScope resolve(Node callExpression) {
+		String name = callExpression.getString(2);
+		Object calledOnObject = callExpression.get(0);
+		Node calledOn;
+		if (calledOnObject instanceof Node) {
+			calledOn = (Node) calledOnObject;
+		}
+		else {
+			calledOn = null;
+		}
+		Node argNode = callExpression.getNode(3);
+		Scope currentScope = table.getCurrentScope();
+
+		return resolve(name, calledOn, argNode, currentScope);
+	}
+
 	public MethodScope resolve(String name, Node calledOn, Node argNode, Scope currentScope) {
 
 		List<String> argTypes = getArgumentTypeList(argNode);
@@ -108,6 +126,13 @@ public class MethodOverloadResolver {
 		ClassScope classScope = findEnclosingClassScope(currentScope);
 		if (calledOn == null) {
 			accessibleMethods = calledOnNull(name, classScope);
+		}
+		else if (calledOn.getName().equals("CallExpression")) {
+			MethodScope previousCall = resolve(calledOn);
+			String calledOnName = previousCall.returnType;
+			String className = table.typeOfSymbol(calledOnName);
+			classScope = ClassScope.classScopes.get(className);
+			accessibleMethods = calledOnObject(name, classScope);
 		}
 		else if (calledOn.getName().equals("ThisExpression")) {
 			accessibleMethods = calledOnThis(name, classScope);
@@ -248,6 +273,11 @@ public class MethodOverloadResolver {
 					accessibleMethods.add(method);
 				}
 			}
+			else {
+				if (method.isStatic && !method.isPrivate) {
+					accessibleMethods.add(method);
+				}
+			}
 		}
 		return accessibleMethods;
 	}
@@ -383,105 +413,11 @@ public class MethodOverloadResolver {
 		return classScope.superClass;
 	}
 
-
-	// public ??? resolveMethodCall(String name, List<String> arguments, String calledOn) {
-	// 	List<String> argTypes = getArgumentTypes(arguments);
-	// 	String callerClass = table.getSymbolType(calledOn);
-	// 	??? ??? = getAccessibleOverloadedMethodsInClass(name, callerClass);
-
-	// 	// DIFFERENTIATE:
-	// 	// calledOn is an object -> instance
-	// 	// calledOn is a class -> static
-
-	// 	// filter by arity (# of args)
-	// 	// find "closest" match
-	// }
-
-	// public ??? resolveMethodCall(String name, List<String> arguments) {
-	// 	// assumptions:
-	// 	// - the first "parent" MethodScope from the currentScope in the symbol table is the
-	// 	//   method we are in right now (same/similar goes for ClassScope)
-	// 	List<String> argTypes = getArgumentTypes(arguments);
-	// 	??? ??? = getAccessibleOverloadedMethodsInCurrentScope(name);
-
-	// 	// may be instance OR static method (within this class)
-
-	// 	// filter by arity (# of args)
-	// 	// find "closest" match
-	// }
-
-	// // looks for all methods with this name that are accessible from an instance of the given class
-	// public ??? getAccessibleOverloadedMethodsInClass(String name, String class) {
-
-	// }
-
-	// // looks for all methods with this name that are accessible from the current scope (aka current class)
-	// public ??? getAccessibleOverloadedMethodsInCurrentScope(String name) {
-
-	// }
-
-	// public List<MethodScope> getAccessibleOverloadedMethodsInScope(String name, Scope scope, , boolean static) {
-	// 	ClassScope class = findEnclosingClassScope(scope);
-
-	// 	Set<MethodScope> methodScopes = getAllOverloadedMethods(name, class);
-	// 	for (MethodScope methods : methodScopes) {
-	// 		if (static) {
-	// 			if (! methodIsAccessibleStatic(method, scope)) {
-	// 				methodScopes.remove(method);
-	// 			}
-	// 		}
-	// 		else {
-	// 			if (! methodIsAccessibleInstance(method, scope)) {
-	// 				methodScopes.remove(method);
-	// 			}
-	// 		}
-	// 	}
-
-	// }
-
-	// // called statically (no instance methods)
-	// public boolean methodIsAccessibleStatic(MethodScope method, Scope fromScope, ClassScope calledOn) {
-	// 	// if method is static
-	// 		// if method is defined in the class it's called on:
-	// 			// if not private
-	// 				// can be used
-	// 			// if private
-	// 				// cannot be used
-	// 		// if method is called inside the class it is defined in:
-	// 		   // ()
-
-	// 	// else:
-	// 		// cannot be used
-
-
-	// 	if (method.classScope == findEnclosingClassScope(fromScope)) {
-	// 		if ()
-	// 		// if method is private, can access
-	// 		// if method is static, can access
-	// 		// cannot access any instance (MUST BE STATIC)
-	// 	}
-	// 	else {
-	// 		// cannot access any instance
-	// 		// cannot access private
-	// 		// cannot access public static!
-	// 	}
-	// }
-
-	// // called on an object (no static methods)
-	// public boolean methodIsAccessibleInstance(MethodScope method, Scope fromScope, String calledOn) {
-	// 	if (method.classScope == findEnclosingClassScope(fromScope)) {
-	// 		// if private, can access
-	// 		// if static, cannot access
-	// 	}
-	// 	else {
-	// 		// CAN ACCESS INSTANCE
-	// 		// cannot access private
-	// 		// cannot access static
-	// 	}
-	// }
-
 	public List<MethodScope> getAllOverloadedMethods(String name, ClassScope scope) {
-		List<MethodScope> methods = new ArrayList<MethodScope>();
+		return getAllOverloadedMethods(name, scope, new ArrayList<MethodScope>());
+	}
+
+	public List<MethodScope> getAllOverloadedMethods(String name, ClassScope scope, List<MethodScope> methods) {
 		if (scope.hasMethod(name)) {
 			Set<MethodScope> scopeMethods = scope.getMethods(name);
 			for (MethodScope newMethod : scopeMethods) {
@@ -490,9 +426,10 @@ public class MethodOverloadResolver {
 				}
 			}
 		}
+
 		ClassScope superClass = scope.getSuperClassScope();
 		if (superClass != null) {
-			methods.addAll( getAllOverloadedMethods(name, superClass) );
+			methods = getAllOverloadedMethods(name, superClass, methods);
 		}
 
 		return methods;
