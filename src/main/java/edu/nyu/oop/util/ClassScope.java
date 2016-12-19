@@ -12,7 +12,13 @@ public class ClassScope extends Scope {
 		ClassScope object = new ClassScope();
 		object.name = "Object";
 		object.superClass = null;
-		// TODO: add methods and stuff (?)
+
+		MethodScope toString = new MethodScope(null, object, false, false, "toString", "String");
+		MethodScope hashCode = new MethodScope(null, object, false, false, "hashCode", "String");
+		MethodScope equals = new MethodScope(null, object, false, false, "equals", "String");
+		equals.addParameter("Object");
+		MethodScope getClass = new MethodScope(null, object, false, false, "getClass", "String");
+
 		classScopes.put("Object", object);
 	}
 

@@ -1,23 +1,34 @@
 package edu.nyu.oop;
 
+import edu.nyu.oop.util.MethodScope;
 import xtc.tree.GNode;
 import xtc.tree.Node;
 import xtc.tree.Visitor;
 import edu.nyu.oop.util.NodeUtil;
 import java.lang.StringBuffer;
+import edu.nyu.oop.util.SymbolTable;
+import edu.nyu.oop.util.SymbolTable.*;
 
 /**
  * Created by alex on 10/26/16.
  */
 public class MakeCppAst extends Visitor {
 
+    public SymbolTable table = SymbolTable.table;
+    public MethodOverloadResolver resolver = new MethodOverloadResolver(table);
+
     public boolean mainMethodDeclarationFound = false;
+    public boolean inMain = false;
     public GNode mainClassNode;
     public GNode packageNode;
 
     public void visit(Node n) {
         for (Object o: n) {
-            if (o instanceof Node) dispatch((Node) o);
+            if (o instanceof Node) {
+                table.enterScopeForNode((GNode) o);
+                dispatch((Node) o);
+                table.exitScopeForNode((GNode) o);
+            }
         }
     }
     public void visitPrimitiveType(GNode n) {
@@ -90,54 +101,104 @@ public class MakeCppAst extends Visitor {
         //2 = name of function
         //3 = arguments
 
-        String caller = "";
+        // visit(n);
 
-        if(((GNode)n.get(0)).get(0) instanceof String) {
-            caller = ((GNode)n.get(0)).get(0).toString();
+        // XtcTestUtils.prettyPrintAst(n);
 
-            if(caller != null) {
-                ((GNode)n.get(0)).set(0, caller + "->__vptr->");
-            }
-        }
-        if((n.get(3) instanceof Node)) {
-            if (((GNode)n.get(3)).size() == 0) {
-                n.set(2, n.get(2).toString() + "(" + caller + ")");
-                n.set(3, null);
-            } else if (! n.getString(2).equals("print") && ! n.getString(2).equals("println")) {
-                n.set(2, n.get(2).toString() + "(" + caller + ", ");
-                Node args = n.getNode(3);
-                Node lastArg = args.getNode(args.size()-1);
-                lastArg.set(0, lastArg.getString(0) + ")");
-            }
-        }
+        // if it's a System.out.println() call
+        if (n.get(0) != null && n.getNode(0).getName().equals("SelectionExpression")) {
+            dispatch(n.getNode(0));
 
-        //if n.get(2) = println / print
-        if(n.size() > 2 && n.get(2) instanceof String) {
-            String arg = n.get(2).toString();
-            if(arg.equals("print") || arg.equals("println")) {
-                String sb = findPrintItems("", (GNode)n.get(3));
-                if (sb.charAt(sb.length()-1) == ')') {
-                    sb += "->data";
+            String caller = "";
+
+            if(((GNode)n.get(0)).get(0) instanceof String) {
+                caller = ((GNode)n.get(0)).get(0).toString();
+
+                if(caller != null) {
+                    ((GNode)n.get(0)).set(0, caller + "->__vptr->");
                 }
-                if (arg.equals("println")) {
-                    n.set(2, "std::cout << " + sb + "<< endl");
-                } else {
-                    n.set(2, "std::cout << " + sb);
+            }
+            if((n.get(3) instanceof Node)) {
+                if (((GNode)n.get(3)).size() == 0) {
+                    n.set(2, n.get(2).toString() + "(" + caller + ")");
+                    n.set(3, null);
+                } else if (! n.getString(2).equals("print") && ! n.getString(2).equals("println")) {
+                    n.set(2, n.get(2).toString() + "(" + caller + ", ");
+                    Node args = n.getNode(3);
+                    Node lastArg = args.getNode(args.size()-1);
+                    lastArg.set(0, lastArg.getString(0) + ")");
                 }
-//                return;
+            }
+
+            //if n.get(2) = println / print
+            if(n.size() > 2 && n.get(2) instanceof String) {
+                String arg = n.get(2).toString();
+                if(arg.equals("print") || arg.equals("println")) {
+                    String sb = findPrintItems("", (GNode)n.get(3));
+                    if (sb.charAt(sb.length()-1) == ')') {
+                        // sb += "->data";
+                    }
+                    if (arg.equals("println")) {
+                        n.set(2, "std::cout << " + sb + "<< endl");
+                    } else {
+                        n.set(2, "std::cout << " + sb);
+                    }
+    //                return;
+                }
+
+            }
+        }
+        else {
+            MethodScope method = resolver.resolve(n);
+            String name = method.getMangledName();
+            n.set(2, name);
+
+            String caller = "";
+
+            if(((GNode)n.get(0)).get(0) instanceof String) {
+                caller = ((GNode)n.get(0)).get(0).toString();
+
+                if(caller != null && !method.isStatic && !method.isPrivate) {
+                    ((GNode)n.get(0)).set(0, caller + "->__vptr->");
+                }
+                else {
+                    ((GNode)n.get(0)).set(0, caller + "->");
+                }
+            }
+            if((n.get(3) instanceof Node)) {
+                if (((GNode)n.get(3)).size() == 0) {
+                    n.set(2, n.get(2).toString() + "(" + caller + ")");
+                    n.set(3, null);
+                } else if (! n.getString(2).equals("print") && ! n.getString(2).equals("println")) {
+                    n.set(2, n.get(2).toString() + "(" + caller + ", ");
+                    Node args = n.getNode(3);
+                    Node lastArg = args.getNode(args.size()-1);
+                    lastArg.set(0, lastArg.getString(0) + ")");
+                }
             }
 
         }
-        visit(n);
+
+        // XtcTestUtils.prettyPrintAst(n);
+
+        // visit(n);
     }
 
     public void visitPrimaryIdentifier(GNode n) {
         if (n.get(0) instanceof String) {
-            switch (n.get(0).toString()) {
-            //and whatever else becomes null cascade here
-            case "System":
+            // switch (n.get(0).toString()) {
+            // //and whatever else becomes null cascade here
+            // case "System":
+            //     n.set(0, null);
+            //     break;
+            // }
+            if ("System".equals(n.get(0).toString())) {
                 n.set(0, null);
-                break;
+            }
+            else {
+                if (!inMain && ! table.symbolExistsBelowClassScope(n.getString(0))) {
+                    n.set(0, "__this->" + n.getString(0));
+                }
             }
 
         }
@@ -269,10 +330,17 @@ public class MakeCppAst extends Visitor {
         if (n.size() >= 4) {
             if (n.getString(3).equals("main")) {
                 mainMethodDeclarationFound = true;
+                inMain = true;
+                // XtcTestUtils.prettyPrintAst(n);
+            }
+            else {
+                n.set(3, table.getMangledName());
+                // XtcTestUtils.prettyPrintAst(n);
             }
         }
 
         visit(n);
+        inMain = false;
     }
 
     public void visitStringLiteral(GNode n) {
@@ -315,7 +383,9 @@ public class MakeCppAst extends Visitor {
                     (GNode)o = GNode.ensureVariable((GNode)o);
                     method.set(index, (GNode)o);
                 }*/
+                // System.out.println(o);
                 dispatch((Node)o); //this gets called twice?
+                // System.out.println(o);
                 line = findPrintItems(line, (GNode) o);
             }
         }

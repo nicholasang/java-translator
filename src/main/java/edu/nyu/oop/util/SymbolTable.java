@@ -181,4 +181,11 @@ public class SymbolTable {
 		return string;
 	}
 
+	public String getMangledName() {
+		if (currentScope instanceof MethodScope) {
+			return ((MethodScope) currentScope).getMangledName();
+		}
+		return null;
+	}
+
 }

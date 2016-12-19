@@ -135,6 +135,10 @@ public class Boot extends Tool {
             // phase 3 - create and save a command to print the header source code
             sourceOutputter.add(new SourceHeaderOutputCommand(new CppHVisitor(), headerCppAst));
 
+            SymbolTable table = new SymbolTable();
+            SymbolTableBuilder builder = new SymbolTableBuilder(table);
+            table = builder.buildTable(allAsts.get(0));
+
             // phase 4 - build the C++ implementation AST,
             // return a list of commands to print the implementation source code
             // (output.cpp and main.cpp)

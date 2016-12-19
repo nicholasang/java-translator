@@ -98,6 +98,9 @@ public class MethodOverloadResolver {
 			case "CharacterLiteral":
 				type = "char";
 				break;
+			case "StringLiteral":
+				type = "String";
+				break;
 			case "AdditiveExpression":
 				String type1 = getArgType(arg.getNode(0));
 				String type2 = getArgType(arg.getNode(2));
@@ -136,6 +139,7 @@ public class MethodOverloadResolver {
 		Scope currentScope = table.getCurrentScope();
 
 		MethodScope methodScope = resolve(name, calledOn, argNode, currentScope);
+		// System.out.println(methodScope.name);
 		return methodScope;
 	}
 
@@ -191,7 +195,7 @@ public class MethodOverloadResolver {
 
 		List<MethodScope> correctArityMethods = filterByArity(accessibleMethods, argTypes.size());
 
-		Map< Integer, MethodScope> distances = computeDistances(accessibleMethods, argTypes);
+		Map< Integer, MethodScope> distances = computeDistances(correctArityMethods, argTypes);
 
 		Integer min  = distances.keySet().iterator().next();
 		for (Integer num : distances.keySet()) {
