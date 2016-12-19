@@ -30,7 +30,7 @@ public class CppCommands {
         for (int i = 0; i < javaRoots.size(); i++) {
             visitor.visit(javaRoots.get(i));
         }
-        XtcTestUtils.prettyPrintAst(javaRoots.get(0));
+//        XtcTestUtils.prettyPrintAst(javaRoots.get(0));
 
         List<SourceOutputCommand> cmd = new ArrayList<SourceOutputCommand>();
 

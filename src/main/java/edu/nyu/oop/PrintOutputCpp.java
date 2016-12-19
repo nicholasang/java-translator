@@ -2,7 +2,7 @@ package edu.nyu.oop;
 
 import xtc.tree.Node;
 import xtc.tree.GNode;
-import java.io.File;
+import java.util.Objects;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -325,16 +325,40 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
 
 
 //------------------------end new
-    public void finishUpClass(GNode n) {
-    //    if (! haveNoArgConstructor) {
-            penPrint("__" + ClassName + "::__" + ClassName + "() :__vptr(&__vtable) {\n");
-            penPrint("}");
-    //    }
+public void finishUpClass(GNode n) {
 
-   //     haveNoArgConstructor = false;
-        superClassName = "";
-        ClassName = "";
+ //   if (! haveNoArgConstructor) {
+        penPrint("__" + ClassName + "::__" + ClassName + "() :__vptr(&__vtable) {\n");
+        penPrint("}");
+ //   }
+
+    // array specializations
+    penPrint("}\n}\n\nnamespace __rt\n{"); // closes the other namespaces
+    if (Objects.equals(superClassName, "")) {
+        penPrint("template<>\n"
+                + "java::lang::Class Array<inputs::" + pack.substring(7,14) + "::" + ClassName + ">::__class()"
+                + "{\n"
+                + "static java::lang::Class k =\n"
+                + "new java::lang::__Class(literal(\"[Linputs." + pack.substring(7) + ClassName + ";\"),"
+                + "\njava::lang::__Object::__class(),\n"
+                + "inputs::" + pack.substring(7,14) + "::__" + ClassName + "::__class());\n" +
+                "return k;\n}\n}" + "\n\nnamespace inputs {\nnamespace " + pack.substring(7,14) + "{");
     }
+    else {
+        penPrint("template<>\n"
+                + "java::lang::Class Array<inputs::" + pack.substring(7, 14) + "::" + ClassName + ">::__class()"
+                + "{\n"
+                + "static java::lang::Class k =\n"
+                + "new java::lang::__Class(literal(\"[Linputs." + pack.substring(7) + ClassName + ";\"),"
+                + "\ninputs::" + pack.substring(7, 14) + "::__" + superClassName + "::__class(),\n"
+                + "inputs::" + pack.substring(7, 14) + "::__" + ClassName + "::__class());\n" +
+                "return k;");
+    }
+ //   haveNoArgConstructor = false;
+    superClassName = "";
+    ClassName = "";
+
+}
 
     public void initializeClass(GNode n) {
 
@@ -359,10 +383,12 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
     }
 
     public void finish() {
-        if (this.inMain) return;
 
+        if (this.inMain) return;
         try {
             this.pen.write(this.printLater[0]);
+            // end bracket of the namespaces printed above
+            // put array code here
             this.pen.flush();
             this.pen.close();
         } catch (IOException e) {
