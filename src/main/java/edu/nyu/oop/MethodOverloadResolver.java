@@ -9,6 +9,22 @@ import xtc.tree.Node;
 
 import java.util.*;
 
+/*
+to use:
+1: create a new MethodOverloadResolver and pass in an already-built SymbolTable
+2: whenever you come accross a CallExpression (except for those that are for System.out.println)
+   call resolve(callExpressionNode).
+   - this will return a String, which is the correct mangled name to use in place of the
+     original method name
+   - note: if it turns out we need some other info about the method (for some reason),
+     lemme know and I can easily change this to return other things
+3: you must "keep track" of the scope using the SymbolTable in your phase 4 visitor:
+   - at the start of *every* visit method, call: table.enterNodeForScope(node)
+   - at the end, call: table.exitNodeForScope(node)
+   - you may get access to the SymbolTable by getting SymbolTable.table (a public static field
+     that'll store the symbol table so any class can access it)
+*/
+
 public class MethodOverloadResolver {
 	private SymbolTable table;
 
@@ -102,7 +118,7 @@ public class MethodOverloadResolver {
 		return type;
 	}
 
-	public MethodScope resolve(Node callExpression) {
+	public String resolve(Node callExpression) {
 		String name = callExpression.getString(2);
 		Object calledOnObject = callExpression.get(0);
 		Node calledOn;
@@ -115,7 +131,8 @@ public class MethodOverloadResolver {
 		Node argNode = callExpression.getNode(3);
 		Scope currentScope = table.getCurrentScope();
 
-		return resolve(name, calledOn, argNode, currentScope);
+		MethodScope methodScope = resolve(name, calledOn, argNode, currentScope);
+		return methodScope.getMangledName();
 	}
 
 	public MethodScope resolve(String name, Node calledOn, Node argNode, Scope currentScope) {

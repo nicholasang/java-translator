@@ -8,6 +8,7 @@ import xtc.tree.GNode;
 
 public class SymbolTable {
 	private static final boolean DEBUG = false;
+	public static SymbolTable table;
 
 	private Scope root;
 	private Scope currentScope;

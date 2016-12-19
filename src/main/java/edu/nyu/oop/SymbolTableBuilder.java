@@ -32,6 +32,7 @@ public class SymbolTableBuilder extends RecursiveVisitor {
 
 	public SymbolTableBuilder(SymbolTable table) {
 		this.table = table;
+		SymbolTable.table = table;
 	}
 
 	public void printTable() {
