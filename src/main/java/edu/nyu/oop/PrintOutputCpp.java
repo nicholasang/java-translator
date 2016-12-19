@@ -70,6 +70,29 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
 
 ////////////////new stuff//////////////////////////////
 
+    public void visitStringLiteral(GNode n) {
+        if (n.get(0) != null) {
+            if (! n.getString(0).contains("String")) {
+                penPrint("(new __String(" + n.getString(0) + "))");
+                // System.out.println(n);
+            }
+            else {
+
+                penPrint(n.getString(0));
+            }
+        }
+    }
+
+    public void visitSelectionExpression(GNode n) {
+        // System.out.println(n);
+        if (n.get(0) != null) {
+            if (n.getNode(0).get(0) != null && !n.getNode(0).getString(0).contains("System")) {
+                penPrint(n.getNode(0).getString(0) + "->" + n.getString(1));
+            }
+        }
+        visit(n);
+    }
+
     public void visitNullLiteral(GNode n) {
         try {
             pen.write("0");
@@ -114,6 +137,7 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
     public void visitReturnStatement(GNode n) {
         penPrint(" return ");
         returnType = null;
+        // System.out.println(n);
         visit(n);
         penPrint(";\n");
     }
@@ -209,27 +233,53 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
         //if (inConstructor) {
         //    penPrint("this->");
         //} else {
+        if (n.get(0) instanceof Node) {
+            if (n.getNode(0).getName().equals("PrimaryIdentifier")) {
+                if (n.getNode(0).getString(0).contains("__this")) {
+
+                }
+                else {
+                    // System.out.println(n);
+                    penPrint("__this->");
+                }
+            }
+            else {
+                // System.out.println(n);
+                penPrint("__this->");
+            }
+        }
+        else {
+            // System.out.println(n);
             penPrint("__this->");
+        }
+
         //}
         visit(n);
     }
 //***changed because our working version has __this in constructor
     public void visitPrimaryIdentifier(GNode n) {
-        if (inConstructor){
-            if(!isAnArg.contains(n.get(0)) && !inMain) {
-                penPrint("__this->");
-            }
+        // System.out.println(n);
+        // if (n.get(0) != null && n.getString(0).contains("__this")) {
 
-        }
-        else if (! variablesInScope.contains(n.getString(0)) && ! inMain) {
-            if (inConstructor) {
-                if(!isAnArg.contains(n.get(0))){
-                    penPrint("this->");
+        // }
+        // else {
+
+            if (inConstructor){
+                if(!isAnArg.contains(n.get(0)) && !inMain) {
+                    // penPrint("__this->");
                 }
-            } else {
-                penPrint("__this->");
+
             }
-        }
+            else if (! variablesInScope.contains(n.getString(0)) && ! inMain) {
+                if (inConstructor) {
+                    if(!isAnArg.contains(n.get(0))){
+                        // penPrint("this->");
+                    }
+                } else {
+                    // penPrint("__this->");
+                }
+            }
+        // }
         visit(n);
     }
 
@@ -309,6 +359,13 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
 
             }
         }
+        else if (n.get(2) == null) {
+            // System.out.println(n);
+            penPrint(n.getString(0));
+        }
+        else if (((GNode)n.get(2)).getName().equals("StringLiteral")) {
+            penPrint(n.getString(0) + " " + n.getNode(2).getString(0));
+        }
         else{
             visit(n);
         }
@@ -317,6 +374,10 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
 
     public void visitFieldDeclaration(GNode n){
         if (this.inMain){
+            visit(n);
+        }
+        else {
+            // System.out.println(n);
             visit(n);
         }
         //do not print this in output.cpp

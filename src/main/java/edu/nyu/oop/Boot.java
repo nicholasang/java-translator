@@ -46,7 +46,8 @@ public class Boot extends Tool {
         bool("printJavaAst", "printJavaAst", false, "Print Java Ast.").
         bool("printJavaCode", "printJavaCode", false, "Print Java code.").
         bool("printJavaImportCode", "printJavaImportCode", false, "Print Java code for imports and package source.").
-        bool("translateJava", "translateJava", false, "Translate Java to C++.");
+        bool("translateJava", "translateJava", false, "Translate Java to C++.").
+        bool("symbolTable", "symbolTable", false, "Generate Symbol Table.");
     }
 
     @Override
@@ -134,6 +135,10 @@ public class Boot extends Tool {
             // phase 3 - create and save a command to print the header source code
             sourceOutputter.add(new SourceHeaderOutputCommand(new CppHVisitor(), headerCppAst));
 
+            SymbolTable table = new SymbolTable();
+            SymbolTableBuilder builder = new SymbolTableBuilder(table);
+            table = builder.buildTable(allAsts.get(0));
+
             // phase 4 - build the C++ implementation AST,
             // return a list of commands to print the implementation source code
             // (output.cpp and main.cpp)
@@ -141,6 +146,31 @@ public class Boot extends Tool {
 
             // execute all commands to output C++ source code
             sourceOutputter.executeAll();
+
+        }
+
+        if (runtime.test("symbolTable")) {
+            String workingDir = System.getProperty("user.dir");
+
+            Location nLocation = n.getLocation();
+            Location longLocation = new Location(workingDir + "/" + nLocation.file, nLocation.line, nLocation.column);
+            n.setLocation(longLocation);
+
+            //phase 1
+            List<GNode> allAsts = GenerateJavaASTs.beginParse((GNode) n);
+
+            // TODO: compress all ASTs into 1 AST ?
+
+            // ^ this is just doing phase 1 stuff
+
+            SymbolTable table = new SymbolTable();
+            SymbolTableBuilder builder = new SymbolTableBuilder(table);
+
+            // right now, just parses only the first AST in the List
+            table = builder.buildTable(allAsts.get(0));
+            System.out.println(table);
+
+
 
         }
 

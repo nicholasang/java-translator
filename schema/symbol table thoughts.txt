@@ -1,0 +1,86 @@
+// "anonymous" scopes (random {}, loops, if statements) -
+// method scopes - name / mangled name
+// class scopes - name
+
+// method symbols - name, static or not, private or not, params, scope
+// constructor symbols - name, private or not, params, scope
+// field symbols - name, type
+
+
+Create Symbol Table:
+
+	createNewSymbolTable:
+		SymbolTable table = new SymbolTable();
+
+	visitorForField: (add to current scope)
+		table.addField(fieldName, fieldType);
+		// deal with having a field name == a method name
+
+		visit(n)
+
+	visitorForMethod: (add to current scope)
+		table.enterNewMethod(methodName)
+		// now inside scope of new method
+		// deal with overloads in this scope
+
+		// blah blah do stuff inside this method (like add fields)
+
+		visit(n)
+		table.exitScope()
+
+	visitorForFormalParameter: (add to current scope aka method)
+		table.addParam(paramName, paramType)
+		visit(n)
+
+	visitorForLoop: (add to current scope)
+		table.enterScope(node)
+		visit(n) <- visitor for for loop params adds "int i"
+		table.exitScope()
+
+	visitorForConditional: (add to current scope)
+		table.enterScope(node)
+		visit(n)
+		table.exitScope()
+
+	visitorForClass:
+		table.enterScope(className)
+		visit(n)
+		// thisClass = new Class(classNode, className, superClass, classScope)
+		addToClassMaps(thisClass, superClass)
+		table.exitScope()
+
+	visitorForAnonymousBlock:
+		table.enterScope(node)
+		visit(n)
+		table.exitScope()
+
+
+
+
+
+	// need to deal with name mangling for inherited and overloaded methods
+	afterEverythingElse:
+		topological sort classMap
+		for (class : classMap) {
+            table.addInheritedMethods(class, superclass)
+            // table.mangleInheritedMethods(class, superclass)
+            // table.addInheritedFields(class, superclass)
+		}
+
+
+Phase 4:
+    // assume that in Phase 2, all inheritance setup (methods + fields) has been done / added to the symbol table for each class
+    // traverse the AST
+        - upon entering class, method, etc, enter the scope in the Symbol Table
+    // create the new C++ AST
+        // when you hit a method, send that off to a special thing (along with the symbol table) to be translated
+        // when you hit the main method, send that off to another special thing (with symbol table) to translate into the main.cpp AST
+
+Phase 2:
+    // so far, names (even inherited) are all mangled
+
+    // much of Layout Schematic is redundant, BUT:
+    - constructor -> __init()
+    - get inherited methods to vtable
+    - get inherited fields to class
+    - deal with static + private methods (not in vtable)
