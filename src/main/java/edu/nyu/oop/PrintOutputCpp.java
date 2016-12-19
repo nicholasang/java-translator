@@ -2,7 +2,7 @@ package edu.nyu.oop;
 
 import xtc.tree.Node;
 import xtc.tree.GNode;
-import java.io.File;
+import java.util.Objects;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,25 +25,40 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
     String pack = "";
     String ClassName = "";
     String returnType = null;
+    ArrayList<Object> isAnArg = new ArrayList<Object>();
 
     ArrayList<String> variablesInScope = new ArrayList<String>();
     public boolean inMain = false;
 
-    public PrintOutputCpp(FileWriter outFileWrite, String[] printLater, GNode mainClass) {
+    public PrintOutputCpp(FileWriter outFileWrite, String[] printLater, GNode mainClass, boolean inMain) {
         this.printLater = printLater;
         pen = outFileWrite;
         this.mainClass = mainClass;
+        this.inMain = inMain;
+    }
+
+    public void start() {
+        if (!this.inMain) {
+            try {
+                this.pen.write("#include \"output.h\"\n#include \"java_lang.h\"\nusing namespace std;\n#include <iostream>\nusing namespace java::lang;\n");
+
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     public void visit(Node n) {
+
+
         if (n != null) {
-            for (Object o: n) {
+            for (Object o : n) {
                 if (o instanceof Node) {
                     dispatch((Node) o);
                 } else if (o instanceof String) {
                     try {
                         pen.write(o.toString() + " ");
-                    } catch(Exception e) {
+                    } catch (Exception e) {
                         System.out.print(e);
                     }
                 }
@@ -51,7 +66,9 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
         }
     }
 
-    ////////////////new stuff//////////////////////////////
+
+
+////////////////new stuff//////////////////////////////
 
     public void visitNullLiteral(GNode n) {
         try {
@@ -179,7 +196,7 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
           penPrint("; ");
       }
     */
-    //to avoid needing try/catch blocks everywhere
+//to avoid needing try/catch blocks everywhere
     public void penPrint(String words) {
         try {
             pen.write(words);
@@ -189,18 +206,26 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
     }
 
     public void visitThisExpression(GNode n) {
-        if (inConstructor) {
-            penPrint("this->");
-        } else {
+        //if (inConstructor) {
+        //    penPrint("this->");
+        //} else {
             penPrint("__this->");
-        }
+        //}
         visit(n);
     }
-
+//***changed because our working version has __this in constructor
     public void visitPrimaryIdentifier(GNode n) {
-        if (! variablesInScope.contains(n.getString(0)) && ! inMain) {
+        if (inConstructor){
+            if(!isAnArg.contains(n.get(0)) && !inMain) {
+                penPrint("__this->");
+            }
+
+        }
+        else if (! variablesInScope.contains(n.getString(0)) && ! inMain) {
             if (inConstructor) {
-                penPrint("this->");
+                if(!isAnArg.contains(n.get(0))){
+                    penPrint("this->");
+                }
             } else {
                 penPrint("__this->");
             }
@@ -210,7 +235,27 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
 
     public void visitConstructorDeclaration(GNode n) {
         inConstructor = true;
-        penPrint("__" + ClassName + "::__" + ClassName);
+
+        //only print if has params (empty printed automatically at end)
+        if (n.size() >= 6 && ((Node)n.get(3)).getName().compareTo("FormalParameters") == 0){
+            GNode fps = (GNode) n.get(3); //FormalParameters
+            if (fps.size() > 0){
+                //not an empty constructor
+                penPrint("void __" + ClassName + "::__init(" + ClassName + " __this");
+                for (int i = 0; i < fps.size(); i++){
+                    GNode fp = (GNode) fps.get(i); //FormalParameter
+                    if(fp.size() >=4 && ((Node)fp.get(1)).getName().compareTo("Type") == 0){
+                        penPrint(", " + ((Node)((Node)fp.get(1)).get(0)).get(0).toString() + " ");
+                        penPrint(fp.get(3).toString());
+                        isAnArg.add(fp.get(3));
+                    }
+                }
+                penPrint(")");
+                dispatch((Node) n.get(5)); //dispatch on block
+            }
+        }
+        isAnArg.clear();
+ /*       penPrint("__" + ClassName + "::__" + ClassName);
         if (n.get(3) instanceof Node) {
             penPrint("(");
             Object num = dispatch(n.getNode(3));
@@ -228,21 +273,92 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
         if (n.get(5) instanceof Node) {
             dispatch(n.getNode(5));
         }
-
+*/
         inConstructor = false;
         variablesInScope.clear();
     }
 
-    public void finishUpClass(GNode n) {
-        if (! haveNoArgConstructor) {
-            penPrint("__" + ClassName + "::__" + ClassName + "() :__vptr(&__vtable) {\n");
-            penPrint("}");
+//------------------------new
+    public void visitDeclarator(GNode n){
+        //if this is an object we need to construct/init
+        if(n.get(2) != null && ((GNode)n.get(2)).getName().compareTo("NewClassExpression") == 0){
+            String name = n.get(0).toString();
+            name = name.substring(0,name.length() - 3); //get rid of " = "
+            GNode cn = (GNode)n.get(2);  //cn = child node "NewClassExpression"
+            String type = ((Node)cn.get(2)).get(0).toString();
+            //if this is for main.cpp
+            if(this.inMain){
+                penPrint(n.get(0).toString() + n.get(1).toString() + " (new " + type + "());\n");
+                penPrint(type + "::__init(" + name);
+                GNode args = (GNode) cn.get(3);
+                if (args != null && args.size() > 0){
+                    for (int i = 0; i < args.size(); i++){
+
+                        if(args.get(i) instanceof Node) {
+                            if (((Node) args.get(i)).get(0) != null) {
+                                penPrint(", " + ((Node)args.get(i)).get(0).toString());
+
+                            }
+                        }
+                    }
+                }
+                penPrint(")");
+            }
+            else{
+                //in output.cpp
+
+            }
+        }
+        else{
+            visit(n);
         }
 
-        haveNoArgConstructor = false;
-        superClassName = "";
-        ClassName = "";
     }
+
+    public void visitFieldDeclaration(GNode n){
+        if (this.inMain){
+            visit(n);
+        }
+        //do not print this in output.cpp
+    }
+
+
+
+//------------------------end new
+public void finishUpClass(GNode n) {
+
+ //   if (! haveNoArgConstructor) {
+        penPrint("__" + ClassName + "::__" + ClassName + "() :__vptr(&__vtable) {\n");
+        penPrint("}");
+ //   }
+
+    // array specializations
+    penPrint("}\n}\n\nnamespace __rt\n{"); // closes the other namespaces
+    if (Objects.equals(superClassName, "")) {
+        penPrint("template<>\n"
+                + "java::lang::Class Array<inputs::" + pack.substring(7,14) + "::" + ClassName + ">::__class()"
+                + "{\n"
+                + "static java::lang::Class k =\n"
+                + "new java::lang::__Class(literal(\"[Linputs." + pack.substring(7) + ClassName + ";\"),"
+                + "\njava::lang::__Object::__class(),\n"
+                + "inputs::" + pack.substring(7,14) + "::__" + ClassName + "::__class());\n" +
+                "return k;\n}\n}" + "\n\nnamespace inputs {\nnamespace " + pack.substring(7,14) + "{");
+    }
+    else {
+        penPrint("template<>\n"
+                + "java::lang::Class Array<inputs::" + pack.substring(7, 14) + "::" + ClassName + ">::__class()"
+                + "{\n"
+                + "static java::lang::Class k =\n"
+                + "new java::lang::__Class(literal(\"[Linputs." + pack.substring(7) + ClassName + ";\"),"
+                + "\ninputs::" + pack.substring(7, 14) + "::__" + superClassName + "::__class(),\n"
+                + "inputs::" + pack.substring(7, 14) + "::__" + ClassName + "::__class());\n" +
+                "return k;");
+    }
+ //   haveNoArgConstructor = false;
+    superClassName = "";
+    ClassName = "";
+
+}
 
     public void initializeClass(GNode n) {
 
@@ -257,12 +373,27 @@ public class PrintOutputCpp extends xtc.tree.Visitor {
                  "static Class k = \n"
                  + "new __Class(__rt::literal(\"class " + pack + ClassName + "\"), __Object::__class());\n"
                  + "return k;}\n\n");
+        penPrint("void __" + ClassName + "::__init(" + ClassName+" __this){\n}\n\n");
 
         //erase stuff so it doesn't print twice
         for (int i = 0; i < 5; i++) {
             n.set(i, null);
         }
 
+    }
+
+    public void finish() {
+
+        if (this.inMain) return;
+        try {
+            this.pen.write(this.printLater[0]);
+            // end bracket of the namespaces printed above
+            // put array code here
+            this.pen.flush();
+            this.pen.close();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
 

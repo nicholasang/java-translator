@@ -8,11 +8,14 @@ function pre_clean {
         rm $1
     fi
 }
+function write_out_record {
+    echo -e $RECORD >> ./src/test/record.txt
+}
 # run sbt translation and C++ compilation commands
 function translate_and_compile {
     if [ ! -f "src/test/java/inputs/test$1/Test$1.java" ]
     then
-        echo "TEST FILE DOES NOT EXIT"
+        echo "TEST FILE DOES NOT EXIST"
         exit
     fi
     
@@ -21,7 +24,7 @@ function translate_and_compile {
 function translate_and_compile_batch {
     if [ ! -f "src/test/java/inputs/test$1/Test$1.java" ]
     then
-        echo "TEST FILE DOES NOT EXIT"
+        echo "TEST FILE DOES NOT EXIST"
         exit
     fi
     
@@ -80,15 +83,13 @@ function comp_java_cpp {
         echo "SUCCESSFUL Translation of $1"
     fi
     
-    rm jOut.txt cppOut.txt
+    rm jOut.txt
+    rm cppOut.txt
     cd ../../    
 }
 
 #run all functions in order
 function run_test {
-    pre_clean "./src/test/record.txt"
-    touch "./src/test/record.txt"
-    
     output_java $1
     output_cpp
     if [ "$?" -eq 0 ]
@@ -127,6 +128,8 @@ then
         pre_clean "./output/main.cpp"
         pre_clean "./output/output.cpp"
         pre_clean "./output/output.h"
+        pre_clean "./src/test/record.txt"
+        touch "./src/test/record.txt"
         
         translate_and_compile $1
         run_test $1
@@ -138,6 +141,8 @@ then
         pre_clean "./output/main.cpp"
         pre_clean "./output/output.cpp"
         pre_clean "./output/output.h"
+        pre_clean "./src/test/record.txt"
+        touch "./src/test/record.txt"
         
         for i in $(seq -f "%03g" 0 "$1")
         do
@@ -152,4 +157,4 @@ else
     invalid_arg_exit
 fi
 
-echo -e $RECORD >> ./src/test/record.txt
+write_out_record
