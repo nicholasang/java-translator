@@ -118,7 +118,11 @@ public class MethodOverloadResolver {
 		return type;
 	}
 
-	public String resolve(Node callExpression) {
+	public String resolveCall(Node callExpression) {
+		return resolve(callExpression).getMangledName();
+	}
+
+	public MethodScope resolve(Node callExpression) {
 		String name = callExpression.getString(2);
 		Object calledOnObject = callExpression.get(0);
 		Node calledOn;
@@ -132,7 +136,7 @@ public class MethodOverloadResolver {
 		Scope currentScope = table.getCurrentScope();
 
 		MethodScope methodScope = resolve(name, calledOn, argNode, currentScope);
-		return methodScope.getMangledName();
+		return methodScope;
 	}
 
 	public MethodScope resolve(String name, Node calledOn, Node argNode, Scope currentScope) {
