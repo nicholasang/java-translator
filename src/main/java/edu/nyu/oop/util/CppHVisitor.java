@@ -29,6 +29,8 @@ public class CppHVisitor extends xtc.tree.Visitor {
      * checks and returns the accessModifier e.g. public, private, or protected
      */
     private String checkAccess(String accessModifier) {
+        return "";
+        /*
         boolean noAccessChange = this.curAccess.equals("");
         if(noAccessChange && accessModifier.equals("public") || this.curAccess.equals(accessModifier)) {
             return "";
@@ -40,8 +42,13 @@ public class CppHVisitor extends xtc.tree.Visitor {
             return "public:\n";
         }
         case "private"   : {
-            this.curAccess = "private";
-            return "private:\n";
+<<<<<<< HEAD
+            this.curAccess = "public";
+            return "public:\n";
+=======
+            this.curAccess = "protected";
+            return "protected:\n";
+>>>>>>> c94ebc1b52028e3f3b80a8d3f4f365a56a653437
         }
         case "protected" : {
             this.curAccess = "protected";
@@ -51,6 +58,7 @@ public class CppHVisitor extends xtc.tree.Visitor {
             return "";
         }
         }
+        */
 
     }
 

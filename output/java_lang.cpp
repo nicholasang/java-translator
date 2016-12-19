@@ -171,6 +171,11 @@ namespace java {
         if (__this->__vptr->equals(__this, (Object)k)) return true;
 
         // FIXME: handle covariance of arrays
+        if(__this->__vptr->isArray(__this) && k->__vptr->isArray(k)) {
+        	Class c1 = __this->__vptr->getComponentType(__this);
+        	Class c2 = k->__vptr->getComponentType(k);
+        	if (c1->__vptr->equals(c1, (Object) c2)) return true;
+        }
 
         k = k->__vptr->getSuperclass(k);
       } while ((Class)__rt::null() != k);
@@ -201,6 +206,112 @@ namespace __rt {
     static java::lang::Object value(0);
     return value;
   }
+
+    // add Java primitives hardcoded for array specializations
+    // Template specialization for arrays of booleans.
+    template<>
+    java::lang::Class Array<bool>::__class()
+    {
+        static java::lang::Class ik =
+            new java::lang::__Class(__rt::literal("boolean"), (java::lang::Class) __rt::null(),
+                                    (java::lang::Class) __rt::null(), true);
+
+        static java::lang::Class k =
+            new java::lang::__Class(literal("[Z"),
+                                    java::lang::__Object::__class(),
+                                    ik);
+        return k;
+    }
+
+    // Template specialization for arrays of bytes.
+    template<>
+    java::lang::Class Array<int8_t>::__class()
+    {
+        static java::lang::Class ik =
+            new java::lang::__Class(__rt::literal("byte"), (java::lang::Class) __rt::null(),
+                                    (java::lang::Class) __rt::null(), true);
+
+        static java::lang::Class k =
+            new java::lang::__Class(literal("[B"),
+                                    java::lang::__Object::__class(),
+                                    ik);
+        return k;
+    }
+
+    // Template specialization for arrays of shorts.
+    template<>
+    java::lang::Class Array<int16_t>::__class()
+    {
+        static java::lang::Class ik =
+            new java::lang::__Class(__rt::literal("short"), (java::lang::Class) __rt::null(),
+                                    (java::lang::Class) __rt::null(), true);
+
+        static java::lang::Class k =
+            new java::lang::__Class(literal("[S"),
+                                    java::lang::__Object::__class(),
+                                    ik);
+        return k;
+    }
+
+    // Template specialization for arrays of longs.
+    template<>
+    java::lang::Class Array<int64_t>::__class()
+    {
+        static java::lang::Class ik =
+            new java::lang::__Class(__rt::literal("long"), (java::lang::Class) __rt::null(),
+                                    (java::lang::Class) __rt::null(), true);
+
+        static java::lang::Class k =
+            new java::lang::__Class(literal("[J"),
+                                    java::lang::__Object::__class(),
+                                    ik);
+        return k;
+    }
+
+    // Template specialization for arrays of floats.
+    template<>
+    java::lang::Class Array<float>::__class()
+    {
+        static java::lang::Class ik =
+            new java::lang::__Class(__rt::literal("float"), (java::lang::Class) __rt::null(),
+                                    (java::lang::Class) __rt::null(), true);
+
+        static java::lang::Class k =
+            new java::lang::__Class(literal("[F"),
+                                    java::lang::__Object::__class(),
+                                    ik);
+        return k;
+    }
+
+    // Template specialization for arrays of doubles.
+    template<>
+    java::lang::Class Array<double>::__class()
+    {
+        static java::lang::Class ik =
+            new java::lang::__Class(__rt::literal("double"), (java::lang::Class) __rt::null(),
+                                    (java::lang::Class) __rt::null(), true);
+
+        static java::lang::Class k =
+            new java::lang::__Class(literal("[D"),
+                                    java::lang::__Object::__class(),
+                                    ik);
+        return k;
+    }
+
+    // Template specialization for arrays of chars.
+    template<>
+    java::lang::Class Array<char>::__class()
+    {
+        static java::lang::Class ik =
+            new java::lang::__Class(__rt::literal("char"), (java::lang::Class) __rt::null(),
+                                    (java::lang::Class) __rt::null(), true);
+
+        static java::lang::Class k =
+            new java::lang::__Class(literal("[C"),
+                                    java::lang::__Object::__class(),
+                                    ik);
+        return k;
+    }
 
   // Template specialization for arrays of ints.
   template<>

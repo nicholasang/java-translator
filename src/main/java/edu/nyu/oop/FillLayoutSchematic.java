@@ -14,6 +14,8 @@ public class FillLayoutSchematic {
 
     public static LayoutSchematic objectLayoutSchematic;
 
+    public static final boolean MANGLING_IS_ON = true;
+
     public static void fillClasses(CppAst topNode) {
         List<ClassRef> classList = topNode.getClassRefs();
 
@@ -309,8 +311,10 @@ public class FillLayoutSchematic {
     }
 
     /*
+        OLD, pre __init()
      * populates the class struct using a list of methods, fields, and constructors
      */
+    /*
     private static void populateClassStruct(LayoutSchematic.ClassStruct classStruct, GNode classNode, String className) {
         List<Node> methodNodes = NodeUtil.dfsAll(classNode, "MethodDeclaration");
         List<Node> methodFields = new ArrayList<Node>();
@@ -341,6 +345,40 @@ public class FillLayoutSchematic {
             classStruct.constructorList.add(createDefaultConstructor());
         }
     }
+    */
+
+
+
+    // Buggy attempt to implement __init methods
+    private static void populateClassStruct(LayoutSchematic.ClassStruct classStruct, GNode classNode, String className) {
+        List<Node> methodNodes = NodeUtil.dfsAll(classNode, "MethodDeclaration");
+        List<Node> methodFields = new ArrayList<Node>();
+        List<Node> fieldNodes = NodeUtil.dfsAll(classNode, "FieldDeclaration");
+        List<Node> constructorNodes = NodeUtil.dfsAll(classNode, "ConstructorDeclaration");
+
+        for (Node methodNode : methodNodes) {
+            classStruct.methodList.add(createMethod((GNode) methodNode, className));
+            methodFields.addAll(NodeUtil.dfsAll(methodNode, "FieldDeclaration"));
+        }
+
+        for (Node fieldNode : fieldNodes) {
+            if (methodFields.contains(fieldNode)) {
+                continue;
+            }
+            classStruct.fieldList.addAll(createField((GNode) fieldNode));
+        }
+
+        // add default constructor and __init()
+        classStruct.constructorList.add(createDefaultConstructor());
+        classStruct.methodList.add(createDefaultInitMethod(className));
+
+        for (Node constructorNode : constructorNodes) {
+            if (!hasNoArguments((GNode) constructorNode)) {
+                classStruct.methodList.add(createInitMethod(className, (GNode) constructorNode));
+            }
+        }
+
+    }
 
     /*
      * returns the method
@@ -370,10 +408,56 @@ public class FillLayoutSchematic {
         method.parameterTypes.add(className.substring(2));
         for (int i = 0; i < parameters.size(); i++) {
             Node parameter = parameters.getNode(i);
-            method.parameterTypes.add(getType((GNode) parameter.getNode(1)));
+
+            if (MANGLING_IS_ON)
+            {
+                String type = getType((GNode) parameter.getNode(1));
+                method.parameterTypes.add(type);
+                method.name += type;
+            }
+            else
+            {
+                method.parameterTypes.add(getType((GNode) parameter.getNode(1)));
+            }
         }
 
+
+
         return method;
+    }
+
+    /*
+        creates and returns an __init method
+     */
+    private static LayoutSchematic.Method createInitMethod(String className, GNode methodNode) {
+        LayoutSchematic.Method init = new LayoutSchematic.Method();
+        init.accessModifier = "private";
+        init.returnType     = "void";
+        init.name           = "__init";
+
+        GNode parameters = (GNode) methodNode.getNode(3);
+
+        init.parameterTypes.add(className.substring(2));
+        for (int i = 0, numParams = parameters.size(); i < numParams; i++) {
+            Node parameterNode = parameters.getNode(i);
+            init.parameterTypes.add(/* paramType */ getType((GNode) parameterNode.getNode(1)));
+        }
+
+        return init;
+    }
+
+    /*
+    * returns the default __init
+    */
+    private static LayoutSchematic.Method createDefaultInitMethod(String className) {
+        LayoutSchematic.Method init = new LayoutSchematic.Method();
+        init.accessModifier = "private";
+        init.returnType     = "void";
+        init.name           = "__init";
+
+        init.parameterTypes.add(className.substring(2));
+
+        return init;
     }
 
     private static List<LayoutSchematic.Field> createField(GNode fieldNode) {

@@ -5,6 +5,7 @@ import edu.nyu.oop.util.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -102,6 +103,8 @@ public class Boot extends Tool {
             Location longLocation = new Location(workingDir + "/" + nLocation.file, nLocation.line, nLocation.column);
             n.setLocation(longLocation);
 
+            /* old
+
             //phase 1
             List<GNode> allAsts = GenerateJavaASTs.beginParse((GNode) n);
 
@@ -112,7 +115,34 @@ public class Boot extends Tool {
             new CppHVisitor().visit(headerCppAst);
 
             //phase 4 + 5
-            CppCommands.convertToCpp(allAsts);
+             CppCommands.convertToCpp(allAsts);
+
+             */
+
+            // new
+
+            List<SourceOutputCommand> commands = new ArrayList<SourceOutputCommand>();
+
+            // phase 1 - collect a list abstract syntax trees, one AST per file
+            List<GNode> allAsts = GenerateJavaASTs.beginParse((GNode) n);
+
+            // phase 2 - build and return the C++ header AST
+            CppAst headerCppAst = CppHeaderAstGenerator.generateNew(allAsts);
+
+            // (the invoker for outputting source code)
+            TranslationWriter sourceOutputter = new TranslationWriter();
+
+            // phase 3 - create and save a command to print the header source code
+            sourceOutputter.add(new SourceHeaderOutputCommand(new CppHVisitor(), headerCppAst));
+
+            // phase 4 - build the C++ implementation AST,
+            // return a list of commands to print the implementation source code
+            // (output.cpp and main.cpp)
+            sourceOutputter.addAll(CppCommands.convertToCpp(allAsts));
+
+            // execute all commands to output C++ source code
+            sourceOutputter.executeAll();
+
         }
 
         if (runtime.test("symbolTable")) {
