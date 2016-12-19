@@ -14,6 +14,8 @@ public class FillLayoutSchematic {
 
     public static LayoutSchematic objectLayoutSchematic;
 
+    public static final boolean MANGLING_IS_ON = true;
+
     public static void fillClasses(CppAst topNode) {
         List<ClassRef> classList = topNode.getClassRefs();
 
@@ -406,8 +408,20 @@ public class FillLayoutSchematic {
         method.parameterTypes.add(className.substring(2));
         for (int i = 0; i < parameters.size(); i++) {
             Node parameter = parameters.getNode(i);
-            method.parameterTypes.add(getType((GNode) parameter.getNode(1)));
+
+            if (MANGLING_IS_ON)
+            {
+                String type = getType((GNode) parameter.getNode(1));
+                method.parameterTypes.add(type);
+                method.name += type;
+            }
+            else
+            {
+                method.parameterTypes.add(getType((GNode) parameter.getNode(1)));
+            }
         }
+
+
 
         return method;
     }
